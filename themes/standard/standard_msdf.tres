@@ -1,0 +1,17 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://cbfpl0rg0rlgl"]
+
+[ext_resource type="FontFile" uid="uid://dtx4u0dbdvah8" path="res://groups/essentials/fonts/no_cache/roboto/black/msdf/roboto_black_msdf.ttf" id="1_1pwci"]
+[ext_resource type="FontFile" uid="uid://basr5vpb4nf1q" path="res://groups/essentials/fonts/no_cache/roboto/black/msdf/roboto_black_italic_msdf.ttf" id="2_7i85t"]
+[ext_resource type="FontFile" uid="uid://b7roh17fmnkxq" path="res://groups/essentials/fonts/no_cache/roboto/medium/msdf/roboto_medium_italic_msdf.ttf" id="3_l6pai"]
+[ext_resource type="FontFile" uid="uid://bt4fu1locy7dx" path="res://groups/essentials/fonts/no_cache/roboto/medium/msdf/roboto_medium_msdf.ttf" id="4_1pwci"]
+
+[resource]
+RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
+RichTextLabel/font_sizes/bold_font_size = 12
+RichTextLabel/font_sizes/bold_italics_font_size = 12
+RichTextLabel/font_sizes/italics_font_size = 12
+RichTextLabel/font_sizes/normal_font_size = 12
+RichTextLabel/fonts/bold_font = ExtResource("1_1pwci")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_7i85t")
+RichTextLabel/fonts/italics_font = ExtResource("3_l6pai")
+RichTextLabel/fonts/normal_font = ExtResource("4_1pwci")

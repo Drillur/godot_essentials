@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cnygr4pwivdv1"]
+
+[ext_resource type="Theme" uid="uid://bbsyitixspj7m" path="res://groups/essentials/themes/standard/standard.tres" id="1_uuvv5"]
+[ext_resource type="Script" uid="uid://cdqy3dn2x4ufs" path="res://groups/essentials/hud/rich_label/rich_label.gd" id="2_7d7ni"]
+
+[node name="RichLabel" type="RichTextLabel"]
+clip_contents = false
+offset_right = 51.0
+offset_bottom = 15.0
+mouse_filter = 2
+theme = ExtResource("1_uuvv5")
+bbcode_enabled = true
+text = "Label"
+fit_content = true
+script = ExtResource("2_7d7ni")

@@ -1,0 +1,66 @@
+[gd_resource type="Theme" load_steps=17 format=3 uid="uid://duqqjoa2apxpj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fm8x2"]
+bg_color = Color(1, 1, 1, 0.0588235)
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w51h6"]
+bg_color = Color(1, 1, 1, 0.0588235)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_bottom_right = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4dvoy"]
+bg_color = Color(1, 1, 1, 0.04)
+corner_radius_bottom_right = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q0o14"]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kkvkk"]
+bg_color = Color(1, 1, 1, 0.03)
+corner_radius_bottom_right = 10
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3aw7i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8tm4s"]
+draw_center = false
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_whs78"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyvgp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4dct8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_sg3sk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_piwup"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bwk4p"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hpsw7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cpe3j"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dnw0p"]
+
+[resource]
+Button/styles/disabled = SubResource("StyleBoxFlat_fm8x2")
+Button/styles/focus = SubResource("StyleBoxFlat_w51h6")
+Button/styles/hover = SubResource("StyleBoxFlat_4dvoy")
+Button/styles/normal = SubResource("StyleBoxFlat_q0o14")
+Button/styles/pressed = SubResource("StyleBoxFlat_kkvkk")
+HScrollBar/styles/scroll = SubResource("StyleBoxEmpty_3aw7i")
+Panel/styles/panel = SubResource("StyleBoxFlat_8tm4s")
+ScrollContainer/styles/panel = SubResource("StyleBoxEmpty_whs78")
+TabContainer/font_sizes/font_size = 1
+TabContainer/styles/panel = SubResource("StyleBoxEmpty_vyvgp")
+TabContainer/styles/tab_disabled = SubResource("StyleBoxEmpty_4dct8")
+TabContainer/styles/tab_focus = SubResource("StyleBoxEmpty_sg3sk")
+TabContainer/styles/tab_hovered = SubResource("StyleBoxEmpty_piwup")
+TabContainer/styles/tab_selected = SubResource("StyleBoxEmpty_bwk4p")
+TabContainer/styles/tab_unselected = SubResource("StyleBoxEmpty_hpsw7")
+TabContainer/styles/tabbar_background = SubResource("StyleBoxEmpty_cpe3j")
+VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_dnw0p")

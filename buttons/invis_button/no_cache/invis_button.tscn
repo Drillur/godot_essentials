@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bq01sk2sxisnx"]
+
+[ext_resource type="Theme" uid="uid://ch0qp5qbltmr" path="res://groups/essentials/themes/invis/invis.tres" id="1_f8jfc"]
+[ext_resource type="Script" uid="uid://cd62ksknpfry2" path="res://groups/essentials/buttons/invis_button/invis_button.gd" id="2_uy8uh"]
+
+[node name="InvisButton" type="Button"]
+custom_minimum_size = Vector2(10, 10)
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme = ExtResource("1_f8jfc")
+button_mask = 3
+script = ExtResource("2_uy8uh")
+metadata/_edit_lock_ = true
+
+[connection signal="button_up" from="." to="." method="_on_button_up"]
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="left_pressed" from="." to="." method="_play_appropriate_audio"]
+[connection signal="right_pressed" from="." to="." method="_play_appropriate_audio"]

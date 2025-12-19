@@ -1,0 +1,92 @@
+[gd_scene load_steps=8 format=3 uid="uid://bfi0uovwegdxj"]
+
+[ext_resource type="Script" uid="uid://ce4qf4j0yk7yh" path="res://groups/essentials/buttons/rich_button/rich_button.gd" id="1_pwhdq"]
+[ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://groups/essentials/themes/subtle_background.tres" id="2_n80am"]
+[ext_resource type="Texture2D" uid="uid://d5nd0gmcf7pr" path="res://groups/essentials/icons/reset/reset_16.svg" id="3_71o7q"]
+[ext_resource type="PackedScene" uid="uid://bq01sk2sxisnx" path="res://groups/essentials/buttons/invis_button/no_cache/invis_button.tscn" id="3_87imt"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://groups/essentials/hud/rich_label/no_cache/rich_label.tscn" id="4_g5ow3"]
+[ext_resource type="Theme" uid="uid://bbsyitixspj7m" path="res://groups/essentials/themes/standard/standard.tres" id="5_5dgkt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nrvo0"]
+bg_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.34902)
+
+[node name="RichButton" type="MarginContainer"]
+custom_minimum_size = Vector2(36, 36)
+offset_right = 36.0
+offset_bottom = 40.0
+focus_mode = 2
+mouse_filter = 2
+script = ExtResource("1_pwhdq")
+text = "Menu"
+
+[node name="Background" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme = ExtResource("2_n80am")
+theme_override_styles/panel = SubResource("StyleBoxFlat_nrvo0")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="IconContainer" type="Control" parent="MarginContainer/HBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBox/IconContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 0
+offset_right = 24.0
+offset_bottom = 24.0
+size_flags_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("3_71o7q")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Label" parent="MarginContainer/HBox" instance=ExtResource("4_g5ow3")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "Menu"
+autowrap_mode = 0
+
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/HBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("5_5dgkt")
+button_pressed = true
+
+[node name="InvisButton" parent="." instance=ExtResource("3_87imt")]
+layout_mode = 2
+
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="button_down" from="InvisButton" to="." method="_on_button_button_down"]
+[connection signal="button_up" from="InvisButton" to="." method="_on_button_button_up"]
+[connection signal="left_pressed" from="InvisButton" to="." method="_on_button_left_pressed"]
+[connection signal="mouse_entered" from="InvisButton" to="." method="_on_button_mouse_entered"]
+[connection signal="mouse_exited" from="InvisButton" to="." method="_on_button_mouse_exited"]

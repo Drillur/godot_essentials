@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bhe3wm14sfxho"]
+
+[ext_resource type="Script" uid="uid://dkengtpqr73cg" path="res://groups/essentials/hud/flash/flash.gd" id="1_bp24c"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dvmj0"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="MarginContainer" type="MarginContainer"]
+mouse_filter = 2
+script = ExtResource("1_bp24c")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dvmj0")
