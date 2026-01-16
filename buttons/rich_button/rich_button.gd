@@ -131,7 +131,8 @@ func _ready():
 	
 	invis_button.gui_input.connect(gui_input.emit)
 	
-	await Utility.physics()
+	if not Engine.is_editor_hint():
+		await Utility.physics()
 	
 	update_icon()
 	update_check_button_visibility()

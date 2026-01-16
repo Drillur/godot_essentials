@@ -228,7 +228,8 @@ func get_randomized_total(min_range := 0.8, max_range := 1.2) -> Big:
 func get_midpoint() -> Big:
 	if is_full() and cap_current:
 		return get_total()
-	return Big.add(get_current(), get_total()).divided_by(2)
+	var sum := Big.add(get_current(), get_total())
+	return sum.divided_by(2)
 
 
 func get_average() -> Big:

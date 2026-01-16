@@ -259,24 +259,24 @@ func is_positive() -> bool:
 	return current >= ZERO
 
 
-func is_greater_than(n) -> bool:
+func is_greater_than(n: Variant) -> bool:
 	return not is_less_than_or_equal_to(n)
 
 
-func is_greater_than_or_equal_to(n) -> bool:
+func is_greater_than_or_equal_to(n: Variant) -> bool:
 	return not is_less_than(n)
 
 
-func is_equal_to(n) -> bool:
+func is_equal_to(n: Variant) -> bool:
 	assert(VALID_COMPARISON_TYPES.has(typeof(n)), INVALID_TYPE_MESSAGE)
 	return is_equal_approx(current, n)
 
 
-func is_less_than_or_equal_to(n) -> bool:
+func is_less_than_or_equal_to(n: Variant) -> bool:
 	return is_less_than(n) or is_equal_to(n)
 
 
-func is_less_than(n) -> bool:
+func is_less_than(n: Variant) -> bool:
 	assert(VALID_COMPARISON_TYPES.has(typeof(n)), INVALID_TYPE_MESSAGE)
 	return current < n
 

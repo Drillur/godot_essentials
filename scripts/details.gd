@@ -120,7 +120,7 @@ func get_icon_and_title() -> String:
 
 
 func get_icon_and_colored_title() -> String:
-		return icon_and_colored_title
+	return icon_and_colored_title
 
 
 func get_icon_and_name() -> String:

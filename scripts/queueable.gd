@@ -4,8 +4,10 @@ extends RefCounted
 
 signal method_called
 
-enum CooldownType {PROCESS, PHYSICS_PROCESS, DURATION}
-enum QueueType {NODE, RESOURCE}
+enum CooldownType { PROCESS, PHYSICS_PROCESS, DURATION }
+enum QueueType { NODE, RESOURCE }
+
+static var list: Array[Queueable]
 
 var done := LoudBool.new(false)
 
@@ -41,10 +43,43 @@ static func new_node_queueable(_node: CanvasItem, _cooldown_type := CooldownType
 	return queue
 
 
+static func new_permanent_node_queueable(
+		_method: Callable,
+		_signals: Array[Signal],
+		_node: CanvasItem,
+		_cooldown_type := CooldownType.PROCESS,
+		_cooldown_duration := -1.0
+	) -> void:
+	
+	var queue := await new_node_queueable(_node, _cooldown_type, _cooldown_duration)
+	queue.method = _method
+	for sig: Signal in _signals:
+		sig.connect(queue.call_method)
+	list.append(queue)
+	await Main.await_done()
+	queue.call_method()
+
+
 static func new_resource_queueable(_cooldown_type := CooldownType.PROCESS, _cooldown_duration := -1.0) -> Queueable:
 	var queue := Queueable.new(QueueType.RESOURCE, _cooldown_type, _cooldown_duration)
 	queue.done.set_true()
 	return queue
+
+
+static func new_permanent_resource_queueable(
+		_method: Callable,
+		_signals: Array[Signal],
+		_cooldown_type := CooldownType.PROCESS,
+		_cooldown_duration := -1.0
+	) -> void:
+	
+	var queue := new_resource_queueable(_cooldown_type, _cooldown_duration)
+	queue.method = _method
+	for sig: Signal in _signals:
+		sig.connect(queue.call_method)
+	list.append(queue)
+	await Main.await_done()
+	queue.call_method()
 
 
 ## Creates a Queueable with CooldownType.DURATION: 1.0

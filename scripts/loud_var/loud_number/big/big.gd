@@ -178,7 +178,7 @@ static func divide(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	_y = to_big(_y)
 	
-	if _y.mantissa > -MANTISSA_PRECISION and _y.mantissa < MANTISSA_PRECISION:
+	if _y.mantissa == 0.0:
 		printerr("Big Error: Divide by ZERO. %se%s" % [_y.mantissa, _y.exponent])
 		return _x
 	

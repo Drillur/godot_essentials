@@ -30,17 +30,16 @@ func _ready() -> void:
 	tree = get_tree()
 	viewport = get_viewport()
 	window = viewport.get_window()
+	
+	cache_class_paths()
+	_tick_seconds()
 
-	Kit.signals.mods_loaded.connect(_cache_class_paths)
-	_cache_class_paths()
 
-
-func _cache_class_paths() -> void:
+func cache_class_paths() -> void:
 	for x: Dictionary in ProjectSettings.get_global_class_list():
 		if class_data.has(x["class"]):
 			continue
 		class_data[x["class"]] = x["path"]
-	Kit.emit_classes_changed()
 
 
 #endregion
@@ -81,6 +80,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _tick_seconds() -> void:
+	await timer(1.0)
 	while true:
 		await timer(1.0)
 		one_second.emit()
@@ -93,9 +93,9 @@ func _tick_seconds() -> void:
 #region Await
 
 
-func timer(time: float) -> void:
-	time = maxf(time, 0.05)
-	await tree.create_timer(time).timeout
+func timer(_duration: float) -> void:
+	_duration = maxf(_duration, 0.05)
+	await tree.create_timer(_duration).timeout
 
 
 func physics(_count: int = 1) -> void:
@@ -303,7 +303,7 @@ func get_color_from_string(x: String) -> Color:
 	if x.begins_with("#"):
 		return Color.html(x)
 	
-	return Color.BLACK
+	return Color.NAVY_BLUE
 
 
 func get_random_color() -> Color:

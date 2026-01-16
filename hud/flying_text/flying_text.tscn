@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cbb6mvlbhyco6"]
 
 [ext_resource type="Script" uid="uid://bwr64b0fetxhu" path="res://groups/essentials/hud/flying_text/flying_text.gd" id="1_84t0v"]
-[ext_resource type="Texture2D" uid="uid://cuxbfyd31bjd4" path="res://groups/currency/icons/stage 1/copper_ore.png" id="2_qju5n"]
+[ext_resource type="Texture2D" uid="uid://cuxbfyd31bjd4" path="res://groups/currency/icons/stage_1/copper_ore.png" id="2_qju5n"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://groups/essentials/hud/rich_label/no_cache/rich_label.tscn" id="3_rq4j7"]
 
 [node name="FlyingText" type="Control"]

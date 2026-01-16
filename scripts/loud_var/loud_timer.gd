@@ -245,7 +245,7 @@ func get_wait_time() -> float:
 
 
 func get_time_left() -> float:
-	if running.is_false():
+	if running.is_false() or not timer:
 		return 0.0
 	return timer.time_left
 

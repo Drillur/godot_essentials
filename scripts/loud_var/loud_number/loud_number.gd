@@ -18,9 +18,8 @@ const MIN_INT := -9223372036854775808
 const MAX_FLOAT := 1.79769e308
 const MIN_FLOAT := -1.79769e308
 const VALID_COMPARISON_TYPES: Array[Variant.Type] = [
-	TYPE_FLOAT,
-	TYPE_INT,
-]
+		TYPE_FLOAT,
+		TYPE_INT]
 const INVALID_TYPE_MESSAGE: String = "n must be int or float"
 const STANDARD_SUFFIXES: PackedStringArray = [
 	"",
@@ -61,6 +60,135 @@ var text_requires_update := true:
 	set = _set_text_requires_update
 
 
+#region Static
+
+
+#region Format Number
+
+
+static func format_number(value: Variant, override_decimals: int = -1) -> String:
+	if is_zero_approx(value):
+		return "0"
+	
+	var _sign: float = signf(value)
+	value = abs(value) # not absi() or absf() because value is Variant
+	var floored_value: int = floori(value)
+	
+	return (
+			Big.new(value * _sign).get_text() if floored_value >= 1e6
+			else _format_number_gte_1e5(value, _sign) if floored_value >= 1e5
+			else _format_number_1000s(value, _sign) if floored_value >= 1000
+			else String.num(value * _sign, 0) if value is int
+			else _format_small_number(value, _sign, override_decimals))
+
+
+static func _format_number_gte_1e5(value: Variant, _sign: float) -> String:
+	var output := ""
+	var i: int = value
+	var sign_text: String = "-" if _sign < 0 else ""
+	
+	while i >= 1000: 
+		output = ",%03d%s" % [i % 1000, output]
+		i /= 1000
+	
+	return "%s%s%s" % [sign_text, i, output]
+
+
+static func _format_number_1000s(value: Variant, _sign: float) -> String:
+	var output: String = ""
+	var i: int = value
+	var sign_text: String = "-" if _sign < 0 else ""
+	
+	while i >= 1000: 
+		output = ",%03d%s" % [i % 1000, output]
+		i /= 1000
+	
+	return "%s%s%s" % [sign_text, i, output]
+
+
+static func _format_small_number(value: Variant, _sign: float, override_decimals: int) -> String:
+	# Log10 of value (floored) (-0.35 -> -1 | 2.82 -> 2)
+	var floor_log: int = floori(log(value) / LOG_10)
+	
+	var decimals: int = (
+			override_decimals if override_decimals >= 0
+			else 0 if (
+					floor_log >= 1
+					or is_equal_approx(value, int(value))
+					or floor_log <= -6)
+			else absi(floor_log) + 2)
+	
+	return String.num(value * _sign, decimals)
+
+
+#endregion
+
+
+## Formats a percent float (0.0 to >= 1.0)
+static func format_percent(percent: float) -> String:
+	if percent < 0.0:
+		Log.warn("percent was negative (", percent, ")")
+		percent = 0.0
+	
+	percent *= 100
+	var floor_log: int = floori(log(percent) / LOG_10)
+	
+	# Huge percent
+	if floor_log >= 6:
+		return Big.new(percent).get_text() + "%"
+	
+	# Very small % to 100%
+	var decimals: int = (
+			0 if (
+				floor_log >= 1 # 10.0 to 100+
+				or is_equal_approx(percent, int(percent))
+				or floor_log <= -6)
+			else absi(floor_log) + 1)
+	
+	return String.num(percent, decimals) + "%"
+
+
+static func format_distance(distance: int) -> String:
+	# Meters
+	if distance < 1000:
+		return str(distance) + "m"
+	
+	# Kilometers
+	var kilometers := float(distance) / 1000
+	if kilometers < 1000:
+		if kilometers < 10:
+			return String.num(kilometers, 1) + "km"
+		return str(ceilf(kilometers)) + "km"
+	
+	# Megameters
+	var megameters := kilometers / 1000
+	if megameters < 1000:
+		if megameters < 10:
+			return String.num(megameters, 1) + "Mm"
+		return str(ceilf(megameters)) + "Mm"
+	
+	return "??? meters"
+
+
+static func factorial(n: int) -> int:
+	if n <= 1:
+		return 1
+	
+	var result: int = n
+	for x in range(n - 1, 1, -1):
+		result *= x
+	
+	return result
+
+
+static func binomial_coefficient(n: int, k: int) -> float:
+	return float(factorial(n)) / (factorial(k) * factorial(n - k))
+
+
+#endregion
+
+
+
 #region Init
 
 
@@ -68,11 +196,11 @@ func loud_number_init() -> void:
 	if initialized:
 		return
 	initialized = true
-	Settings.notation_changed.connect(
-		func():
+	if Engine.is_editor_hint():
+		print_stack()
+	Settings.notation_changed.connect(func():
 			text_requires_update = true
-			changed.emit()
-	)
+			changed.emit())
 	changed.disconnect(loud_number_init)
 
 
@@ -202,127 +330,12 @@ func clear_copycat() -> void:
 #endregion
 
 
-#region Static
+#region Region
 
 
-#region Format Number
-
-
-static func format_number(value: Variant, override_decimals: int = -1) -> String:
-	if is_zero_approx(value):
-		return "0"
-	
-	var _sign: float = signf(value)
-	value = abs(value) # not absi() or absf() because value is Variant
-	var floored_value: int = floori(value)
-	
-	return (
-			Big.new(value * _sign).get_text() if floored_value >= 1e6
-			else _format_number_gte_1e5(value, _sign) if floored_value >= 1e5
-			else _format_number_1000s(value, _sign) if floored_value >= 1000
-			else String.num(value * _sign, 0) if value is int
-			else _format_small_number(value, _sign, override_decimals))
-
-
-static func _format_number_gte_1e5(value: Variant, _sign: float) -> String:
-	var output := ""
-	var i: int = value
-	var sign_text: String = "-" if _sign < 0 else ""
-	
-	while i >= 1000: 
-		output = ",%03d%s" % [i % 1000, output]
-		i /= 1000
-	
-	return "%s%s%s" % [sign_text, i, output]
-
-
-static func _format_number_1000s(value: Variant, _sign: float) -> String:
-	var output: String = ""
-	var i: int = value
-	var sign_text: String = "-" if _sign < 0 else ""
-	
-	while i >= 1000: 
-		output = ",%03d%s" % [i % 1000, output]
-		i /= 1000
-	
-	return "%s%s%s" % [sign_text, i, output]
-
-
-static func _format_small_number(value: Variant, _sign: float, override_decimals: int) -> String:
-	# Log10 of value (floored) (-0.35 -> -1 | 2.82 -> 2)
-	var floor_log: int = floori(log(value) / LOG_10)
-	
-	var decimals: int = (
-			override_decimals if override_decimals >= 0
-			else 0 if (
-					floor_log >= 1
-					or is_equal_approx(value, int(value))
-					or floor_log <= -6)
-			else absi(floor_log) + 2)
-	
-	return String.num(value * _sign, decimals)
-
-
-#endregion
-
-
-## Formats a percent float (0.0 to >= 1.0)
-static func format_percent(percent: float) -> String:
-	assert(percent >= 0.0, "percent must be positive")
-	
-	percent *= 100
-	var floor_log: int = floori(log(percent) / LOG_10)
-	
-	# Huge percent
-	if floor_log >= 6:
-		return Big.new(percent).get_text() + "%"
-	
-	# Very small % to 100%
-	var decimals: int = (
-			0 if (
-				floor_log >= 1 # 10.0 to 100+
-				or is_equal_approx(percent, int(percent))
-				or floor_log <= -6)
-			else absi(floor_log) + 1)
-	
-	return String.num(percent, decimals) + "%"
-
-
-static func format_distance(distance: int) -> String:
-	# Meters
-	if distance < 1000:
-		return str(distance) + "m"
-	
-	# Kilometers
-	var kilometers := float(distance) / 1000
-	if kilometers < 1000:
-		if kilometers < 10:
-			return String.num(kilometers, 1) + "km"
-		return str(ceilf(kilometers)) + "km"
-	
-	# Megameters
-	var megameters := kilometers / 1000
-	if megameters < 1000:
-		if megameters < 10:
-			return String.num(megameters, 1) + "Mm"
-		return str(ceilf(megameters)) + "Mm"
-	
-	return "??? meters"
-
-
-static func factorial(n: int) -> int:
-	if n <= 1:
-		return 1
-	
-	var result: int = n
-	for x in range(n - 1, 1, -1):
-		result *= x
-	
-	return result
-
-
-static func binomial_coefficient(n: int, k: int) -> float:
-	return float(factorial(n)) / (factorial(k) * factorial(n - k))
+func report() -> void:
+	Log.pr("Current:", get_text())
+	book.report()
 
 
 #endregion

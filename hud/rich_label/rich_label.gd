@@ -384,12 +384,9 @@ func _update_text_from_value() -> void:
 	else:
 		# NOTE - If value is a Big, this must be -1
 		match custom_decimal_places:
-			-1:
-				_set_text(value.get_text())
-			0:
-				_set_text(str(roundi(value.val())))
-			_:
-				_set_text(str(snappedf(value.val(), 1.0 / (10 ** custom_decimal_places))))
+			-1: _set_text(value.get_text())
+			0: _set_text(str(roundi(value.val())))
+			_: _set_text(str(snappedf(value.val(), 1.0 / (10 ** custom_decimal_places))))
 	
 	if flash_on_changed:
 		await Utility.physics(2)

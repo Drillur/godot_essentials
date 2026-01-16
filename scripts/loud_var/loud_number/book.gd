@@ -31,6 +31,20 @@ var powerers: Array[Resource]
 var book := {}
 
 
+#region Static
+
+
+static func is_category_multiplicative(_category: Book.Category) -> bool:
+	return _category in [Book.Category.MULTIPLIED, Book.Category.DIVIDED]
+
+
+static func is_category_additive(_category: Book.Category) -> bool:
+	return _category in [Book.Category.ADDED, Book.Category.SUBTRACTED]
+
+
+#endregion
+
+
 #region Init
 
 
@@ -66,7 +80,9 @@ func _init(_type: Type):
 				Book.Category.PENDING: LoudDict._Big.new({"multiplicative": false}),
 			}
 			sync = func(base) -> Big:
-				var result: Big = Big.add(base, get_added())
+				var result: Big = Big.new(base)
+				var added: Big = get_added()
+				result.plus_equals(added)
 				result.minus_equals(get_subtracted())
 				result.times_equals(get_multiplied())
 				result.divided_by_equals(get_divided())
@@ -216,16 +232,44 @@ func get_added():
 	return book[Book.Category.ADDED].sum
 
 
+func get_added_text() -> String:
+	var sum: Variant = get_added()
+	if type == Type.INT or type == Type.FLOAT:
+		return LoudNumber.format_number(sum)
+	return sum.get_text()
+
+
 func get_subtracted():
 	return book[Book.Category.SUBTRACTED].sum
+
+
+func get_subtracted_text() -> String:
+	var sum: Variant = get_subtracted()
+	if type == Type.INT or type == Type.FLOAT:
+		return LoudNumber.format_number(sum)
+	return sum.get_text()
 
 
 func get_multiplied():
 	return book[Book.Category.MULTIPLIED].sum
 
 
+func get_multiplied_text() -> String:
+	var sum: Variant = get_multiplied()
+	if type == Type.INT or type == Type.FLOAT:
+		return LoudNumber.format_number(sum)
+	return sum.get_text()
+
+
 func get_divided():
 	return book[Book.Category.DIVIDED].sum
+
+
+func get_divided_text() -> String:
+	var sum: Variant = get_divided()
+	if type == Type.INT or type == Type.FLOAT:
+		return LoudNumber.format_number(sum)
+	return sum.get_text()
 
 
 func get_pending():
@@ -236,12 +280,14 @@ func get_added_from_source(_source: Variant) -> Variant:
 	return book[Book.Category.ADDED].get_value(_source)
 
 
-static func is_category_multiplicative(_category: Book.Category) -> bool:
-	return _category in [Book.Category.MULTIPLIED, Book.Category.DIVIDED]
-
-
-static func is_category_additive(_category: Book.Category) -> bool:
-	return _category in [Book.Category.ADDED, Book.Category.SUBTRACTED]
+func report() -> void:
+	Log.prn("Added:", get_added_text(), book[Book.Category.ADDED].data,
+		"\nMultiplied:", get_multiplied_text(), book[Book.Category.MULTIPLIED].data
+	)
+	Log.prn(
+		"Subtracted:", get_subtracted_text(), book[Book.Category.SUBTRACTED].data,
+		"\nDivided:", get_divided_text(), book[Book.Category.DIVIDED].data,
+	)
 
 
 #endregion
