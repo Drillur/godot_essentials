@@ -96,7 +96,7 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true, _flash := false
 		else:
 			update = func():
 				_node.visible = is_false()
-	_node.tree_exiting.connect(func(): changed.disconnect(update))
+	_node.tree_exiting.connect(changed.disconnect.bind(update))
 	changed.connect(update)
 	update.call()
 

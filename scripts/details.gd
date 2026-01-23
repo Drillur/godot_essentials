@@ -4,8 +4,11 @@ extends RefCounted
 
 var name: String = "": ## A setter/getter var for details_name
 	set = _set_name, get = _get_name
+var brief_name: String = "":
+	set = _set_brief_name, get = _get_brief_name
 
 var details_name := DetailsName.new()
+var details_brief_name := DetailsBriefName.new()
 var icon := DetailsIcon.new()
 var color := DetailsColor.new()
 var title := DetailsTitle.new()
@@ -14,6 +17,7 @@ var icon_and_name: String
 var icon_and_title: String
 var icon_and_colored_title: String
 var icon_and_colored_name: String
+var icon_and_colored_brief_name: String
 var description: String
 
 
@@ -45,6 +49,14 @@ func _value_set() -> void:
 		if icon.is_set and color.is_set:
 			icon_and_colored_title = icon.text + " [color=#" + color.bright_color.to_html() + "]%s[/color]" % title.text
 	
+	if details_brief_name.is_set:
+		if color.is_set:
+			details_brief_name.colored_text = color.text % details_brief_name.text
+		
+		if color.is_set and icon.is_set:
+			icon_and_colored_brief_name = "%s [color=#%s]%s[/color]" % [
+					icon.text, color.bright_color.to_html(), details_brief_name.text]
+	
 	if details_name.is_set:
 		if color.is_set:
 			details_name.colored_text = color.text % details_name.text
@@ -55,7 +67,8 @@ func _value_set() -> void:
 			icon_and_name = icon.text + " " + details_name.text
 		
 		if color.is_set and icon.is_set:
-			icon_and_colored_name = icon.text + " [color=#" + color.bright_color.to_html() + "]%s[/color]" % details_name.text
+			icon_and_colored_name = "%s [color=#%s]%s[/color]" % [
+					icon.text, color.bright_color.to_html(), details_name.text]
 
 
 func set_color(_color: Color) -> void:
@@ -86,6 +99,13 @@ func set_icon(_icon: Texture2D, _is_colored: bool = true) -> void:
 func _set_name(_name: String) -> void:
 	details_name.is_set = true
 	details_name.text = _name
+
+
+func _set_brief_name(val: String) -> void:
+	if val.is_empty():
+		return
+	details_brief_name.is_set = true
+	details_brief_name.text = val
 
 
 func set_title(_title: String) -> void:
@@ -129,6 +149,12 @@ func get_icon_and_name() -> String:
 
 func _get_name() -> String:
 	return details_name.text
+
+
+func _get_brief_name() -> String:
+	if not details_brief_name.is_set:
+		return _get_name()
+	return details_brief_name.text
 
 
 func get_title() -> String:
@@ -177,6 +203,12 @@ func get_icon_and_colored_plural_name() -> String:
 
 func get_icon_and_plural_name() -> String:
 	return "%s %s" % [get_icon_text(), get_plural_name()]
+
+
+func get_icon_and_colored_brief_name() -> String:
+	if not details_brief_name.is_set:
+		return icon_and_colored_name
+	return icon_and_colored_brief_name
 
 
 func is_color_set() -> bool:
@@ -241,6 +273,10 @@ class DetailsName extends DetailsObject:
 			plural = val
 			emit_changed()
 	var colored_plural := ""
+	var colored_text := ""
+
+
+class DetailsBriefName extends DetailsObject:
 	var colored_text := ""
 
 
