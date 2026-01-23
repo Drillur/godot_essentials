@@ -145,12 +145,15 @@ func recalculate_sum() -> void:
 
 
 func are_values_equal(a: Variant, b: Variant) -> bool:
-	var a_type := typeof(a)
-	var b_type := typeof(b)
-	if a_type == TYPE_INT or a_type == TYPE_FLOAT:
-		if b_type == TYPE_INT or b_type == TYPE_FLOAT:
-			return is_equal_approx(a, b)
-	return b.is_equal_to(a)
+	var a_type: int = typeof(a)
+	if not (a_type == TYPE_INT or a_type == TYPE_FLOAT):
+		return a.is_equal_to(b)
+		
+	var b_type: int = typeof(b)
+	if not (b_type == TYPE_INT or b_type == TYPE_FLOAT):
+		return b.is_equal_to(a)
+	
+	return is_equal_approx(a, b)
 
 
 func add(key: Variant, value: Variant) -> void:
