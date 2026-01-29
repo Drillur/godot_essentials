@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=37 format=3 uid="uid://bbsyitixspj7m"]
+[gd_resource type="Theme" format=3 uid="uid://bbsyitixspj7m"]
 
 [ext_resource type="FontFile" uid="uid://cubavfw1lomep" path="res://groups/essentials/fonts/no_cache/roboto/black/roboto_black.ttf" id="1_mu6ik"]
 [ext_resource type="FontFile" uid="uid://d2cepijgbnmb1" path="res://groups/essentials/fonts/no_cache/roboto/black/roboto_black_italic.ttf" id="2_da8xq"]
