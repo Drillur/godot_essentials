@@ -12,7 +12,7 @@ signal decreased(amount)
 signal number_changed(number)
 signal text_changed
 
-const LOG_10: float = log(10)
+const NATURAL_LOG: float = log(10)
 const MAX_INT := 9223372036854775807
 const MIN_INT := -9223372036854775808
 const MAX_FLOAT := 1.79769e308
@@ -108,7 +108,7 @@ static func _format_number_1000s(value: Variant, _sign: float) -> String:
 
 static func _format_small_number(value: Variant, _sign: float, override_decimals: int) -> String:
 	# Log10 of value (floored) (-0.35 -> -1 | 2.82 -> 2)
-	var floor_log: int = floori(log(value) / LOG_10)
+	var floor_log: int = floori(log(value) / NATURAL_LOG)
 	
 	var decimals: int = (
 			override_decimals if override_decimals >= 0
@@ -131,7 +131,7 @@ static func format_percent(percent: float) -> String:
 		percent = 0.0
 	
 	percent *= 100
-	var floor_log: int = floori(log(percent) / LOG_10)
+	var floor_log: int = floori(log(percent) / NATURAL_LOG)
 	
 	# Huge percent
 	if floor_log >= 6:
@@ -183,6 +183,10 @@ static func factorial(n: int) -> int:
 
 static func binomial_coefficient(n: int, k: int) -> float:
 	return float(factorial(n)) / (factorial(k) * factorial(n - k))
+
+
+static func log10(n: float) -> float:
+	return log(n) / NATURAL_LOG
 
 
 #endregion

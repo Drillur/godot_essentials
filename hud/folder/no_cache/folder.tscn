@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://cfsx8xs3ojigj"]
+[gd_scene format=3 uid="uid://cfsx8xs3ojigj"]
 
 [ext_resource type="Script" uid="uid://brh8d62wr0jfp" path="res://groups/essentials/hud/folder/folder.gd" id="1_bpdvy"]
 [ext_resource type="PackedScene" uid="uid://bq01sk2sxisnx" path="res://groups/essentials/buttons/invis_button/no_cache/invis_button.tscn" id="2_m84jn"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://groups/essentials/hud/rich_label/no_cache/rich_label.tscn" id="3_kak2e"]
+[ext_resource type="Texture2D" uid="uid://bjrwcsrkea4lp" path="res://groups/upgrade/upgrade_tree/stage_1/unique/tree_1unique.png" id="3_m84jn"]
+[ext_resource type="Texture2D" uid="uid://ca7587w1g2bcy" path="res://groups/essentials/icons/arrows/arrow_s_line/arrow_s_line_up.png" id="5_kak2e"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw8ca"]
 draw_center = false
@@ -22,41 +24,38 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6fybl"]
-load_path = "res://.godot/imported/arrow-down-s-line.png-9fe9df91cb536052baabad9dc4fb05d3.ctex"
-
-[node name="Folder" type="MarginContainer"]
+[node name="Folder" type="MarginContainer" unique_id=1308126862]
 offset_right = 449.0
 offset_bottom = 56.0
 size_flags_horizontal = 4
 script = ExtResource("1_bpdvy")
 is_open = true
 
-[node name="Shadow" type="Panel" parent="."]
+[node name="Shadow" type="Panel" parent="." unique_id=2470114]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jw8ca")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=1574591071]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jeci1")
 
-[node name="BottomButton" parent="." instance=ExtResource("2_m84jn")]
+[node name="BottomButton" parent="." unique_id=1244325111 instance=ExtResource("2_m84jn")]
 custom_minimum_size = Vector2(10, 8)
 layout_mode = 2
 size_flags_vertical = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2031284282]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 metadata/_edit_lock_ = true
 
-[node name="Header" type="MarginContainer" parent="VBoxContainer"]
+[node name="Header" type="MarginContainer" parent="VBoxContainer" unique_id=805506680]
 layout_mode = 2
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Header"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Header" unique_id=492341167]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 16
@@ -65,41 +64,53 @@ theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 metadata/_edit_lock_ = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header/MarginContainer" unique_id=2090979388]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 16
 metadata/_edit_lock_ = true
 
-[node name="HeaderLabel" parent="VBoxContainer/Header/MarginContainer/HBoxContainer" instance=ExtResource("3_kak2e")]
+[node name="IconTextureRect" type="TextureRect" parent="VBoxContainer/Header/MarginContainer/HBoxContainer" unique_id=514037332]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_m84jn")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="HeaderLabel" parent="VBoxContainer/Header/MarginContainer/HBoxContainer" unique_id=382753130 instance=ExtResource("3_kak2e")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-text = "Folder"
+text = "[b]Folder"
 autowrap_mode = 0
 autowrap = false
 
-[node name="ArrowTextureRect" type="TextureRect" parent="VBoxContainer/Header/MarginContainer/HBoxContainer"]
+[node name="ArrowTextureRect" type="TextureRect" parent="VBoxContainer/Header/MarginContainer/HBoxContainer" unique_id=273495310]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 10
 mouse_filter = 2
-texture = SubResource("CompressedTexture2D_6fybl")
+texture = ExtResource("5_kak2e")
 stretch_mode = 3
 metadata/_edit_lock_ = true
 
-[node name="HeaderButton" parent="VBoxContainer/Header" instance=ExtResource("2_m84jn")]
+[node name="HeaderButton" parent="VBoxContainer/Header" unique_id=954744943 instance=ExtResource("2_m84jn")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ContentContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="ContentContainer" type="MarginContainer" parent="VBoxContainer" unique_id=753841040]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 metadata/_edit_lock_ = true
 
-[node name="Content" type="MarginContainer" parent="VBoxContainer/ContentContainer"]
+[node name="Content" type="MarginContainer" parent="VBoxContainer/ContentContainer" unique_id=1080790305]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3

@@ -46,7 +46,7 @@ static func normalize(_big: Big) -> void:
 	_big.mantissa = absf(_big.mantissa)
 	
 	if _big.mantissa < 1.0 or _big.mantissa >= 10.0:
-		var diff: int = floor(log10(_big.mantissa))
+		var diff: int = floor(LoudNumber.log10(_big.mantissa))
 		if diff > -10 and diff < 248:
 			var div := 10.0 ** diff
 			if div > MANTISSA_PRECISION:
@@ -245,7 +245,7 @@ static func power(_x: Variant, _y: Variant) -> Big:
 		# a bit slower, still supports floats
 		var newExponent: int = int(temp)
 		var residue: float = temp - newExponent
-		newMantissa = 10 ** (_y * Big.log10(result.mantissa) + residue)
+		newMantissa = 10 ** (_y * LoudNumber.log10(result.mantissa) + residue)
 		if newMantissa != INF and newMantissa != -INF:
 			result.mantissa = newMantissa
 			result.exponent = newExponent
@@ -349,10 +349,6 @@ static func get_min(_x: Variant, _y: Variant) -> Big:
 static func get_max(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	return _x if _x.is_greater_than(_y) else to_big(_y)
-
-
-static func log10(_x: float) -> float:
-	return log(_x) / LoudNumber.LOG_10
 
 
 static func delta(_x: Variant, _y: Variant) -> Big:
@@ -470,12 +466,16 @@ func to_float() -> float:
 func to_log() -> float:
 	if is_zero():
 		return 0.0
-	var result: float = float(exponent) + log10(mantissa)
+	var result: float = float(exponent) + LoudNumber.log10(mantissa)
 	return result
 
 
+## Multiply the common log of this Big by log(10), resulting in ln(this Big)
+## In GDScript, log(10) = ~2.302585
+## Natural log of x: log(x)
+## Common log of x: log(x) / log(10)
 func to_natural_log() -> float:
-	return log(to_float())
+	return to_log() * LoudNumber.NATURAL_LOG
 
 
 func to_int() -> int:
@@ -668,7 +668,7 @@ func to_logarithmic_notation() -> String:
 	if exponent >= 100:
 		return "e" + Big.new(exponent).get_text()
 	
-	var log_value: float = exponent + log10(absf(mantissa))
+	var log_value: float = exponent + LoudNumber.log10(absf(mantissa))
 	var decimals: int = 2 if log_value < 10 else 1
 	
 	var result := "e" + LoudNumber.format_number(log_value, decimals)
@@ -716,7 +716,7 @@ func to_plain_scientific() -> String:
 
 
 # func logN(base) -> float:
-# 	return (2.302585092994046 / log(base)) * (exponent + Big.log10(mantissa))
+# 	return (2.302585092994046 / log(base)) * (exponent + Big.LoudNumber.log10(mantissa))
 
 
 # func pow10(value: int) -> void:

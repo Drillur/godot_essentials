@@ -24,7 +24,6 @@ enum AttachType {
 	set = _set_font_size
 @export var prepended_text: String = ""
 @export var appended_text: String = ""
-@export var flash_on_changed := false
 @export_group("Time Mode")
 @export var time_mode := false
 @export var short_time_text := false
@@ -387,10 +386,6 @@ func _update_text_from_value() -> void:
 			-1: _set_text(value.get_text())
 			0: _set_text(str(roundi(value.val())))
 			_: _set_text(str(snappedf(value.val(), 1.0 / (10 ** custom_decimal_places))))
-	
-	if flash_on_changed:
-		await Utility.physics(2)
-		Flash.flash(self, color)
 
 
 func _update_text__percent_mode() -> void:
