@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bk70jhtjlp65b"
-path="res://.godot/imported/dot.png-43dcf133693f553a297c729faa8da100.ctex"
+path="res://.godot/imported/dot.png-7c7560ae6d681a2f0b72643be336b452.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/dot.png"
-dest_files=["res://.godot/imported/dot.png-43dcf133693f553a297c729faa8da100.ctex"]
+source_file="res://main/godot_essentials/icons/dot.png"
+dest_files=["res://.godot/imported/dot.png-7c7560ae6d681a2f0b72643be336b452.ctex"]
 
 [params]
 

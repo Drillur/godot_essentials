@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://rqynxq2sfm0a"
-path="res://.godot/imported/progress-2-line.svg-a356d45bae9f5ba4830114c366468d29.ctex"
+path="res://.godot/imported/progress-2-line.svg-e15c4de1dc82ced59ac48f087ae5d538.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/progress/progress-2-line.svg"
-dest_files=["res://.godot/imported/progress-2-line.svg-a356d45bae9f5ba4830114c366468d29.ctex"]
+source_file="res://main/godot_essentials/icons/progress/progress-2-line.svg"
+dest_files=["res://.godot/imported/progress-2-line.svg-e15c4de1dc82ced59ac48f087ae5d538.ctex"]
 
 [params]
 

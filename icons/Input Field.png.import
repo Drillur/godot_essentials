@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bym56spjboovl"
-path="res://.godot/imported/Input Field.png-5f422d5f75fd6cd62abbae37a73e0fd1.ctex"
+path="res://.godot/imported/Input Field.png-d5b6b2399d0fe63f88810f535124cd27.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/Input Field.png"
-dest_files=["res://.godot/imported/Input Field.png-5f422d5f75fd6cd62abbae37a73e0fd1.ctex"]
+source_file="res://main/godot_essentials/icons/Input Field.png"
+dest_files=["res://.godot/imported/Input Field.png-d5b6b2399d0fe63f88810f535124cd27.ctex"]
 
 [params]
 
