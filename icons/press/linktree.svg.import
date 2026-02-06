@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://t417dkq21umq"
-path="res://.godot/imported/linktree.svg-42b5f3a7c494ec1f6743876340ca6fb5.ctex"
+path="res://.godot/imported/linktree.svg-301c4b20ffec395a8ea148f048b5ed71.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/press/linktree.svg"
-dest_files=["res://.godot/imported/linktree.svg-42b5f3a7c494ec1f6743876340ca6fb5.ctex"]
+source_file="res://main/godot_essentials/icons/press/linktree.svg"
+dest_files=["res://.godot/imported/linktree.svg-301c4b20ffec395a8ea148f048b5ed71.ctex"]
 
 [params]
 

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dfsf0vhx8ip5a"
-path="res://.godot/imported/Skull.png-6206420e77be4648e0d9f862b7366eb9.ctex"
+path="res://.godot/imported/Skull.png-ef95966d04baed0f986dcdb31411ff52.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/Skull.png"
-dest_files=["res://.godot/imported/Skull.png-6206420e77be4648e0d9f862b7366eb9.ctex"]
+source_file="res://main/godot_essentials/icons/Skull.png"
+dest_files=["res://.godot/imported/Skull.png-ef95966d04baed0f986dcdb31411ff52.ctex"]
 
 [params]
 

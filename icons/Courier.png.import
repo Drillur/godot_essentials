@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://xxksvtjqggp8"
-path="res://.godot/imported/Courier.png-b66614e88b3342c68dbc5812b8f408ab.ctex"
+path="res://.godot/imported/Courier.png-a98dd0cdcb5b652b4c610d6542c7d69d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/Courier.png"
-dest_files=["res://.godot/imported/Courier.png-b66614e88b3342c68dbc5812b8f408ab.ctex"]
+source_file="res://main/godot_essentials/icons/Courier.png"
+dest_files=["res://.godot/imported/Courier.png-a98dd0cdcb5b652b4c610d6542c7d69d.ctex"]
 
 [params]
 

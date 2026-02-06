@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dju0vputext4m"
-path="res://.godot/imported/pin_remove.png-c2852b260d96bc2a3fbd6cfcf49ff1cf.ctex"
+path="res://.godot/imported/pin_remove.png-3c00a42f12340b38dde6dc3a372c9c8d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/pin/pin_remove.png"
-dest_files=["res://.godot/imported/pin_remove.png-c2852b260d96bc2a3fbd6cfcf49ff1cf.ctex"]
+source_file="res://main/godot_essentials/icons/pin/pin_remove.png"
+dest_files=["res://.godot/imported/pin_remove.png-3c00a42f12340b38dde6dc3a372c9c8d.ctex"]
 
 [params]
 

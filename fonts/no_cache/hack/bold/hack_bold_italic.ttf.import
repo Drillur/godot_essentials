@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://dhc474282y6x5"
-path="res://.godot/imported/hack_bold_italic.ttf-55df2c250dc3a0c2359649126784bcc4.fontdata"
+path="res://.godot/imported/hack_bold_italic.ttf-55b23817e05d5421037a796efd730714.fontdata"
 
 [deps]
 
-source_file="res://groups/essentials/fonts/no_cache/hack/bold/hack_bold_italic.ttf"
-dest_files=["res://.godot/imported/hack_bold_italic.ttf-55df2c250dc3a0c2359649126784bcc4.fontdata"]
+source_file="res://main/godot_essentials/fonts/no_cache/hack/bold/hack_bold_italic.ttf"
+dest_files=["res://.godot/imported/hack_bold_italic.ttf-55b23817e05d5421037a796efd730714.fontdata"]
 
 [params]
 
