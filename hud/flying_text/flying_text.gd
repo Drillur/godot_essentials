@@ -5,7 +5,6 @@ extends Control
 const DEFAULT_LINGER_DURATION: float = 0.3
 
 static var available_nodes: Array[FlyingText]
-static var pending_currencies: Dictionary # dict of dicts. first key: the spawner_node
 
 var tween: Tween
 var linger_duration: float = DEFAULT_LINGER_DURATION
@@ -133,88 +132,6 @@ static func new_icon(_spawn_node: Node, _icon: Texture2D) -> void:
 	prefab.label.hide()
 	prefab.set_icon(_icon)
 	prefab.go(_spawn_node)
-
-
-static func got_currencies(
-		_spawn_node: Control,
-		currencies: Dictionary,
-		_consolidate: bool,
-		_crit_mutliplier: Big = Big.new(1.0),
-		gained := true
-	) -> void:
-	
-	const BASE_TEXT: String = "[b]%s%s[/b]"
-	const BASE_CRIT_TEXT: String = " [font_size=10][i]x[b]%s"
-	const CRIT_MULTIPLIER: String = "crit_multiplier"
-	
-	if cannot_throw(_spawn_node):
-		return
-	
-	if _consolidate and pending_currencies.has(_spawn_node):
-		for currency_key in currencies.keys():
-			pending_currencies[_spawn_node].get_or_add(
-				currency_key,
-				Big.new(Big.ZERO)
-			).plus_equals(currencies[currency_key])
-		var current_mult: Big = pending_currencies[_spawn_node].get(
-			CRIT_MULTIPLIER,
-			Big.new(1.0)
-		)
-		if _crit_mutliplier.is_greater_than(current_mult):
-			pending_currencies[_spawn_node][CRIT_MULTIPLIER] = _crit_mutliplier
-		return
-	
-	if _consolidate:
-		pending_currencies[_spawn_node] = {}
-	
-	var crit_text: String = ""
-	if _crit_mutliplier.is_greater_than(1.0):
-		crit_text = BASE_CRIT_TEXT % _crit_mutliplier.get_text()
-	var _sign := "+" if gained else "-"
-	for x in currencies:
-		if (
-			not is_instance_valid(_spawn_node)
-			or _spawn_node.is_queued_for_deletion()
-		):
-			return
-		
-		var color: Color = Currency.get_color(x)
-		var _text: String = BASE_TEXT % [_sign, currencies[x].get_text()]
-		new_text_with_icon(
-				_spawn_node, _text, Currency.get_icon(x), color, crit_text)
-		
-		await Utility.timer(LoudTimer.MINIMUM_DURATION)
-	
-	if _consolidate:
-		await Utility.timer(randf_range(0.9, 1.25))
-		
-		if (
-			not is_instance_valid(_spawn_node)
-			or _spawn_node.is_queued_for_deletion()
-			or not pending_currencies.has(_spawn_node)
-		):
-			return
-		
-		var _pending_currencies: Dictionary = pending_currencies[_spawn_node]
-		pending_currencies.erase(_spawn_node)
-		if _pending_currencies.is_empty():
-			return
-		
-		var crit_multiplier: Big = _pending_currencies.get(
-				CRIT_MULTIPLIER, Big.new(1.0))
-		_pending_currencies.erase(CRIT_MULTIPLIER)
-		got_currencies(
-			_spawn_node,
-			_pending_currencies,
-			_consolidate,
-			crit_multiplier,
-			LoudFloat.ONE
-		)
-
-
-static func lost_currencies(
-		_spawn_node: Control, currencies: Dictionary) -> void:
-	got_currencies(_spawn_node, currencies, false, Big.new(1.0), false)
 
 
 static func _get_node(_spawn_node: Node) -> FlyingText:
