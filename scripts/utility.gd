@@ -219,6 +219,11 @@ func get_red_to_green_fade(percent: float) -> Color:
 	return Color(r, g, 0.0)
 
 
+func running_above_minimum_fps() -> bool:
+	const MINIMUM_FPS: int = 60
+	return Engine.get_frames_per_second() >= MINIMUM_FPS
+
+
 ## Returns all vars and @onready vars in Script `script`.
 func get_script_variables(script: Script) -> Array[String]:
 	const ALLOWED_USAGES: Array[int] = [

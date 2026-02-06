@@ -82,7 +82,7 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true, _flash := false
 		if _flash:
 			update = func():
 				_node.visible = is_true()
-				if _node.visible:
+				if _node.visible and Settings.flashes_allowed.is_true():
 					Flash.flash(_node, _flash_color)
 		else:
 			update = func():
@@ -91,7 +91,7 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true, _flash := false
 		if _flash:
 			update = func():
 				_node.visible = is_false()
-				if _node.visible:
+				if _node.visible and Settings.flashes_allowed.is_true():
 					Flash.flash(_node, _flash_color)
 		else:
 			update = func():
@@ -153,6 +153,7 @@ func _update_button_pressed() -> void:
 
 
 func copycat(_copied_bool: LoudBool) -> void:
+	assert(not is_copycat(), "already a copycat")
 	copied_bool = _copied_bool
 	copied_bool.changed.connect(copycat_changed)
 	copycat_changed()

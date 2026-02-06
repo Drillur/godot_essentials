@@ -232,6 +232,13 @@ func is_equal_to(n: Variant) -> bool:
 	return is_equal_approx(current, n)
 
 
+func is_equal_to_any(values: Array[int]) -> bool:
+	for n: int in values:
+		if is_equal_to(n):
+			return true
+	return false
+
+
 func is_less_than_or_equal_to(n: Variant) -> bool:
 	return is_less_than(n) or is_equal_to(n)
 

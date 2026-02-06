@@ -10,10 +10,6 @@ var tween: Tween
 #region Init
 
 
-static func cache() -> void:
-	LORED.signals.lored_killed.connect(validate_flashes)
-
-
 func _ready() -> void:
 	hide()
 	tree_exiting.connect(kill_tween)
@@ -25,15 +21,14 @@ func _ready() -> void:
 #region Static
 
 
-static func cannot_flash(_spawn_node: Node) -> bool:
+static func _cannot_flash(_spawn_node: Node) -> bool:
 	return (
-			Settings.flashes_allowed.is_false()
-			or not _spawn_node.can_process()
-			or Engine.get_frames_per_second() < Main.MINIMUM_FPS)
+			not _spawn_node.can_process()
+			or not Utility.running_above_minimum_fps())
 
 
 static func flash(_spawn_node: Node, _color := Color.WHITE) -> void:
-	if cannot_flash(_spawn_node):
+	if _cannot_flash(_spawn_node):
 		return
 	
 	var prefab: Flash = get_scene(_spawn_node)
@@ -44,7 +39,11 @@ static func get_scene(_spawn_node: Node) -> Flash:
 	const SCENE_NAME: StringName = &"flash"
 	
 	var prefab: Flash
-	if available_nodes.is_empty() or not is_instance_valid(available_nodes.back()):
+	var no_node_available: bool = (
+			available_nodes.is_empty()
+			or not is_instance_valid(available_nodes.back()))
+	
+	if no_node_available:
 		prefab = ResourceBag.instantiate(SCENE_NAME)
 	else:
 		prefab = available_nodes.pop_back()

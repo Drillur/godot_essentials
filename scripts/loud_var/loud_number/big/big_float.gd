@@ -114,7 +114,7 @@ func _emit_signals(previous_value: Big, current_value: Big) -> void:
 
 
 func reset() -> void:
-	current = Big.new(base)
+	current.set_to(base)
 	super()
 
 

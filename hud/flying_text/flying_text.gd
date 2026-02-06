@@ -70,9 +70,11 @@ func go(_spawn_node: Node) -> void:
 func animate_normal() -> void:
 	tween = create_tween()
 	var new_pos := Vector2(position.x, position.y - randf_range(20, 25))
-	tween.tween_property(self, "position", new_pos, 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", new_pos, 0.5).set_trans(
+			Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_interval(linger_duration)
-	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.2).set_trans(
+			Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	tween.finished.connect(_become_available)
 
 
@@ -96,17 +98,18 @@ func _become_available() -> void:
 
 static func cannot_throw(_spawn_node: Node) -> bool:
 	return (
-		Settings.flying_texts.is_false()
-		or not _spawn_node.is_visible_in_tree()
-		or not _spawn_node.can_process()
-		or Engine.get_frames_per_second() < Main.MINIMUM_FPS
-	)
+			not _spawn_node.is_visible_in_tree()
+			or not _spawn_node.can_process()
+			or not Utility.running_above_minimum_fps())
 
 
-static func new_text_with_icon(_spawn_node: Node, _text: String, _icon: Texture2D, _color := Color.WHITE, _crit_text := "") -> void:
+static func new_text_with_icon(
+		_spawn_node: Node, _text: String, _icon: Texture2D,
+		_color := Color.WHITE, _crit_text := "") -> void:
+	
 	if cannot_throw(_spawn_node):
 		return
-	var prefab: FlyingText = get_scene(_spawn_node)
+	var prefab: FlyingText = _get_node(_spawn_node)
 	prefab.set_icon(_icon)
 	prefab.set_text(_text)
 	if not _crit_text.is_empty():
@@ -114,10 +117,13 @@ static func new_text_with_icon(_spawn_node: Node, _text: String, _icon: Texture2
 	prefab.go(_spawn_node)
 
 
-static func new_text(_spawn_node: Node, _text: String, ignore_conditions := false, _linger_duration := DEFAULT_LINGER_DURATION) -> void:
+static func new_text(
+		_spawn_node: Node, _text: String, ignore_conditions := false,
+		_linger_duration := DEFAULT_LINGER_DURATION) -> void:
+	
 	if not ignore_conditions and cannot_throw(_spawn_node):
 		return
-	var prefab: FlyingText = get_scene(_spawn_node)
+	var prefab: FlyingText = _get_node(_spawn_node)
 	prefab.icon.hide()
 	prefab.set_text(_text)
 	prefab.linger_duration = _linger_duration
@@ -127,7 +133,7 @@ static func new_text(_spawn_node: Node, _text: String, ignore_conditions := fals
 static func new_icon(_spawn_node: Node, _icon: Texture2D) -> void:
 	if cannot_throw(_spawn_node):
 		return
-	var prefab: FlyingText = get_scene(_spawn_node)
+	var prefab: FlyingText = _get_node(_spawn_node)
 	prefab.label.hide()
 	prefab.set_icon(_icon)
 	prefab.go(_spawn_node)
@@ -178,7 +184,8 @@ static func got_currencies(
 		
 		var color: Color = Currency.get_color(x)
 		var _text: String = BASE_TEXT % [_sign, currencies[x].get_text()]
-		new_text_with_icon(_spawn_node, _text, Currency.get_icon(x), color, crit_text)
+		new_text_with_icon(
+				_spawn_node, _text, Currency.get_icon(x), color, crit_text)
 		
 		await Utility.timer(LoudTimer.MINIMUM_DURATION)
 	
@@ -197,7 +204,8 @@ static func got_currencies(
 		if _pending_currencies.is_empty():
 			return
 		
-		var crit_multiplier: Big = _pending_currencies.get(CRIT_MULTIPLIER, Big.new(1.0))
+		var crit_multiplier: Big = _pending_currencies.get(
+				CRIT_MULTIPLIER, Big.new(1.0))
 		_pending_currencies.erase(CRIT_MULTIPLIER)
 		got_currencies(
 			_spawn_node,
@@ -208,15 +216,20 @@ static func got_currencies(
 		)
 
 
-static func lost_currencies(_spawn_node: Control, currencies: Dictionary) -> void:
+static func lost_currencies(
+		_spawn_node: Control, currencies: Dictionary) -> void:
 	got_currencies(_spawn_node, currencies, false, Big.new(1.0), false)
 
 
-static func get_scene(_spawn_node: Node) -> FlyingText:
+static func _get_node(_spawn_node: Node) -> FlyingText:
 	const SCENE_NAME: StringName = &"flying_text"
 	
 	var prefab: FlyingText
-	if available_nodes.is_empty() or not is_instance_valid(available_nodes.back()):
+	var no_node_available: bool = (
+			available_nodes.is_empty()
+			or not is_instance_valid(available_nodes.back()))
+	
+	if no_node_available:
 		prefab = ResourceBag.instantiate(SCENE_NAME)
 	else:
 		prefab = available_nodes.pop_back()

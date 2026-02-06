@@ -240,10 +240,6 @@ func new_animation(_previous: float, _next: float) -> void:
 	var highlight_size := minf(size.x, delta * size.x)
 	if highlight_size < 5:
 		return
-	#if delta >= 0.25:
-		#Flash.flash(background, Color.WHITE)
-	#elif delta >= 0.1:
-		#Flash.flash(progress_bar, color)
 	
 	animation_container.size.x = highlight_size
 	animation_container.size.y = size.y
