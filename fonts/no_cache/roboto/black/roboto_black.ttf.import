@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cubavfw1lomep"
-path="res://.godot/imported/roboto_black.ttf-b87f6d8e09b982187699723e24ccd8fb.fontdata"
+path="res://.godot/imported/roboto_black.ttf-5af0429d451d28729808fc127e68507b.fontdata"
 
 [deps]
 
-source_file="res://main/godot_essentials/fonts/no_cache/roboto/black/roboto_black.ttf"
-dest_files=["res://.godot/imported/roboto_black.ttf-b87f6d8e09b982187699723e24ccd8fb.fontdata"]
+source_file="res://groups/essentials/fonts/no_cache/roboto/black/roboto_black.ttf"
+dest_files=["res://.godot/imported/roboto_black.ttf-5af0429d451d28729808fc127e68507b.fontdata"]
 
 [params]
 

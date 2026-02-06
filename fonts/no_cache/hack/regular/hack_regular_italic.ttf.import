@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://chl25wgkqkf64"
-path="res://.godot/imported/hack_regular_italic.ttf-aea4391693a0aa26fc28e3f500044529.fontdata"
+path="res://.godot/imported/hack_regular_italic.ttf-aea0ae669b143c17a05c09d425cee607.fontdata"
 
 [deps]
 
-source_file="res://main/godot_essentials/fonts/no_cache/hack/regular/hack_regular_italic.ttf"
-dest_files=["res://.godot/imported/hack_regular_italic.ttf-aea4391693a0aa26fc28e3f500044529.fontdata"]
+source_file="res://groups/essentials/fonts/no_cache/hack/regular/hack_regular_italic.ttf"
+dest_files=["res://.godot/imported/hack_regular_italic.ttf-aea0ae669b143c17a05c09d425cee607.fontdata"]
 
 [params]
 

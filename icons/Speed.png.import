@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7teebo72i3p7"
-path="res://.godot/imported/Speed.png-712fb33ceb81c9d9f2df4aff43f8aee4.ctex"
+path="res://.godot/imported/Speed.png-e795fe7965c0cc5f166de0523afaf9da.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://main/godot_essentials/icons/Speed.png"
-dest_files=["res://.godot/imported/Speed.png-712fb33ceb81c9d9f2df4aff43f8aee4.ctex"]
+source_file="res://groups/essentials/icons/Speed.png"
+dest_files=["res://.godot/imported/Speed.png-e795fe7965c0cc5f166de0523afaf9da.ctex"]
 
 [params]
 

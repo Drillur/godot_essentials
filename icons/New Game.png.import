@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3ps841vtkqg5"
-path="res://.godot/imported/New Game.png-fd1f8d4df8f6baaf5bb813a6eea7fe77.ctex"
+path="res://.godot/imported/New Game.png-f91ad455c366374babfdc35c16cb3b66.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://main/godot_essentials/icons/New Game.png"
-dest_files=["res://.godot/imported/New Game.png-fd1f8d4df8f6baaf5bb813a6eea7fe77.ctex"]
+source_file="res://groups/essentials/icons/New Game.png"
+dest_files=["res://.godot/imported/New Game.png-f91ad455c366374babfdc35c16cb3b66.ctex"]
 
 [params]
 

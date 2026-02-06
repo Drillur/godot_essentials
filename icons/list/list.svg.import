@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cpieggja8ncol"
-path="res://.godot/imported/list.svg-e83abfb06c126c02cd3af767252b55de.ctex"
+path="res://.godot/imported/list.svg-005f30a128607136769c6cc690d1cbee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://main/godot_essentials/icons/list/list.svg"
-dest_files=["res://.godot/imported/list.svg-e83abfb06c126c02cd3af767252b55de.ctex"]
+source_file="res://groups/essentials/icons/list/list.svg"
+dest_files=["res://.godot/imported/list.svg-005f30a128607136769c6cc690d1cbee.ctex"]
 
 [params]
 

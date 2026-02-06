@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dggartqbi4c4e"
-path="res://.godot/imported/chat.svg-665c443af38157ee2a78c2090b1e7147.ctex"
+path="res://.godot/imported/chat.svg-23bb7e1c3e3b59580412436a38a4d836.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://main/godot_essentials/icons/chat/chat.svg"
-dest_files=["res://.godot/imported/chat.svg-665c443af38157ee2a78c2090b1e7147.ctex"]
+source_file="res://groups/essentials/icons/chat/chat.svg"
+dest_files=["res://.godot/imported/chat.svg-23bb7e1c3e3b59580412436a38a4d836.ctex"]
 
 [params]
 

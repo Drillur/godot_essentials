@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c5ffjrpe4j3qq"
-path="res://.godot/imported/sparkling.png-6a7eb656b916a03bd6e6eff003a57789.ctex"
+path="res://.godot/imported/sparkling.png-924b220902524c9be1333606fcadf396.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://main/godot_essentials/icons/sparkling/sparkling.png"
-dest_files=["res://.godot/imported/sparkling.png-6a7eb656b916a03bd6e6eff003a57789.ctex"]
+source_file="res://groups/essentials/icons/sparkling/sparkling.png"
+dest_files=["res://.godot/imported/sparkling.png-924b220902524c9be1333606fcadf396.ctex"]
 
 [params]
 
