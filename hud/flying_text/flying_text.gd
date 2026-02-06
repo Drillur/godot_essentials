@@ -23,10 +23,6 @@ var linger_duration: float = DEFAULT_LINGER_DURATION
 #region Init
 
 
-static func cache() -> void:
-	LORED.signals.lored_killed.connect(validate_texts)
-
-
 func _ready() -> void:
 	hide()
 	crit_label.hide()
