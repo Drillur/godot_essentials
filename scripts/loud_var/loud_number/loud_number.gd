@@ -11,6 +11,14 @@ signal decreased(amount)
 signal number_changed(number)
 signal text_changed
 
+enum Notation {
+	STANDARD,
+	SCIENTIFIC,
+	ENGINEERING,
+	LOGARITHMIC,
+	LETTERS,
+}
+
 const NATURAL_LOG: float = log(10)
 const MAX_INT := 9223372036854775807
 const MIN_INT := -9223372036854775808
@@ -238,6 +246,10 @@ const LETTER_SUFFIXES: PackedStringArray = [
 	"cu", # cu: e300
 ]
 
+static var notation: Notation = Notation.STANDARD:
+	set = _set_notation
+static var signals := SignalBus.new()
+
 var book: Book:
 	get = get_book
 var copycat_num: LoudNumber
@@ -371,6 +383,13 @@ static func binomial_coefficient(n: int, k: int) -> float:
 static func log10(n: float) -> float:
 	return log(n) / NATURAL_LOG
 
+
+static func _set_notation(new_notation: Notation) -> void:
+	if notation == new_notation:
+		return
+	notation = new_notation
+	signals.notation_changed.emit(new_notation)
+
 #endregion
 
 #region Init
@@ -381,11 +400,7 @@ func loud_number_init() -> void:
 	initialized = true
 	if Engine.is_editor_hint():
 		print_stack()
-	Settings.notation_changed.connect(
-		func():
-			text_requires_update = true
-			changed.emit()
-	)
+	signals.notation_changed.connect(_require_update.unbind(1))
 	changed.disconnect(loud_number_init)
 
 
@@ -499,12 +514,20 @@ func clear_copycat() -> void:
 	copycat_num.changed.disconnect(copycat_changed)
 	copycat_num = null
 
+
+func _require_update() -> void:
+	text_requires_update = true
+	changed.emit()
+
 #endregion
 
-#region Region
+#region Debug
 
 func report() -> void:
 	Log.pr("Current:", get_text())
 	book.report()
 
 #endregion
+
+class SignalBus extends Object:
+	signal notation_changed(new_notation: Notation)
