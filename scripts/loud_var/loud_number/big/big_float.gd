@@ -251,7 +251,9 @@ func is_less_than(n: Variant) -> bool:
 
 
 func is_zero() -> bool:
-	return is_equal_to(Big.ZERO)
+	return (
+			current.mantissa == Big.ZERO.mantissa
+			and current.exponent == Big.ZERO.exponent)
 
 
 #region Operations

@@ -75,27 +75,15 @@ func reset() -> void:
 	set_to(base)
 
 
-func tie_node_visibility(_node: Control, _equal_to: bool = true, _flash := false, _flash_color := Color.WHITE) -> void:
+func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 	_node.visible = is_true()
 	var update: Callable
 	if _equal_to:
-		if _flash:
-			update = func():
-				_node.visible = is_true()
-				if _node.visible and Settings.flashes_allowed.is_true():
-					Flash.flash(_node, _flash_color)
-		else:
-			update = func():
-				_node.visible = is_true()
+		update = func():
+			_node.visible = is_true()
 	else:
-		if _flash:
-			update = func():
-				_node.visible = is_false()
-				if _node.visible and Settings.flashes_allowed.is_true():
-					Flash.flash(_node, _flash_color)
-		else:
-			update = func():
-				_node.visible = is_false()
+		update = func():
+			_node.visible = is_false()
 	_node.tree_exiting.connect(changed.disconnect.bind(update))
 	changed.connect(update)
 	update.call()

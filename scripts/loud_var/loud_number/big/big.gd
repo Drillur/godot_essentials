@@ -564,9 +564,8 @@ func percent_of(_n: Variant) -> float:
 		return LoudFloat.ZERO
 	
 	var result := Big.new(
-		mantissa / _n.mantissa,
-		exponent - _n.exponent
-	)
+			mantissa / _n.mantissa,
+			exponent - _n.exponent)
 	normalize(result)
 	
 	return clampf(
