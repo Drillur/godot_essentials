@@ -1,7 +1,6 @@
 class_name LoudFloat
 extends LoudNumber
 
-
 const ONE: float = 1.0
 const ZERO: float = 0.0
 const ONE_PERCENT: float = 0.01
@@ -19,12 +18,8 @@ var custom_minimum_limit := LoudNumber.MIN_FLOAT:
 	set = _set_minimum_limit
 var custom_maximum_limit := LoudNumber.MAX_FLOAT:
 	set = _set_maximum_limit
-var _save_pending: bool = false:
-	set = _set_save_pending
-
 
 #region Static
-
 
 static func roll_as_int(n: float) -> int:
 	var chance_to_return_plus_one: float = get_decimals(n)
@@ -53,19 +48,16 @@ static func to_float(n: Variant) -> float:
 				return float(n.current)
 	return float(n)
 
-
 #endregion
 
-
 #region Init
-
 
 func _init(_base: float = 0.0, _custom_minimum_limit := MIN_FLOAT, _custom_maximum_limit := MAX_FLOAT) -> void:
 	base = _base
 	current = base
 	previous = base
 	changed.connect(loud_number_init)
-	
+
 	custom_minimum_limit = _custom_minimum_limit
 	custom_maximum_limit = _custom_maximum_limit
 
@@ -75,25 +67,22 @@ func _create_book() -> void:
 	book.changed.connect(sync)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_current(n: float) -> void:
 	n = clampf(n, custom_minimum_limit, custom_maximum_limit)
 	if is_zero_approx(n):
 		n = 0.0
-	
+
 	if current == n:
 		return
-	
+
 	previous = current
 	current = n
 	text_requires_update = true
-	
+
 	_emit_signals(previous, current)
 
 
@@ -106,19 +95,9 @@ func _set_maximum_limit(n: float) -> void:
 	custom_maximum_limit = n
 	clamp_current()
 
-
-func _set_save_pending(x: bool) -> void:
-	_save_pending = x
-	if _save_pending:
-		SaveManager.saving_started.connect(save_pending_value)
-		SaveManager.loading_ended.connect(load_pending_value)
-
-
 #endregion
 
-
 #region Signals
-
 
 func _emit_signals(_previous: float, _current: float) -> void:
 	assert(_current != _previous, "Do not emit signals if nothing changed.")
@@ -137,12 +116,9 @@ func save_pending_value() -> void:
 func load_pending_value() -> void:
 	plus_equals(saved_pending_value)
 
-
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current = base
@@ -222,16 +198,9 @@ func set_bool_limiter(b: LoudBool, limit: float) -> void:
 			set_to(limit)
 	)
 
-
-func save_pending() -> void:
-	_save_pending = true
-
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> float:
 	return current
@@ -292,9 +261,7 @@ func get_x_percent(x: float) -> float:
 func is_zero() -> bool:
 	return is_equal_to(ZERO)
 
-
 #region Operations
-
 
 func plus(_amount: float) -> float:
 	return current + _amount
@@ -319,8 +286,6 @@ func to_the_power_of(_n: float) -> float:
 func to_ceil() -> float:
 	return ceilf(current)
 
-
 #endregion
-
 
 #endregion

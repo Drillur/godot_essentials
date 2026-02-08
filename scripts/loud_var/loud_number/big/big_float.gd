@@ -1,7 +1,6 @@
 class_name BigFloat
 extends LoudNumber
 
-
 @warning_ignore("unused_private_class_variable")
 @export var saved_value: String
 @export var saved_pending_value: String
@@ -16,9 +15,7 @@ var custom_maximum_limit: Big:
 	set = _set_maximum_limit
 var save_pending: bool = false
 
-
 #region Init
-
 
 func _init(x: Variant = 1.0) -> void:
 	base = Big.new(x)
@@ -32,12 +29,9 @@ func _create_book() -> void:
 	book.changed.connect(sync)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_current(n: Big) -> void:
 	previous = Big.new(current)
@@ -60,20 +54,9 @@ func _set_maximum_limit(n: Big) -> void:
 	custom_maximum_limit = n
 	clamp_current()
 
-
 #endregion
 
-
 #region Save
-
-
-func save(_save_pending_too: bool) -> void:
-	SaveManager.saving_started.connect(save_current_value)
-	assert(not SaveManager.loading_ended.is_connected(load_saved_value), "save() has already been called for this")
-	SaveManager.loading_ended.connect(load_saved_value)
-	save_pending = _save_pending_too
-	save_current_value()
-
 
 func save_current_value() -> void:
 	saved_value = current.to_plain_scientific()
@@ -82,20 +65,14 @@ func save_current_value() -> void:
 
 
 func load_saved_value() -> void:
-	var _saved_value := saved_value
 	if not saved_value.is_empty():
-		set_to(Big.new(_saved_value))
-		#await Utility.timer(1.0)
-		#set_to(Big.new(_saved_value))
+		set_to(Big.new(saved_value))
 	if save_pending and not saved_pending_value.is_empty():
 		plus_equals(Big.new(saved_pending_value))
 
-
 #endregion
 
-
 #region Signals
-
 
 func _emit_signals(previous_value: Big, current_value: Big) -> void:
 	if not current_value.is_equal_to(previous_value):
@@ -106,12 +83,9 @@ func _emit_signals(previous_value: Big, current_value: Big) -> void:
 		number_changed.emit(self)
 		changed.emit()
 
-
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current.set_to(base)
@@ -189,12 +163,9 @@ func update_text(_value = current) -> void:
 	text_requires_update = false
 	text = _value.get_text()
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> Big:
 	return current
@@ -252,12 +223,10 @@ func is_less_than(n: Variant) -> bool:
 
 func is_zero() -> bool:
 	return (
-			current.mantissa == Big.ZERO.mantissa
-			and current.exponent == Big.ZERO.exponent)
-
+		current.mantissa == Big.ZERO.mantissa
+		and current.exponent == Big.ZERO.exponent )
 
 #region Operations
-
 
 func plus(_amount: Variant) -> Big:
 	return current.plus(_amount)
@@ -278,8 +247,6 @@ func divided_by(_amount: Variant) -> Big:
 func to_the_power_of(_n: Variant) -> Big:
 	return current.to_the_power_of(_n)
 
-
 #endregion
-
 
 #endregion

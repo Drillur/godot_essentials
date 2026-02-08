@@ -1,7 +1,6 @@
 class_name LoudInt
 extends LoudNumber
 
-
 const ZERO: int = 0
 const ONE: int = 1
 
@@ -16,19 +15,15 @@ var custom_minimum_limit := MIN_INT:
 	set = _set_minimum_limit
 var custom_maximum_limit := MAX_INT:
 	set = _set_maximum_limit
-var _save_pending: bool = false:
-	set = _set_save_pending
-
 
 #region Init
-
 
 func _init(_base: int = ZERO, _custom_minimum_limit := MIN_INT, _custom_maximum_limit := MAX_INT) -> void:
 	base = _base
 	current = base
 	previous = base
 	changed.connect(loud_number_init)
-	
+
 	custom_minimum_limit = _custom_minimum_limit
 	custom_maximum_limit = _custom_maximum_limit
 
@@ -38,23 +33,20 @@ func _create_book() -> void:
 	book.changed.connect(sync)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
-
 
 #region Setters
 
-
 func _set_current(n: int) -> void:
 	n = clampi(n, custom_minimum_limit, custom_maximum_limit)
-	
+
 	if current == n:
 		return
-	
+
 	previous = current
 	current = n
 	text_requires_update = true
-	
+
 	_emit_signals(previous, current)
 
 
@@ -67,19 +59,9 @@ func _set_maximum_limit(n: int) -> void:
 	custom_maximum_limit = n
 	clamp_current()
 
-
-func _set_save_pending(x: bool) -> void:
-	_save_pending = x
-	if _save_pending:
-		SaveManager.saving_started.connect(save_pending_value)
-		SaveManager.loading_ended.connect(load_pending_value)
-
-
 #endregion
 
-
 #region Signals
-
 
 func _emit_signals(_previous: int, _current: int) -> void:
 	assert(_current != _previous, "Do not emit signals if nothing changed.")
@@ -98,12 +80,9 @@ func save_pending_value() -> void:
 func load_pending_value() -> void:
 	plus_equals(saved_pending_value)
 
-
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current = base
@@ -182,16 +161,9 @@ func set_bool_limiter(b: LoudBool, limit: int) -> void:
 			set_to(limit)
 	)
 
-
-func save_pending() -> void:
-	_save_pending = true
-
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> int:
 	return current
@@ -259,9 +231,7 @@ func get_x_percent(x: float) -> float:
 func is_zero() -> bool:
 	return is_equal_to(ZERO)
 
-
 #region Operations
-
 
 func plus(_amount: int) -> int:
 	return current + _amount
@@ -286,8 +256,6 @@ func to_the_power_of(_n: float) -> float:
 func modulo(_amount: int) -> int:
 	return current % _amount
 
-
 #endregion
-
 
 #endregion
