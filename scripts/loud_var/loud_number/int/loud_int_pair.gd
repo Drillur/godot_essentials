@@ -30,13 +30,6 @@ func _init(base_value: int, base_total: int, _limit_to_total: bool = true):
 	total.text_changed.connect(text_changed)
 	total.changed.connect(check_if_full)
 	total.changed.connect(emit_changed)
-	SaveManager.loading_ended.connect(_game_loaded)
-
-
-func _game_loaded() -> void:
-	clamp_current()
-	check_if_empty()
-	check_if_full()
 
 
 #endregion
@@ -191,8 +184,7 @@ func get_midpoint() -> int:
 
 func get_random_point() -> int:
 	result_of_previous_random_point = (
-		get_total() if is_full() else
-		randi_range(get_current(), get_total())
+		get_total() if is_full() else randi_range(get_current(), get_total())
 	)
 	return get_previous_random_point()
 
