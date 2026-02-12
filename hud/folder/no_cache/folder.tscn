@@ -35,11 +35,13 @@ is_open = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jw8ca")
+metadata/_edit_lock_ = true
 
 [node name="Background" type="Panel" parent="." unique_id=1574591071]
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jeci1")
+metadata/_edit_lock_ = true
 
 [node name="BottomButton" parent="." unique_id=1244325111 instance=ExtResource("2_m84jn")]
 custom_minimum_size = Vector2(10, 8)

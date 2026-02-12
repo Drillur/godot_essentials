@@ -2,13 +2,16 @@ class_name LoudNumber
 extends LoudVar
 
 @warning_ignore("unused_signal")
+signal became_zero
+@warning_ignore("unused_signal")
+signal became_non_zero
+@warning_ignore("unused_signal")
 signal pending_changed
 @warning_ignore("unused_signal")
-signal increased(amount)
+signal increased(delta: Variant)
 @warning_ignore("unused_signal")
-signal decreased(amount)
+signal decreased(delta: Variant)
 @warning_ignore("unused_signal")
-signal number_changed(number)
 signal text_changed
 
 enum Notation {
@@ -20,10 +23,10 @@ enum Notation {
 }
 
 const NATURAL_LOG: float = log(10)
-const MAX_INT := 9223372036854775807
-const MIN_INT := -9223372036854775808
-const MAX_FLOAT := 1.79769e308
-const MIN_FLOAT := -1.79769e308
+const MAX_INT: int = 9_223_372_036_854_775_807 ## 9.22e18
+const MIN_INT: int = -9_223_372_036_854_775_808  ## -9.22e18
+const MAX_FLOAT: float = 1.79769e308
+const MIN_FLOAT: float = -1.79769e308
 const VALID_COMPARISON_TYPES: Array[Variant.Type] = [
 	TYPE_FLOAT,
 	TYPE_INT,

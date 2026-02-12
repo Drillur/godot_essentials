@@ -105,7 +105,12 @@ func _emit_signals(_previous: float, _current: float) -> void:
 		decreased.emit(_previous - _current)
 	elif _previous < _current:
 		increased.emit(_current - _previous)
-	number_changed.emit(self)
+	
+	if _previous == 0.0:
+		became_non_zero.emit()
+	elif _current == 0.0:
+		became_zero.emit()
+	
 	changed.emit()
 
 

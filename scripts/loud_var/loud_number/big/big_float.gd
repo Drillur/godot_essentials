@@ -7,7 +7,7 @@ extends LoudNumber
 
 var current := Big.new(0)
 var base: Big
-var previous: Big
+var previous := Big.new(0)
 var cat: Variant
 var custom_minimum_limit: Big:
 	set = _set_minimum_limit
@@ -34,7 +34,7 @@ func _create_book() -> void:
 #region Setters
 
 func _set_current(n: Big) -> void:
-	previous = Big.new(current)
+	previous.set_to(current)
 	if custom_maximum_limit:
 		n = Big.get_min(n, custom_maximum_limit)
 	if custom_minimum_limit:
@@ -42,7 +42,9 @@ func _set_current(n: Big) -> void:
 	if not current.is_equal_to(n):
 		current.set_to(n)
 		text_requires_update = true
-	_emit_signals(previous, current)
+	
+	if not previous.is_equal_to(current):
+		_emit_signals(previous, current)
 
 
 func _set_minimum_limit(n: Big) -> void:
@@ -74,14 +76,20 @@ func load_saved_value() -> void:
 
 #region Signals
 
-func _emit_signals(previous_value: Big, current_value: Big) -> void:
-	if not current_value.is_equal_to(previous_value):
-		if previous_value.is_greater_than(current_value):
-			decreased.emit(previous_value.minus(current_value))
-		elif previous_value.is_less_than(current_value):
-			increased.emit(current_value.minus(previous_value))
-		number_changed.emit(self)
-		changed.emit()
+func _emit_signals(_previous: Big, _current: Big) -> void:
+	assert(not _current.is_equal_to(_previous), "Do not emit signals if nothing changed.")
+	
+	if _previous.is_greater_than(_current):
+		decreased.emit(_previous.minus(_current))
+	elif _previous.is_less_than(_current):
+		increased.emit(_current.minus(_previous))
+	
+	if _previous.is_zero():
+		became_non_zero.emit()
+	elif _current.is_zero():
+		became_zero.emit()
+	
+	changed.emit()
 
 #endregion
 

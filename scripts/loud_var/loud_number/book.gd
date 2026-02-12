@@ -125,7 +125,7 @@ func add_adder(object: Resource) -> void:
 	if adders.has(object) or object.changed.is_connected(adder_changed):
 		return
 	adders.append(object)
-	object.number_changed.connect(adder_changed)
+	object.changed.connect(adder_changed.bind(object))
 	adder_changed(object)
 
 
@@ -145,7 +145,7 @@ func add_subtracter(object: Resource) -> void:
 	if subtracters.has(object) or object.changed.is_connected(subtracter_changed):
 		return
 	subtracters.append(object)
-	object.number_changed.connect(subtracter_changed)
+	object.changed.connect(subtracter_changed.bind(object))
 	subtracter_changed(object)
 
 
@@ -153,7 +153,7 @@ func remove_subtracter(object: Resource) -> void:
 	if not subtracters.has(object) or not object.changed.is_connected(subtracter_changed):
 		return
 	edit_change(Book.Category.SUBTRACTED, object, 0.0)
-	object.number_changed.disconnect(subtracter_changed)
+	object.changed.disconnect(subtracter_changed)
 	subtracters.erase(object)
 
 
@@ -165,7 +165,7 @@ func add_multiplier(object: Resource) -> void:
 	if multipliers.has(object) or object.changed.is_connected(multiplier_changed):
 		return
 	multipliers.append(object)
-	object.number_changed.connect(multiplier_changed)
+	object.changed.connect(multiplier_changed.bind(object))
 	multiplier_changed(object)
 
 
@@ -173,7 +173,7 @@ func remove_multiplier(object: Resource) -> void:
 	if not multipliers.has(object) or not object.changed.is_connected(multiplier_changed):
 		return
 	edit_change(Book.Category.MULTIPLIED, object, 1.0)
-	object.number_changed.disconnect(multiplier_changed)
+	object.changed.disconnect(multiplier_changed)
 	multipliers.erase(object)
 
 
@@ -183,7 +183,7 @@ func multiplier_changed(object: Resource) -> void:
 
 func add_divider(object: Resource) -> void:
 	dividers.append(object)
-	object.number_changed.connect(divider_changed)
+	object.changed.connect(divider_changed.bind(object))
 	divider_changed(object)
 
 
@@ -191,7 +191,7 @@ func remove_divider(object: Resource) -> void:
 	if not dividers.has(object):
 		return
 	edit_change(Book.Category.DIVIDED, object, 1.0)
-	object.number_changed.disconnect(divider_changed)
+	object.changed.disconnect(divider_changed)
 	dividers.erase(object)
 
 
