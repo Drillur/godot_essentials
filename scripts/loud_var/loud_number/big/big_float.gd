@@ -77,7 +77,7 @@ func load_saved_value() -> void:
 #region Signals
 
 func _emit_signals(_previous: Big, _current: Big) -> void:
-	assert(not _current.is_equal_to(_previous), "Do not emit signals if nothing changed.")
+	assert(not _previous.is_equal_to(_current), "Do not emit signals if nothing changed.")
 	
 	if _previous.is_greater_than(_current):
 		decreased.emit(_previous.minus(_current))
