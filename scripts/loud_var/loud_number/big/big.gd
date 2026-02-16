@@ -39,10 +39,10 @@ static func normalize(_big: Big) -> void:
 	var _sign := signf(_big.mantissa)
 	_big.mantissa = absf(_big.mantissa)
 
-	if _big.mantissa < 1.0 or _big.mantissa >= 10.0:
-		var diff: int = floor(LoudNumber.log10(_big.mantissa))
+	if _big.mantissa != 0.0 and (_big.mantissa < 1.0 or _big.mantissa >= 10.0):
+		var diff: int = floori(LoudNumber.log10(_big.mantissa))
 		if diff > -10 and diff < 248:
-			var div := 10.0 ** diff
+			var div: float = 10.0 ** diff
 			if div > MANTISSA_PRECISION:
 				_big.mantissa /= div
 				_big.exponent += diff
@@ -449,7 +449,7 @@ func to_float() -> float:
 
 ## Returns the log (base 10) value of this Big
 func to_log() -> float:
-	if is_zero():
+	if mantissa <= 0.0:
 		return 0.0
 	var result: float = float(exponent) + LoudNumber.log10(mantissa)
 	return result
@@ -664,7 +664,7 @@ func to_logarithmic_notation() -> String:
 
 func to_scientific_notation() -> String:
 	const BASE_TEXT: String = "%se%s"
-
+	
 	var mantissa_text: String = str(absf(mantissa)).pad_decimals(1)
 	var exponent_text: String
 	if mantissa_text == "10.0":
@@ -674,19 +674,22 @@ func to_scientific_notation() -> String:
 		if mantissa_text.ends_with(".0"):
 			mantissa_text = mantissa_text.replace(".0", "")
 		exponent_text = format_int(exponent)
-
+	
 	return BASE_TEXT % [mantissa_text, exponent_text]
 
 
 func to_plain_scientific() -> String:
 	const BASE_TEXT: String = "%se%s"
+	
 	if is_nan(mantissa):
 		mantissa = 1.0
 	if is_nan(exponent):
 		exponent = 0
+	
 	if not is_positive():
 		mantissa = 0.0
-	return BASE_TEXT % [str(mantissa), str(exponent)]
+	
+	return BASE_TEXT % [mantissa, exponent]
 
 #endregion
 

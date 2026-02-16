@@ -27,6 +27,12 @@ var rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	print("Version %s.%s.%s" % [
+		int(ProjectSettings.get("application/config/version").split(".")[0]),
+		int(ProjectSettings.get("application/config/version").split(".")[1]),
+		int(ProjectSettings.get("application/config/version").split(".")[2]),
+	])
+	
 	tree = get_tree()
 	viewport = get_viewport()
 	window = viewport.get_window()

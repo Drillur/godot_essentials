@@ -72,6 +72,8 @@ func _create_book() -> void:
 #region Setters
 
 func _set_current(n: float) -> void:
+	assert(not is_nan(n))
+	
 	n = clampf(n, custom_minimum_limit, custom_maximum_limit)
 	if is_zero_approx(n):
 		n = 0.0

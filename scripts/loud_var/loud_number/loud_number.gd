@@ -384,7 +384,9 @@ static func binomial_coefficient(n: int, k: int) -> float:
 
 
 static func log10(n: float) -> float:
-	return log(n) / NATURAL_LOG
+	assert(n > 0)
+	var result: float = log(n) / NATURAL_LOG
+	return result
 
 
 static func _set_notation(new_notation: Notation) -> void:
