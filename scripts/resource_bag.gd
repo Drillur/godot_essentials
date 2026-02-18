@@ -22,12 +22,12 @@ func _ready():
 
 
 func dev__report_duration_of_ready_func() -> void:
-	if not Utility.DEV_MODE:
-		return
-	
 	var start_time: int = Time.get_ticks_msec()
 	await done.became_true
-	Log.pr("ResourceBag cached in", int(Time.get_ticks_msec() - start_time), "ms")
+	if Utility.DEV_MODE:
+		Log.pr("Cached icons and nodes in", int(Time.get_ticks_msec() - start_time), "ms")
+	else:
+		print("Cached icons and nodes in %s ms" % int(Time.get_ticks_msec() - start_time))
 
 
 func store_all_resources() -> void:
