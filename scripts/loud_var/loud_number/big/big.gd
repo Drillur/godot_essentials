@@ -170,17 +170,17 @@ static func multiply(_x: Variant, _y: Variant) -> Big:
 static func divide(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	_y = to_big(_y)
-
+	
 	if _y.mantissa == 0.0:
 		printerr("Big Error: Divide by ZERO. %se%s" % [_y.mantissa, _y.exponent])
 		return _x
-
+	
 	var new_exponent: int = _x.exponent - _y.exponent
 	var new_mantissa: float = _x.mantissa / _y.mantissa
 	while new_mantissa > 0.0 and new_mantissa < 1.0 and new_exponent > 0:
 		new_mantissa *= 10.0
 		new_exponent -= 1
-
+	
 	var result := Big.new(new_mantissa, new_exponent)
 	return result
 

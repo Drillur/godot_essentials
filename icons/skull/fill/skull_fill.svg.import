@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfsf0vhx8ip5a"
-path="res://.godot/imported/Skull.png-6206420e77be4648e0d9f862b7366eb9.ctex"
+uid="uid://dhi3po80w6ofa"
+path="res://.godot/imported/skull_fill.svg-32964c188d03613b12f5589921244e30.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://groups/essentials/icons/Skull.png"
-dest_files=["res://.godot/imported/Skull.png-6206420e77be4648e0d9f862b7366eb9.ctex"]
+source_file="res://groups/essentials/icons/skull/fill/skull_fill.svg"
+dest_files=["res://.godot/imported/skull_fill.svg-32964c188d03613b12f5589921244e30.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

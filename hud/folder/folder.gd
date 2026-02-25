@@ -27,6 +27,8 @@ extends MarginContainer
 func _ready() -> void:
 	if icon == null and not Engine.is_editor_hint():
 		icon_texture_rect.queue_free()
+	await Utility.process()
+	_update()
 
 
 #endregion
