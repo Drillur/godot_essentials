@@ -4,6 +4,7 @@ extends MarginContainer
 
 
 signal pressed
+signal right_pressed
 signal toggled(_toggled: bool)
 
 @export var text: String:
@@ -128,7 +129,7 @@ func _ready():
 		else:
 			invis_button.theme = ResourceBag.get_theme(&"invis")
 	
-	
+	invis_button.right_pressed.connect(right_pressed.emit)
 	invis_button.gui_input.connect(gui_input.emit)
 	
 	if not Engine.is_editor_hint():

@@ -166,9 +166,17 @@ func set_bool_limiter(b: LoudBool, limit: int) -> void:
 			set_to(limit)
 	)
 
+
+## Sets this LoudNumber to the given loud_number's current value
+func copy(loud_number: LoudNumber) -> void:
+	set_to(loud_number.val())
+
+
 #endregion
 
+
 #region Get
+
 
 func get_value() -> int:
 	return current
