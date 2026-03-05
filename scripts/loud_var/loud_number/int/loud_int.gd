@@ -71,9 +71,9 @@ func _emit_signals(_previous: int, _current: int) -> void:
 		increased.emit(_current - _previous)
 	
 	if _previous == 0:
-		became_non_zero.emit()
+		became_non_zero.emit(_current)
 	elif _current == 0:
-		became_zero.emit()
+		became_zero.emit(_previous)
 	
 	changed.emit()
 
@@ -167,7 +167,7 @@ func set_bool_limiter(b: LoudBool, limit: int) -> void:
 	)
 
 
-## Sets this LoudNumber to the given loud_number's current value
+## Set to the given loud_number's current value
 func copy(loud_number: LoudNumber) -> void:
 	set_to(loud_number.val())
 

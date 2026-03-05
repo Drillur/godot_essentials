@@ -2,9 +2,9 @@ class_name LoudNumber
 extends LoudVar
 
 @warning_ignore("unused_signal")
-signal became_zero
+signal became_zero(previous_value: Variant)
 @warning_ignore("unused_signal")
-signal became_non_zero
+signal became_non_zero(new_value: Variant)
 @warning_ignore("unused_signal")
 signal pending_changed
 @warning_ignore("unused_signal")

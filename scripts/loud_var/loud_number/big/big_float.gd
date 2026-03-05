@@ -85,9 +85,9 @@ func _emit_signals(_previous: Big, _current: Big) -> void:
 		increased.emit(_current.minus(_previous))
 	
 	if _previous.is_zero():
-		became_non_zero.emit()
+		became_non_zero.emit(_current)
 	elif _current.is_zero():
-		became_zero.emit()
+		became_zero.emit(_previous)
 	
 	changed.emit()
 
