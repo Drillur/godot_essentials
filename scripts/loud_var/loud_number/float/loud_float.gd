@@ -15,6 +15,7 @@ const NATURAL_LOGARITHM: float = 2.71828
 
 var previous: float
 var base: float
+var unclamped_value: float
 var custom_minimum_limit := LoudNumber.MIN_FLOAT:
 	set = _set_minimum_limit
 var custom_maximum_limit := LoudNumber.MAX_FLOAT:
@@ -83,17 +84,18 @@ func _create_book() -> void:
 func _set_current(n: float) -> void:
 	assert(not is_nan(n))
 	
+	unclamped_value = n
 	n = clampf(n, custom_minimum_limit, custom_maximum_limit)
 	if is_zero_approx(n):
 		n = 0.0
-
+	
 	if current == n:
 		return
-
+	
 	previous = current
 	current = n
 	text_requires_update = true
-
+	
 	_emit_signals(previous, current)
 
 
@@ -246,7 +248,7 @@ func get_effective_value() -> float:
 
 func get_text() -> String:
 	if text_requires_update:
-		update_text(current)
+		update_text(current, unclamped_value)
 	return text
 
 

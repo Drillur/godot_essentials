@@ -27,227 +27,34 @@ const MAX_INT: int = 9_223_372_036_854_775_807 ## 9.22e18
 const MIN_INT: int = -9_223_372_036_854_775_808  ## -9.22e18
 const MAX_FLOAT: float = 1.79769e308
 const MIN_FLOAT: float = -1.79769e308
-const VALID_COMPARISON_TYPES: Array[Variant.Type] = [
-	TYPE_FLOAT,
-	TYPE_INT,
-]
+const VALID_COMPARISON_TYPES: Array[Variant.Type] = [ TYPE_FLOAT, TYPE_INT ]
 const INVALID_TYPE_MESSAGE: String = "n must be int or float"
 const STANDARD_SUFFIXES: PackedStringArray = [
-	"",
-	"K",
-	"M",
-	"B",
-	"T",
-	"Qa",
-	"Qi",
-	"Sx",
-	"Sp",
-	"Oc",
-	"No", # 1e30
-	"Dc",
-	"UDc",
-	"DDc",
-	"TDc",
-	"QaDc",
-	"QiDc",
-	"SxDc",
-	"SpDc",
-	"OcDc",
-	"NoDc", # 1e60
-	"Vg",
-	"UVg",
-	"DVg",
-	"TVg",
-	"QaVg",
-	"QiVg",
-	"SxVg",
-	"SpVg",
-	"OcVg",
-	"NoVg", # 1e90
-	"Tg",
-	"UTg",
-	"DTg",
-	"TTg",
-	"QaTg",
-	"QiTg",
-	"SxTg",
-	"SpTg",
-	"OcTg",
-	"NoTg", # 1e120
-	"Qag",
-	"UQag",
-	"DQag",
-	"TQag",
-	"QaQag",
-	"QiQag",
-	"SxQag",
-	"SpQag",
-	"OcQag",
-	"NoQag", # 1e150
-	"Qig",
-	"UQig",
-	"DQig",
-	"TQig",
-	"QaQig",
-	"QiQig",
-	"SxQig",
-	"SpQig",
-	"OcQig",
-	"NoQig", # 1e180
-	"Sxg",
-	"USxg",
-	"DSxg",
-	"TSxg",
-	"QaSxg",
-	"QiSxg",
-	"SxSxg",
-	"SpSxg",
-	"OcSxg",
-	"NoSxg", # 1e210
-	"Spg",
-	"USpg",
-	"DSpg",
-	"TSpg",
-	"QaSpg",
-	"QiSpg",
-	"SxSpg",
-	"SpSpg",
-	"OcSpg",
-	"NoSpg", # 1e240
-	"Ocg",
-	"UOcg",
-	"DOcg",
-	"TOcg",
-	"QaOcg",
-	"QiOcg",
-	"SxOcg",
-	"SpOcg",
-	"OcOcg",
-	"NoOcg", # 1e270
-	"Nog",
-	"UNog",
-	"DNog",
-	"TNog",
-	"QaNog",
-	"QiNog",
-	"SxNog",
-	"SpNog",
-	"OcNog",
-	"NoNog", # 1e300
-	"C",
-	"UC",
-	"DC",
-	"TC",
-	"QaC",
-	"QiC",
-	"SxC",
-	"SpC",
-	"OcC",
-	"NoC", # 1e330
+	"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", # 1e30
+	"Dc", "UDc", "DDc", "TDc", "QaDc", "QiDc", "SxDc", "SpDc", "OcDc", "NoDc", # 1e60
+	"Vg", "UVg", "DVg", "TVg", "QaVg", "QiVg", "SxVg", "SpVg", "OcVg", "NoVg", # 1e90
+	"Tg", "UTg", "DTg", "TTg", "QaTg", "QiTg", "SxTg", "SpTg", "OcTg", "NoTg", # 1e120
+	"Qag", "UQag", "DQag", "TQag", "QaQag", "QiQag", "SxQag", "SpQag", "OcQag", "NoQag", # 1e150
+	"Qig", "UQig", "DQig", "TQig", "QaQig", "QiQig", "SxQig", "SpQig", "OcQig", "NoQig", # 1e180
+	"Sxg", "USxg", "DSxg", "TSxg", "QaSxg", "QiSxg", "SxSxg", "SpSxg", "OcSxg", "NoSxg", # 1e210
+	"Spg", "USpg", "DSpg", "TSpg", "QaSpg", "QiSpg", "SxSpg", "SpSpg", "OcSpg", "NoSpg", # 1e240
+	"Ocg", "UOcg", "DOcg", "TOcg", "QaOcg", "QiOcg", "SxOcg", "SpOcg", "OcOcg", "NoOcg", # 1e270
+	"Nog", "UNog", "DNog", "TNog", "QaNog", "QiNog", "SxNog", "SpNog", "OcNog", "NoNog", # 1e300
+	"C", "UC", "DC", "TC", "QaC", "QiC", "SxC", "SpC", "OcC", "NoC", # 1e330
 ]
 const LETTER_SUFFIXES: PackedStringArray = [
-	"",
-	"K",
-	"a",
-	"b",
-	"c",
-	"d",
-	"e",
-	"f",
-	"g",
-	"h",
-	"i", # i: e30
-	"j",
-	"k",
-	"l",
-	"m",
-	"n",
-	"o",
-	"p",
-	"q",
-	"r",
-	"s", # s: e60
-	"t",
-	"u",
-	"v",
-	"w",
-	"x",
-	"y",
-	"z",
-	"aa",
-	"ab",
-	"ac", # ac: e90
-	"ad",
-	"ae",
-	"af",
-	"ag",
-	"ah",
-	"ai",
-	"aj",
-	"ak",
-	"al",
-	"am", # am: e120
-	"an",
-	"ao",
-	"ap",
-	"aq",
-	"ar",
-	"as",
-	"at",
-	"au",
-	"av",
-	"aw", # aw: e150
-	"ax",
-	"ay",
-	"az",
-	"ba",
-	"bb",
-	"bc",
-	"bd",
-	"be",
-	"bf",
-	"bg", # bg: e180
-	"bh",
-	"bi",
-	"bj",
-	"bk",
-	"bl",
-	"bm",
-	"bn",
-	"bo",
-	"bp",
-	"bq", # bq: e210
-	"br",
-	"bs",
-	"bt",
-	"bu",
-	"bv",
-	"bw",
-	"bx",
-	"by",
-	"bz",
-	"ca", # ca: e240
-	"cb",
-	"cc",
-	"cd",
-	"ce",
-	"cf",
-	"cg",
-	"ch",
-	"ci",
-	"cj",
-	"ck", # ck: e270
-	"cl",
-	"cm",
-	"cn",
-	"co",
-	"cp",
-	"cq",
-	"cr",
-	"cs",
-	"ct",
-	"cu", # cu: e300
+	"", "K", "a", "b", "c", "d", "e", "f", "g", "h", "i", # i: e30
+	"j", "k", "l", "m", "n", "o", "p", "q", "r", "s", # s: e60
+	"t", "u", "v", "w", "x", "y", "z", "aa", "ab", "ac", # ac: e90
+	"ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", # am: e120
+	"an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", # aw: e150
+	"ax", "ay", "az", "ba", "bb", "bc", "bd", "be", "bf", "bg", # bg: e180
+	"bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", # bq: e210
+	"br", "bs", "bt", "bu", "bv", "bw", "bx", "by", "bz", "ca", # ca: e240
+	"cb", "cc", "cd", "ce", "cf", "cg", "ch", "ci", "cj", "ck", # ck: e270
+	"cl", "cm", "cn", "co", "cp", "cq", "cr", "cs", "ct", "cu", # cu: e300
 ]
+
 
 static var notation: Notation = Notation.STANDARD:
 	set = _set_notation
@@ -262,9 +69,12 @@ var text: String
 var text_requires_update := true:
 	set = _set_text_requires_update
 
+
 #region Static
 
-#region Format Number
+
+#region - Format Number
+
 
 static func format_number(value: Variant, override_decimals: int = -1) -> String:
 	if is_zero_approx(value):
@@ -321,6 +131,7 @@ static func _format_small_number(value: Variant, _sign: float, override_decimals
 	return String.num(value * _sign, decimals)
 
 #endregion
+
 
 ## Formats a percent float (0.0 to >= 1.0)
 static func format_percent(percent: float) -> String:
@@ -395,9 +206,12 @@ static func _set_notation(new_notation: Notation) -> void:
 	notation = new_notation
 	signals.notation_changed.emit(new_notation)
 
+
 #endregion
 
+
 #region Init
+
 
 func loud_number_init() -> void:
 	if initialized:
@@ -413,7 +227,9 @@ func loud_number_init() -> void:
 func _create_book() -> void:
 	pass
 
+
 #endregion
+
 
 #region Setters & Getters
 
@@ -432,11 +248,16 @@ func get_book() -> Book:
 
 #endregion
 
+
 #region Public
 
-func update_text(value) -> void:
+
+func update_text(value: Variant, unclamped_value: Variant) -> void:
 	text_requires_update = false
-	text = format_number(value)
+	if value == unclamped_value:
+		text = format_number(value)
+	else:
+		text = "%s (%s)" % [format_number(value), format_number(unclamped_value)]
 
 
 func get_text() -> String:
@@ -450,7 +271,9 @@ func reset() -> void:
 func is_copycat() -> bool:
 	return copycat_num != null
 
+
 #region Book
+
 
 func edit_change(category: Book.Category, source: Variant, amount) -> void:
 	book.edit_change(category, source, amount)
