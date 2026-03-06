@@ -161,10 +161,10 @@ func sync() -> void:
 func clamp_current() -> void:
 	if custom_maximum_limit:
 		if current.is_greater_than(custom_maximum_limit):
-			current = Big.new(custom_maximum_limit)
+			current.set_to(custom_maximum_limit)
 	if custom_minimum_limit:
 		if current.is_less_than(custom_minimum_limit):
-			current = Big.new(custom_minimum_limit)
+			current.set_to(custom_minimum_limit)
 
 
 func set_default_value(n: Variant) -> void:
@@ -213,7 +213,7 @@ func get_effective_value() -> Big:
 func get_text() -> String:
 	if text_requires_update:
 		text_requires_update = false
-		if current.is_equal_to(unclamped_value):
+		if not unclamped_value or current.is_equal_to(unclamped_value.val()):
 			text = current.get_text()
 		else:
 			text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
