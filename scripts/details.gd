@@ -2,14 +2,20 @@ class_name Details
 extends RefCounted
 
 
-var name: String = "": ## A setter/getter var for details_name
+#region Setter/getter vars
+
+var name: String:
 	set = _set_name, get = _get_name
-var brief_name: String = "":
+var brief_name: String:
 	set = _set_brief_name, get = _get_brief_name
+var plural_name: String: get = get_plural_name
+var icon: Texture2D = null: get = get_icon
+
+#endregion
 
 var details_name := DetailsName.new()
 var details_brief_name := DetailsBriefName.new()
-var icon := DetailsIcon.new()
+var details_icon := DetailsIcon.new()
 var color := DetailsColor.new()
 var title := DetailsTitle.new()
 
@@ -25,7 +31,7 @@ var description: String
 
 
 func _init() -> void:
-	for x in [icon, details_name, color, title]:
+	for x in [details_icon, details_name, color, title]:
 		x.changed.connect(_value_set)
 
 
@@ -36,26 +42,31 @@ func _init() -> void:
 
 
 func _value_set() -> void:
-	if color.is_set and icon.is_set and not icon.is_colored and icon.text == "":
-		icon.text = icon.text % color.html
+	if (
+		color.is_set and details_icon.is_set and not details_icon.is_colored
+		and details_icon.text == ""
+	):
+		details_icon.text = details_icon.text % color.html
 	
 	if title.is_set:
 		if color.is_set:
 			title.colored_text = color.text % title.text
 		
-		if icon.is_set:
-			icon_and_title = icon.text + " " + title.text
+		if details_icon.is_set:
+			icon_and_title = details_icon.text + " " + title.text
 		
-		if icon.is_set and color.is_set:
-			icon_and_colored_title = icon.text + " [color=#" + color.bright_color.to_html() + "]%s[/color]" % title.text
+		if details_icon.is_set and color.is_set:
+			icon_and_colored_title = details_icon.text + " [color=#" + \
+					color.bright_color.to_html() + "]%s[/color]" % title.text
 	
 	if details_brief_name.is_set:
 		if color.is_set:
 			details_brief_name.colored_text = color.text % details_brief_name.text
 		
-		if color.is_set and icon.is_set:
+		if color.is_set and details_icon.is_set:
 			icon_and_colored_brief_name = "%s [color=#%s]%s[/color]" % [
-					icon.text, color.bright_color.to_html(), details_brief_name.text]
+					details_icon.text, color.bright_color.to_html(),
+					details_brief_name.text]
 	
 	if details_name.is_set:
 		if color.is_set:
@@ -63,12 +74,13 @@ func _value_set() -> void:
 			if not details_name.plural.is_empty():
 				details_name.colored_plural = color.text % details_name.plural
 		
-		if icon.is_set:
-			icon_and_name = icon.text + " " + details_name.text
+		if details_icon.is_set:
+			icon_and_name = details_icon.text + " " + details_name.text
 		
-		if color.is_set and icon.is_set:
+		if color.is_set and details_icon.is_set:
 			icon_and_colored_name = "%s [color=#%s]%s[/color]" % [
-					icon.text, color.bright_color.to_html(), details_name.text]
+					details_icon.text, color.bright_color.to_html(),
+					details_name.text]
 
 
 func set_color(_color: Color) -> void:
@@ -85,15 +97,15 @@ func set_icon(_icon: Texture2D, _is_colored: bool = true) -> void:
 	if not _icon:
 		return
 	
-	icon.texture = _icon
-	icon.is_colored = _is_colored
-	icon.path = _icon.get_path()
-	icon.is_set = true
+	details_icon.texture = _icon
+	details_icon.is_colored = _is_colored
+	details_icon.path = _icon.get_path()
+	details_icon.is_set = true
 
-	if icon.is_colored:
-		icon.text = "[img=<16>]" + icon.path + "[/img]"
+	if details_icon.is_colored:
+		details_icon.text = "[img=<16>]" + details_icon.path + "[/img]"
 	else:
-		icon.text = "[img=<16> color=#%s]" + icon.path + "[/img]"
+		details_icon.text = "[img=<16> color=#%s]" + details_icon.path + "[/img]"
 
 
 func _set_name(_name: String) -> void:
@@ -124,15 +136,15 @@ func set_description(_description: String) -> void:
 
 
 func get_icon() -> Texture2D:
-	return icon.texture
+	return details_icon.texture
 
 
 func get_icon_path() -> String:
-	return icon.path
+	return details_icon.path
 
 
 func get_icon_text() -> String:
-	return icon.text
+	return details_icon.text
 
 
 func get_icon_and_title() -> String:
@@ -220,7 +232,7 @@ func is_title_set() -> bool:
 
 
 func is_icon_set() -> bool:
-	return icon.is_set
+	return details_icon.is_set
 
 
 func is_description_set() -> bool:
