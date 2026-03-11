@@ -1,18 +1,19 @@
 class_name LoudNumber
 extends LoudVar
 
-@warning_ignore("unused_signal")
-signal became_zero(previous_value: Variant)
-@warning_ignore("unused_signal")
-signal became_non_zero(new_value: Variant)
-@warning_ignore("unused_signal")
-signal pending_changed
-@warning_ignore("unused_signal")
-signal increased(delta: Variant)
-@warning_ignore("unused_signal")
-signal decreased(delta: Variant)
-@warning_ignore("unused_signal")
+
 signal text_changed
+
+@warning_ignore_start("unused_signal")
+
+signal became_zero(previous_value: Variant)
+signal became_non_zero(new_value: Variant)
+signal pending_changed
+signal increased(delta: Variant)
+signal decreased(delta: Variant)
+
+@warning_ignore_restore("unused_signal")
+
 
 enum Notation {
 	STANDARD,

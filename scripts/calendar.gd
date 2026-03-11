@@ -25,8 +25,7 @@ var month: Month:
 	set = _set_month
 
 var day_progress: float = 0.0
-var day_duration: float:
-	set = _set_day_duration
+var day_duration: LoudFloat
 
 
 #region Static
@@ -97,7 +96,8 @@ func _init(
 		_day_duration: float, _year: int = 1, _month: int = 1,
 		_day: int = 1) -> void:
 	
-	day_duration = _day_duration
+	day_duration = LoudFloat.new(_day_duration)
+	day_duration.custom_minimum_limit = 1.0 / 60.0
 	year_count = _year
 	month_count = _month
 	day_count = _day
@@ -139,16 +139,6 @@ func _set_month(new_month: Month) -> void:
 	month_changed.emit(month, previous)
 
 
-func _set_day_duration(new_day_duration: float) -> void:
-	const FPS_60: float = 1.0 / 60.0
-	new_day_duration = maxf(new_day_duration, FPS_60)
-
-	if day_duration == new_day_duration:
-		return
-	
-	day_duration = new_day_duration
-
-
 #endregion
 
 
@@ -158,8 +148,8 @@ func _set_day_duration(new_day_duration: float) -> void:
 func _process(delta: float) -> void:
 	day_progress += delta
 	
-	if day_progress >= day_duration:
-		day_progress -= day_duration
+	if day_progress >= day_duration.val():
+		day_progress -= day_duration.val()
 		_add_day()
 
 
@@ -234,6 +224,12 @@ func is_date(date: Date) -> bool:
 			and day_count == date.day)
 
 
+func get_date_text() -> String:
+	return "%s, %s %s, %s" % [
+			Day.keys()[day].capitalize(), Month.keys()[month].capitalize(),
+			day_count, year_count]
+
+
 #endregion
 
 
@@ -248,3 +244,9 @@ class Date:
 		month = _month
 		day = _day
 		year = _year
+	
+	
+	func get_date_text() -> String:
+		return "%s, %s %s, %s" % [
+				Day.keys()[day % 7].capitalize(), Month.keys()[month].capitalize(),
+				day, year]

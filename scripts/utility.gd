@@ -23,6 +23,7 @@ var window: Window
 
 var rng := RandomNumberGenerator.new()
 
+
 #region Ready
 
 
@@ -353,7 +354,7 @@ func validate_color_darkness(color: Color, limit := 1.0) -> Color:
 	return color
 
 
-#endregion
+#endregion -
 
 
 #endregion

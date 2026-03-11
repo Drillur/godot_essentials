@@ -215,55 +215,57 @@ static func power(_x: Variant, _y: Variant) -> Big:
 		result.mantissa = y_mantissa * result.mantissa
 		normalize(result)
 		return result
-
+	
 	elif typeof(_y) == TYPE_FLOAT:
-		if result.mantissa == 0:
+		if result.mantissa == 0.0:
 			return result
-
+		
 		# fast track
 		var temp: float = result.exponent * _y
-		var newMantissa = result.mantissa ** _y
-		if (
-			roundi(_y) == _y and
-			temp <= LoudNumber.MAX_INT and
-			temp >= LoudNumber.MIN_INT and
-			is_finite(temp)
-		):
-			if is_finite(newMantissa):
-				result.mantissa = newMantissa
-				result.exponent = int(temp)
-				normalize(result)
-				return result
-
+		var new_mantissa: float = result.mantissa ** _y
+		
+		var fast_track: bool = (
+				roundi(_y) == _y
+				and temp <= LoudNumber.MAX_INT
+				and temp >= LoudNumber.MIN_INT
+				and is_finite(temp)
+				and is_finite(new_mantissa))
+		
+		if fast_track:
+			result.mantissa = new_mantissa
+			result.exponent = int(temp)
+			normalize(result)
+			return result
+		
 		# a bit slower, still supports floats
 		var newExponent: int = int(temp)
 		var residue: float = temp - newExponent
-		newMantissa = 10 ** (_y * LoudNumber.log10(result.mantissa) + residue)
-		if newMantissa != INF and newMantissa != -INF:
-			result.mantissa = newMantissa
+		new_mantissa = 10 ** (_y * LoudNumber.log10(result.mantissa) + residue)
+		if new_mantissa != INF and new_mantissa != -INF:
+			result.mantissa = new_mantissa
 			result.exponent = newExponent
 			normalize(result)
 			return result
-
+		
 		if round(_y) != _y:
 			printerr("Big Error: Power function does not support large floats, use integers!")
-
+		
 		return power(_x, int(_y))
-
+	
 	elif _y is Big:
 		# warning - this might be slow!
-		if _y.isEqualTo(0):
-			return Big.new(1)
-		if _y.isLessThan(0):
+		if _y.is_equal_to(ZERO):
+			return Big.new(ONE)
+		if _y.is_less_than(ZERO):
 			printerr("Big Error: Negative exponents are not supported!")
-			return Big.new(0)
-
-		var exponent_decremented: Big = _y.minus(1)
-		while exponent_decremented.isGreaterThan(0):
+			return Big.new(ZERO)
+		
+		var exponent_decremented: Big = _y.minus(ONE)
+		while exponent_decremented.is_greater_than(Big.ZERO):
 			result.times_equals(_x)
-			exponent_decremented.minus_equals(1)
+			exponent_decremented.minus_equals(ONE)
 		return result
-
+	
 	else:
 		printerr("Big Error: Unknown/unsupported data type passed as an exponent in power function!")
 		return _x

@@ -84,6 +84,7 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 	else:
 		update = func():
 			_node.visible = is_false()
+	assert(not _node.tree_exiting.is_connected(changed.disconnect), "Already bound")
 	_node.tree_exiting.connect(changed.disconnect.bind(update))
 	changed.connect(update)
 	update.call()
