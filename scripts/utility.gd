@@ -10,7 +10,7 @@ signal process_frame(delta: float)
 enum AudioLayer { MASTER, UI, MUSIC }
 enum Platform { PC, BROWSER }
 
-const DEV_MODE: bool = true
+const DEV_MODE: bool = false
 const PLATFORM: Platform = Platform.PC
 const SCROLL_SPEED: int = 25
 
@@ -20,7 +20,8 @@ var class_data: Dictionary[String, String]
 var tree: SceneTree
 var viewport: Viewport
 var window: Window
-
+var game_version: Dictionary[StringName, int] = {}:
+	get = _get_game_version
 var rng := RandomNumberGenerator.new()
 
 
@@ -29,10 +30,7 @@ var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	print("Version %s.%s.%s" % [
-		int(ProjectSettings.get("application/config/version").split(".")[0]),
-		int(ProjectSettings.get("application/config/version").split(".")[1]),
-		int(ProjectSettings.get("application/config/version").split(".")[2]),
-	])
+			game_version.major, game_version.minor, game_version.revision])
 	
 	tree = get_tree()
 	viewport = get_viewport()
@@ -47,6 +45,24 @@ func cache_class_paths() -> void:
 		if class_data.has(x["class"]):
 			continue
 		class_data[x["class"]] = x["path"]
+
+
+#endregion
+
+
+
+#region Getters
+
+
+func _get_game_version() -> Dictionary[StringName, int]:
+	if game_version.is_empty():
+		var version: String = ProjectSettings.get("application/config/version")
+		var version_split: Array = version.split(".")
+		game_version = {
+				&"major": int(version_split[0]),
+				&"minor": int(version_split[1]),
+				&"revision": int(version_split[2])}
+	return game_version
 
 
 #endregion
