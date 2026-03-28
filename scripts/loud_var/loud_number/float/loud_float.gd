@@ -10,12 +10,12 @@ const FIFTY_PERCENT: float = 0.5
 const NATURAL_LOGARITHM: float = 2.71828
 
 @export var current: float:
-	set = _set_current
+	set = _set_current, get = _get_current
 @export var saved_pending_value: float = 0.0
 
 var previous: float
 var base: float
-var unclamped_value: float
+#var unclamped_value: float
 var custom_minimum_limit := LoudNumber.MIN_FLOAT:
 	set = _set_minimum_limit
 var custom_maximum_limit := LoudNumber.MAX_FLOAT:
@@ -71,7 +71,8 @@ func _init(_base: float = 0.0, _custom_minimum_limit := MIN_FLOAT, _custom_maxim
 
 func _create_book() -> void:
 	book = Book.new(Book.Type.FLOAT)
-	book.changed.connect(sync)
+	book.changed.connect(sync.call_deferred)
+	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
 
@@ -84,7 +85,7 @@ func _create_book() -> void:
 func _set_current(n: float) -> void:
 	assert(not is_nan(n))
 	
-	unclamped_value = n
+	#unclamped_value = n
 	n = clampf(n, custom_minimum_limit, custom_maximum_limit)
 	if is_zero_approx(n):
 		n = 0.0
@@ -97,6 +98,11 @@ func _set_current(n: float) -> void:
 	text_requires_update = true
 	
 	_emit_signals(previous, current)
+
+
+func _get_current() -> float:
+	sync()
+	return current
 
 
 func _set_minimum_limit(n: float) -> void:
@@ -186,7 +192,8 @@ func divided_by_equals(amount: float) -> void:
 
 
 func sync() -> void:
-	if book.sync_allowed.is_true():
+	if book.sync_allowed.is_true() and book.sync_required:
+		book.sync_required = false
 		set_to(book.sync.call(base))
 
 
@@ -248,7 +255,7 @@ func get_effective_value() -> float:
 
 func get_text() -> String:
 	if text_requires_update:
-		update_text(current, unclamped_value)
+		update_text(current)#, unclamped_value)
 	return text
 
 

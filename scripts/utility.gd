@@ -10,7 +10,7 @@ signal process_frame(delta: float)
 enum AudioLayer { MASTER, UI, MUSIC }
 enum Platform { PC, BROWSER }
 
-const DEV_MODE: bool = false
+const DEV_MODE: bool = true
 const PLATFORM: Platform = Platform.PC
 const SCROLL_SPEED: int = 25
 

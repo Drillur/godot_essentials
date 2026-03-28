@@ -13,7 +13,9 @@ static var SIXTY: Big = Big.new(60.0, 0)
 var mantissa: float
 var exponent: int
 
+
 #region Init
+
 
 func _init(m: Variant = 1.0, e: int = 0) -> void:
 	if m is Big:
@@ -28,9 +30,12 @@ func _init(m: Variant = 1.0, e: int = 0) -> void:
 		exponent = e
 	normalize(self)
 
+
 #endregion
 
+
 #region Static
+
 
 static func to_big(_n: Variant) -> Big:
 	return _n if _n is Big else Big.new(_n)
@@ -39,7 +44,7 @@ static func to_big(_n: Variant) -> Big:
 static func normalize(_big: Big) -> void:
 	var _sign := signf(_big.mantissa)
 	_big.mantissa = absf(_big.mantissa)
-
+	
 	if _big.mantissa != 0.0 and (_big.mantissa < 1.0 or _big.mantissa >= 10.0):
 		var diff: int = floori(LoudNumber.log10(_big.mantissa))
 		if diff > -10 and diff < 248:
@@ -47,7 +52,7 @@ static func normalize(_big: Big) -> void:
 			if div > MANTISSA_PRECISION:
 				_big.mantissa /= div
 				_big.exponent += diff
-
+	
 	while _big.exponent < 0:
 		_big.mantissa *= 0.1
 		_big.exponent += 1
@@ -58,7 +63,7 @@ static func normalize(_big: Big) -> void:
 		_big.mantissa *= 0.1
 		_big.exponent += 1
 	_big.mantissa = snappedf(_big.mantissa, MANTISSA_PRECISION)
-
+	
 	_big.mantissa *= _sign
 
 
@@ -88,18 +93,18 @@ static func format_int(value: int) -> String:
 static func rand_range(_x: Variant, _y: Variant) -> Big:
 	var a := Big.new(_x)
 	var b := Big.new(_y)
-
+	
 	if a.is_equal_to(b):
 		return a
-
+	
 	# Ensure a < b
 	if a.is_greater_than(b):
 		var temp: Big = b
 		b = a
 		a = temp
-
+	
 	var result: Big
-
+	
 	# If a and b are within e10 of each other, calculate it like this
 	if absi(b.exponent - a.exponent) <= 10:
 		var subtraction := Big.subtract(b, a)
@@ -107,40 +112,50 @@ static func rand_range(_x: Variant, _y: Variant) -> Big:
 			var big_range: float = subtraction.to_float()
 			result = Big.new(randf_range(0.0, big_range)).plus(a)
 			return result
-
+	
 	var random_exponent := randi_range(a.exponent, b.exponent)
 	var random_mantissa: float
-
+	
 	if random_exponent == a.exponent:
 		random_mantissa = randf_range(a.mantissa, 10.0)
 	elif random_exponent == b.exponent:
 		random_mantissa = randf_range(1.0, b.mantissa)
 	else:
 		random_mantissa = randf_range(1.0, 10.0)
-
+	
 	result = Big.new(random_mantissa, random_exponent)
-
+	
 	# Ensure the result is within the original range
 	if result.is_less_than(a):
 		return a
 	elif result.is_greater_than(b):
 		return b
-
+	
 	return result
 
+
+## Useful for Array.reduce()
+static func sum(a: Big, b: Big) -> Big:
+	return add(a, b)
+
+
 #region Operations
+
 
 static func add(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	_y = to_big(_y)
 	var result := Big.new(_x)
-
+	
 	var exponent_delta: int = _y.exponent - _x.exponent
 	if exponent_delta < 248.0:
 		var scaled_mantissa: float = _y.mantissa * pow(10, exponent_delta)
 		result.mantissa = _x.mantissa + scaled_mantissa
-	elif _x.is_less_than(_y): # When difference between values is too big, discard the smaller number
+	
+	elif _x.is_less_than(_y):
+		# Discard whichever is smaller between x and y
 		result.set_to(_y)
+	
 	normalize(result)
 	return result
 
@@ -155,7 +170,7 @@ static func multiply(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	_y = to_big(_y)
 	var result := Big.new()
-
+	
 	var new_exponent: int = _y.exponent + _x.exponent
 	var new_mantissa: float = _y.mantissa * _x.mantissa
 	while new_mantissa >= 10.0:
@@ -336,11 +351,13 @@ static func round_down(n: Big) -> Big:
 	return n
 
 
+## Returns the minimum of the given values
 static func get_min(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	return _x if _x.is_less_than(_y) else to_big(_y)
 
 
+## Returns the maximum of the given values
 static func get_max(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	return _x if _x.is_greater_than(_y) else to_big(_y)
@@ -353,11 +370,15 @@ static func delta(_x: Variant, _y: Variant) -> Big:
 		return subtract(_x, _y)
 	return subtract(_y, _x)
 
-#endregion
 
 #endregion
+
+
+#endregion
+
 
 #region Modifiers
+
 
 func set_to(_n: Variant) -> Big:
 	var new_value: Big = to_big(_n)

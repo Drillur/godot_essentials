@@ -18,17 +18,20 @@ enum Type {
 	BIG,
 }
 
-var sync_allowed := LoudBool.new(true) ## Turn off before making massive changes. Turn on afterwards.
+## Turn off before making massive changes. Turn on afterwards.
+var sync_allowed := LoudBool.new(true)
+var sync_required: bool = true ## A change was made, syncing is required
 
 var type: Type
 var sync: Callable
-var adders: Array[Resource]
+var adders: Array[Resource] ## As of Stage 3, the highest adders.size() I saw was 24
 var subtracters: Array[Resource]
-var multipliers: Array[Resource]
+var multipliers: Array[Resource] ## As of Stage 3, the highest adders.size() I saw was 18
+var conditional_multipliers: Dictionary[Variant, ConditionalEntry]
 var dividers: Array[Resource]
 var powerers: Array[Resource]
 
-var book := {}
+var book: Dictionary[Category, LoudDict] = {}
 
 
 #region Static
@@ -53,31 +56,31 @@ func _init(_type: Type):
 	match type:
 		Type.INT:
 			book = {
-				Book.Category.ADDED: LoudDict.Int.new({"multiplicative": false}),
-				Book.Category.SUBTRACTED: LoudDict.Int.new({"multiplicative": false}),
+				Book.Category.ADDED: LoudDict.Int.new(),
+				Book.Category.SUBTRACTED: LoudDict.Int.new(),
 				Book.Category.MULTIPLIED: LoudDict.Int.new({"multiplicative": true}),
 				Book.Category.DIVIDED: LoudDict.Int.new({"multiplicative": true}),
-				Book.Category.PENDING: LoudDict.Int.new({"multiplicative": false}),
+				Book.Category.PENDING: LoudDict.Int.new(),
 			}
 			sync = func(base) -> int:
 				return (base + get_added() - get_subtracted()) * get_multiplied() / get_divided()
 		Type.FLOAT:
 			book = {
-				Book.Category.ADDED: LoudDict.Float.new({"multiplicative": false}),
-				Book.Category.SUBTRACTED: LoudDict.Float.new({"multiplicative": false}),
+				Book.Category.ADDED: LoudDict.Float.new(),
+				Book.Category.SUBTRACTED: LoudDict.Float.new(),
 				Book.Category.MULTIPLIED: LoudDict.Float.new({"multiplicative": true}),
 				Book.Category.DIVIDED: LoudDict.Float.new({"multiplicative": true}),
-				Book.Category.PENDING: LoudDict.Float.new({"multiplicative": false}),
+				Book.Category.PENDING: LoudDict.Float.new(),
 			}
 			sync = func(base) -> float:
 				return (base + get_added() - get_subtracted()) * get_multiplied() / get_divided()
 		Type.BIG:
 			book = {
-				Book.Category.ADDED: LoudDict._Big.new({"multiplicative": false}),
-				Book.Category.SUBTRACTED: LoudDict._Big.new({"multiplicative": false}),
+				Book.Category.ADDED: LoudDict._Big.new(),
+				Book.Category.SUBTRACTED: LoudDict._Big.new(),
 				Book.Category.MULTIPLIED: LoudDict._Big.new({"multiplicative": true}),
 				Book.Category.DIVIDED: LoudDict._Big.new({"multiplicative": true}),
-				Book.Category.PENDING: LoudDict._Big.new({"multiplicative": false}),
+				Book.Category.PENDING: LoudDict._Big.new(),
 			}
 			sync = func(base) -> Big:
 				var result: Big = Big.new(base)
@@ -98,6 +101,7 @@ func _init(_type: Type):
 func reset() -> void:
 	for category in book:
 		book[category].reset()
+	sync_required = true
 
 
 func reset_pending() -> void:
@@ -105,20 +109,26 @@ func reset_pending() -> void:
 	pending_changed.emit()
 
 
-func edit_change(category: Book.Category, source, amount) -> void:
-	book[category].edit(source, amount)
+func edit_change(category: Book.Category, source: Variant, amount: Variant) -> void:
+	var no_change: bool = not book[category].edit(source, amount)
+	if no_change:
+		return
 	if category == Book.Category.PENDING:
 		pending_changed.emit()
 	else:
-		changed.emit()
+		if not sync_required:
+			sync_required = true
+			changed.emit()
 
 
-func remove_change(category: Book.Category, source) -> void:
+func remove_change(category: Book.Category, source: Variant) -> void:
 	book[category].erase(source)
 	if category == Book.Category.PENDING:
 		pending_changed.emit()
 	else:
-		changed.emit()
+		if not sync_required:
+			sync_required = true
+			changed.emit()
 
 
 func add_adder(object: Resource) -> void:
@@ -161,6 +171,9 @@ func subtracter_changed(object: Resource) -> void:
 	edit_change(Book.Category.SUBTRACTED, object, object.get_value())
 
 
+#region Multipliers
+
+
 func add_multiplier(object: Resource) -> void:
 	if multipliers.has(object) or object.changed.is_connected(multiplier_changed):
 		return
@@ -177,8 +190,37 @@ func remove_multiplier(object: Resource) -> void:
 	multipliers.erase(object)
 
 
+## Receives a ConditionalEntry. Based on the triggers, will call the attached
+## function to get a value to applied multiplicatively
+func add_conditional_multiplier(conditional_entry: ConditionalEntry) -> void:
+	assert(not conditional_multipliers.has(conditional_entry.source),
+			"This source was already added.")
+	conditional_multipliers[conditional_entry.source] = conditional_entry
+	for trigger: Signal in conditional_entry.triggers:
+		trigger.connect(conditional_multiplier_changed.bind(conditional_entry))
+	conditional_multiplier_changed(conditional_entry)
+
+
+func remove_conditional_multiplier(source: Variant) -> void:
+	assert(conditional_multipliers.has(source), "%s was not added" % source)
+	var conditional_entry: ConditionalEntry = conditional_multipliers[source]
+	for trigger: Signal in conditional_entry.triggers:
+		trigger.disconnect(conditional_multiplier_changed)
+	conditional_multipliers.erase(source)
+	edit_change(Book.Category.MULTIPLIED, conditional_entry.source, 1.0)
+
+
 func multiplier_changed(object: Resource) -> void:
 	edit_change(Book.Category.MULTIPLIED, object, object.get_value())
+
+
+func conditional_multiplier_changed(conditional_entry: ConditionalEntry) -> void:
+	var source: Variant = conditional_entry.source
+	var amount: Variant = conditional_entry.get_value.call()
+	edit_change(Book.Category.MULTIPLIED, source, amount)
+
+
+#endregion
 
 
 func add_divider(object: Resource) -> void:
@@ -200,22 +242,16 @@ func divider_changed(object: Resource) -> void:
 
 
 func add_powerer(base: Resource, exponent: Resource, offset := 0) -> void:
-	var power_up = func():
+	var power_up: Callable = func() -> void:
 		var offset_amount: float = offset
 		if exponent is BigFloat:
 			offset_amount += exponent.val().to_float()
 		else:
 			offset_amount += exponent.val()
+		offset_amount = max(0, offset_amount)
 		
-		edit_change(
-			Book.Category.MULTIPLIED,
-			base,
-			Big.power(
-				base.get_value(),
-				max(0, offset_amount)
-			)
-		)
-		changed.emit()
+		edit_change(Book.Category.MULTIPLIED, base,
+				Big.power(base.val(), offset_amount))
 	
 	power_up.call()
 	base.changed.connect(power_up)
@@ -280,14 +316,32 @@ func get_added_from_source(_source: Variant) -> Variant:
 	return book[Book.Category.ADDED].get_value(_source)
 
 
-func report() -> void:
-	Log.prn("Added:", get_added_text(), book[Book.Category.ADDED].data,
-		"\nMultiplied:", get_multiplied_text(), book[Book.Category.MULTIPLIED].data
-	)
-	Log.prn(
-		"Subtracted:", get_subtracted_text(), book[Book.Category.SUBTRACTED].data,
-		"\nDivided:", get_divided_text(), book[Book.Category.DIVIDED].data,
-	)
+#func report() -> void:
+	#Log.prn("Added:", get_added_text(), book[Book.Category.ADDED].data,
+		#"\nMultiplied:", get_multiplied_text(), book[Book.Category.MULTIPLIED].data
+	#)
+	#Log.prn(
+		#"Subtracted:", get_subtracted_text(), book[Book.Category.SUBTRACTED].data,
+		#"\nDivided:", get_divided_text(), book[Book.Category.DIVIDED].data,
+	#)
+
+
+#endregion
+
+
+#region Classes
+
+
+class ConditionalEntry:
+	var source: Variant
+	var get_value: Callable
+	var triggers: Array[Signal]
+	
+	
+	func _init(_source: Variant, _get_value: Callable, _triggers: Array[Signal]) -> void:
+		source = _source
+		get_value = _get_value
+		triggers = _triggers
 
 
 #endregion

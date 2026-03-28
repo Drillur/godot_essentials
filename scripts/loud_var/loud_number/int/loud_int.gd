@@ -7,12 +7,12 @@ const ONE: int = 1
 
 @warning_ignore("unused_private_class_variable")
 @export var current: int:
-	set = _set_current
+	set = _set_current, get = _get_current
 @export var saved_pending_value: int = 0
 
 var previous: int
 var base: int
-var unclamped_value: int
+#var unclamped_value: int
 var custom_minimum_limit := MIN_INT:
 	set = _set_minimum_limit
 var custom_maximum_limit := MAX_INT:
@@ -34,7 +34,8 @@ func _init(_base: int = ZERO, _custom_minimum_limit := MIN_INT, _custom_maximum_
 
 func _create_book() -> void:
 	book = Book.new(Book.Type.INT)
-	book.changed.connect(sync)
+	book.changed.connect(sync.call_deferred)
+	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
 
@@ -47,7 +48,7 @@ func _create_book() -> void:
 func _set_current(n: int) -> void:
 	assert(not is_nan(n))
 	
-	unclamped_value = n
+	#unclamped_value = n
 	n = clampi(n, custom_minimum_limit, custom_maximum_limit)
 	
 	if current == n:
@@ -58,6 +59,11 @@ func _set_current(n: int) -> void:
 	text_requires_update = true
 	
 	_emit_signals(previous, current)
+
+
+func _get_current() -> int:
+	sync()
+	return current
 
 
 func _set_minimum_limit(n: int) -> void:
@@ -147,7 +153,8 @@ func divided_by_equals(amount: int) -> void:
 
 
 func sync() -> void:
-	if book.sync_allowed.is_true():
+	if book.sync_allowed.is_true() and book.sync_required:
+		book.sync_required = false
 		set_to(book.sync.call(base))
 
 
@@ -208,7 +215,7 @@ func get_effective_value() -> int:
 
 func get_text() -> String:
 	if text_requires_update:
-		update_text(current, unclamped_value)
+		update_text(current)#, unclamped_value)
 	return text
 
 

@@ -62,7 +62,7 @@ static var notation: Notation = Notation.STANDARD:
 static var signals := SignalBus.new()
 
 var book: Book:
-	get = get_book
+	get = _get_book
 var copycat_num: LoudNumber
 var initialized := false
 
@@ -242,7 +242,7 @@ func _set_text_requires_update(val: bool) -> void:
 		text_changed.emit()
 
 
-func get_book() -> Book:
+func _get_book() -> Book:
 	if book == null:
 		_create_book()
 	return book
@@ -253,12 +253,12 @@ func get_book() -> Book:
 #region Public
 
 
-func update_text(value: Variant, unclamped_value: Variant) -> void:
+func update_text(value: Variant) -> void:#, unclamped_value: Variant) -> void:
 	text_requires_update = false
-	if value == unclamped_value:
-		text = format_number(value)
-	else:
-		text = "%s (%s)" % [format_number(value), format_number(unclamped_value)]
+	#if value == unclamped_value:
+	text = format_number(value)
+	#else:
+		#text = "%s (%s)" % [format_number(value), format_number(unclamped_value)]
 
 
 func get_text() -> String:
@@ -296,11 +296,11 @@ func edit_divided(source: Variant, amount: Variant) -> void:
 	edit_change(Book.Category.DIVIDED, source, amount)
 
 
-func edit_pending(source: Variant, _amount) -> void:
+func edit_pending(source: Variant, _amount: Variant) -> void:
 	edit_change(Book.Category.PENDING, source, _amount)
 
 
-func remove_change(category: Book.Category, source) -> void:
+func remove_change(category: Book.Category, source: Variant) -> void:
 	book.remove_change(category, source)
 
 

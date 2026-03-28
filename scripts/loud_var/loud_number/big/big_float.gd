@@ -6,10 +6,11 @@ extends LoudNumber
 @export var saved_value: String
 @export var saved_pending_value: String
 
-var current := Big.new(0.0)
+var current := Big.new(0.0):
+	get = _get_current
 var base: Big
 var previous := Big.new(0.0)
-var unclamped_value: Big
+#var unclamped_value: Big
 var cat: Variant
 var custom_minimum_limit: Big:
 	set = _set_minimum_limit
@@ -30,7 +31,8 @@ func _init(x: Variant = 1.0) -> void:
 
 func _create_book() -> void:
 	book = Book.new(Book.Type.BIG)
-	book.changed.connect(sync)
+	book.changed.connect(sync.call_deferred)
+	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
 
@@ -44,7 +46,7 @@ func _set_current(n: Big) -> void:
 	previous.set_to(current)
 	
 	if custom_maximum_limit or custom_minimum_limit:
-		unclamped_value.set_to(n)
+		#unclamped_value.set_to(n)
 		
 		if custom_maximum_limit:
 			n = Big.get_min(n, custom_maximum_limit)
@@ -59,17 +61,22 @@ func _set_current(n: Big) -> void:
 		_emit_signals(previous, current)
 
 
+func _get_current() -> Big:
+	sync()
+	return current
+
+
 func _set_minimum_limit(n: Big) -> void:
 	custom_minimum_limit = n
-	if not unclamped_value:
-		unclamped_value = Big.new(0.0)
+	#if not unclamped_value:
+		#unclamped_value = Big.new(0.0)
 	clamp_current()
 
 
 func _set_maximum_limit(n: Big) -> void:
 	custom_maximum_limit = n
-	if not unclamped_value:
-		unclamped_value = Big.new(0.0)
+	#if not unclamped_value:
+		#unclamped_value = Big.new(0.0)
 	clamp_current()
 
 
@@ -154,7 +161,8 @@ func divided_by_equals(amount: Variant) -> void:
 
 
 func sync() -> void:
-	if book.sync_allowed.is_true():
+	if book.sync_allowed.is_true() and book.sync_required:
+		book.sync_required = false
 		set_to(book.sync.call(base))
 
 
@@ -213,10 +221,10 @@ func get_effective_value() -> Big:
 func get_text() -> String:
 	if text_requires_update:
 		text_requires_update = false
-		if not unclamped_value or current.is_equal_to(unclamped_value.val()):
-			text = current.get_text()
-		else:
-			text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
+		#if not unclamped_value or current.is_equal_to(unclamped_value.val()):
+		text = current.get_text()
+		#else:
+			#text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
 	return text
 
 

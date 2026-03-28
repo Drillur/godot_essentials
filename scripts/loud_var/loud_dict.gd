@@ -110,7 +110,7 @@ func _init(_data := {}) -> void:
 	multiplicative = _data.get("multiplicative", false)
 	_data.erase("multiplicative")
 	base = _data
-	data = base
+	data = base.duplicate()
 	if multiplicative:
 		is_value_redundant = func(value) -> bool:
 			match typeof(value):
@@ -153,7 +153,7 @@ func are_values_equal(a: Variant, b: Variant) -> bool:
 	if not (b_type == TYPE_INT or b_type == TYPE_FLOAT):
 		return b.is_equal_to(a)
 	
-	return is_equal_approx(a, b)
+	return a == b
 
 
 func add(key: Variant, value: Variant) -> void:
@@ -227,12 +227,26 @@ func reset() -> void:
 	recalculate_sum()
 
 
-func edit(key: Variant, value: Variant) -> void:
-	if data.has(key):
-		if are_values_equal(get_value(key), value):
-			return
+## Returns whether anything was changed
+func edit(key: Variant, value: Variant) -> bool:
+	var has_key: bool = data.has(key)
+	var previous_value: Variant = null
+	if has_key:
+		previous_value = get_value(key)
+		if are_values_equal(previous_value, value):
+			return false
 		erase(key)
+	
+	if is_value_redundant.call(value):
+		# If had the key already:
+		# 	The value is being edited from non-zero to zero (ie 5 -> 0)
+		# 	For this case, it should return true (a change occurred)
+		# If the key didn't exist:
+		# 	It's trying to add zero or multiply by 1
+		return has_key
+	
 	add(key, value)
+	return true
 
 
 #endregion

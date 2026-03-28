@@ -186,6 +186,7 @@ func timer_timeout() -> void:
 	if is_stopped():
 		return
 	
+	running.set_false()
 	stopped.emit()
 	timeout.emit()
 
