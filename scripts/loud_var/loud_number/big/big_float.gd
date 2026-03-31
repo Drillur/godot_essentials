@@ -94,9 +94,9 @@ func save_current_value() -> void:
 
 func load_saved_value() -> void:
 	if not saved_value.is_empty():
-		set_to(Big.new(saved_value))
+		set_to(saved_value)
 	if save_pending and not saved_pending_value.is_empty():
-		plus_equals(Big.new(saved_pending_value))
+		plus_equals(saved_pending_value)
 
 
 #endregion

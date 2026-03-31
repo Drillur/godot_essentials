@@ -561,34 +561,27 @@ func is_positive() -> bool:
 
 func percent_of(_n: Variant) -> float:
 	_n = to_big(_n)
-
-	assert(
-		not is_zero_approx(_n.mantissa),
-		"You can't divide by ZERO, it's impossible. Why isn't it possible you stupid bastard?",
-	)
-
+	
+	assert(not is_zero_approx(_n.mantissa))
+	
 	if exponent > _n.exponent:
 		return LoudFloat.ONE
-
+	
 	var exponent_delta: int = _n.exponent - exponent
 	if exponent_delta > 9:
 		return LoudFloat.ZERO
-
-	var result := Big.new(
-		mantissa / _n.mantissa,
-		exponent - _n.exponent,
-	)
+	
+	var result := Big.new(mantissa / _n.mantissa, exponent - _n.exponent)
 	normalize(result)
+	
+	return clampf(result.mantissa * pow(10, result.exponent), 0.0, 1.0)
 
-	return clampf(
-		result.mantissa * pow(10, result.exponent),
-		LoudFloat.ZERO,
-		LoudFloat.ONE,
-	)
 
 #endregion
 
+
 #region Get Text
+
 
 func get_text() -> String:
 	if exponent < 6:
