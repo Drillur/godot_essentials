@@ -14,15 +14,12 @@ enum Month {
 const DAYS_PER_MONTH: Array[int] = [
 		31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-@export var year_count: int = 1:
-	set = _set_year_count
-@export var month_count: int = 1
-@export var day_count: int = 1
+@export var year_count: int = 1: set = _set_year_count
+@export var month_count: int = 1 ## Human-readable month number, like Jan = 1
+@export var day_count: int = 1 ## Human-readable day, such as Jan [code]1[/code]
 
-var day: Day:
-	set = _set_day
-var month: Month:
-	set = _set_month
+var day: Day: set = _set_day
+var month: Month: set = _set_month
 
 var day_progress: float = 0.0
 var day_duration: LoudFloat
@@ -42,7 +39,7 @@ static func are_dates_equal(a: Date, b: Date) -> bool:
 #region - Easter Calculator
 
 
-## Returns the year_count, month_count, and day_count of Easter given the year_count
+## Returns the year, month, and day of Easter depending on [code]_year[/code]
 static func get_easter_date(_year: int) -> Dictionary[StringName, int]:
 	var a: int = _year % 19
 	var b: int = floori(_year / 100.0)

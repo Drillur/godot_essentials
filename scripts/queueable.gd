@@ -207,7 +207,7 @@ func _cooldown_period() -> void:
 		CooldownType.PHYSICS_PROCESS:
 			await Utility.physics()
 		CooldownType.DURATION:
-			await Main.instance.get_tree().create_timer(cooldown_duration).timeout
+			await Utility.timer(cooldown_duration)
 
 
 #endregion

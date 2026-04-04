@@ -8,6 +8,7 @@ const MANTISSA_PRECISION: float = 0.0000001
 static var NEGATIVE_ONE: Big = Big.new(-1.0)
 static var ZERO: Big = Big.new(0.0, 0)
 static var ONE: Big = Big.new(1.0, 0)
+static var TEN: Big = Big.new(10.0, 0)
 static var SIXTY: Big = Big.new(60.0, 0)
 
 var mantissa: float

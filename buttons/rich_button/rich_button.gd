@@ -167,19 +167,16 @@ func _set_color(val: Color) -> void:
 	invis_button.modulate = val
 	if background:
 		background.modulate = val
-	#if val == Color.BLACK or val == Color.WHITE:
-		#label.modulate = val
 	if check_button:
 		check_button.modulate = val
-	if modulate_icon:
-		texture_rect.modulate = val
+	modulate_icon = modulate_icon
 
 
 func _set_modulate_icon(val: bool) -> void:
 	if texture_rect == null:
 		return
 	modulate_icon = val
-	if val:
+	if val and not disabled:
 		texture_rect.modulate = color
 	else:
 		texture_rect.modulate = Color.WHITE
@@ -227,15 +224,17 @@ func _set_center_content(val: bool) -> void:
 
 
 func _set_disabled(val: bool) -> void:
-	if disabled == val:
-		return
 	disabled = val
+	
 	if not is_node_ready():
 		await ready
-	if val:
-		disable()
-	else:
-		enable()
+	
+	modulate_icon = modulate_icon
+	
+	modulate = Color(0.5, 0.5, 0.5) if disabled else Color.WHITE
+	invis_button.disabled = disabled
+	invis_button.mouse_default_cursor_shape = (
+			Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND)
 
 
 func _set_check_button_mode(val: bool) -> void:
@@ -397,18 +396,6 @@ func hide_text() -> void:
 
 func set_color(val: Color) -> void:
 	color = val
-
-
-func enable() -> void:
-	modulate = Color.WHITE
-	invis_button.disabled = false
-	invis_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-
-func disable() -> void:
-	modulate = Color(0.5, 0.5, 0.5)
-	invis_button.disabled = true
-	invis_button.mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 
 #region Signals

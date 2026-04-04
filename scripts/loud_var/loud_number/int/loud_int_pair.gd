@@ -224,4 +224,8 @@ func is_empty() -> bool:
 	return current.is_zero()
 
 
+func is_zero() -> bool:
+	return current.is_zero()
+
+
 #endregion

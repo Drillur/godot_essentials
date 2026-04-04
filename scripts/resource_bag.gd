@@ -83,11 +83,20 @@ func folder_is_invalid(filename: StringName) -> bool:
 
 func extension_is_invalid(extension: StringName) -> bool:
 	const VALID_EXTENSIONS: Array[String] = [
-		"png", "jpg", "svg", # Image
-		"wav", "mp3", # Audio
-		"import", "remap", # Export
-		"tscn", "tres", "gd", "json", # Native?
-		"dialogue", # Addons
+		# Image
+		"png", "jpg", "svg",
+		
+		# Audio
+		"wav", "mp3",
+		
+		# Export
+		"import", "remap",
+		
+		# Native
+		"tscn", "tres", "gd", "json",
+		
+		# Addons
+		"dialogue",
 	]
 	return not VALID_EXTENSIONS.has(extension)
 
@@ -105,7 +114,8 @@ func get_icon(_name: StringName) -> Texture2D:
 
 ## Returns path of the image or icon.svg (if no _name exists)
 func get_texture_path(_name: StringName) -> String:
-	return texture_paths.get(_name, "uid://gcyoj5pt5j87") # icon.svg
+	const DEFAULT: String = "uid://gcyoj5pt5j87" ## icon.svg
+	return texture_paths.get(_name, DEFAULT)
 
 
 func get_scene(_name: StringName) -> PackedScene:

@@ -233,6 +233,29 @@ func get_class_path(_class_name: String) -> String:
 	return class_data.get(_class_name, "")
 
 
+## Calculates the total price for [code]n[/code] levels starting from level
+## [code]current_level[/code] given the [code]base[/code] price and the
+## [code]increase[/code] multiplier
+func get_price_of_n_purchases(
+		current_level: int, n: int, base: Big, increase: float) -> Big:
+	
+	var base_price := Big.new(base)
+	var multiplier := Big.new(increase)
+	
+	if multiplier.is_equal_to(Big.ONE):
+		return base_price.times(n)
+	
+	# This is sum of geometric series:
+	# 	base * multiplier^start * (multiplier^n - 1) / (multiplier - 1)
+	
+	var first_term: Big = base_price.times(Big.power(multiplier, current_level))
+	var numerator: Big = Big.power(multiplier, n).minus(Big.ONE)
+	var denominator: Big = multiplier.minus(Big.ONE)
+	var series_sum: Big = numerator.divided_by(denominator)
+	
+	return Big.multiply(first_term, series_sum)
+
+
 func get_random_point_in_rect(rect: Rect2) -> Vector2:
 	return Vector2(
 			rect.position.x + (randf() * rect.size.x),
@@ -320,7 +343,7 @@ func string_to_key_event(key_string: String) -> InputEventKey:
 
 
 
-#region - Color
+#region Color
 
 
 func get_color_from_string(x: String) -> Color:
