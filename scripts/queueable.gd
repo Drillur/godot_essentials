@@ -82,9 +82,10 @@ static func new_permanent_resource_queueable(
 	queue.call_method()
 
 
-## Creates a Queueable with CooldownType.DURATION: 1.0
-static func new_one_second_resource() -> Queueable:
-	return new_resource_queueable(CooldownType.DURATION, 1.0)
+## Creates a resource Queueable with CooldownType.DURATION equal to
+## [code]duration[/code]
+static func new_duration_resource(duration: float) -> Queueable:
+	return new_resource_queueable(CooldownType.DURATION, duration)
 
 
 #endregion

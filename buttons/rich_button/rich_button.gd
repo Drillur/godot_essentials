@@ -173,13 +173,11 @@ func _set_color(val: Color) -> void:
 
 
 func _set_modulate_icon(val: bool) -> void:
-	if texture_rect == null:
-		return
 	modulate_icon = val
-	if val and not disabled:
-		texture_rect.modulate = color
-	else:
-		texture_rect.modulate = Color.WHITE
+	if not is_node_ready():
+		await ready
+	if texture_rect != null:
+		texture_rect.modulate = color if val and not disabled else Color.WHITE
 
 
 func _set_open_by_default(val: bool) -> void:

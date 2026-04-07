@@ -149,7 +149,7 @@ static func add(_x: Variant, _y: Variant) -> Big:
 	var result := Big.new(_x)
 	
 	var exponent_delta: int = _y.exponent - _x.exponent
-	if exponent_delta < 248.0:
+	if exponent_delta < 12.0:
 		var scaled_mantissa: float = _y.mantissa * pow(10, exponent_delta)
 		result.mantissa = _x.mantissa + scaled_mantissa
 	

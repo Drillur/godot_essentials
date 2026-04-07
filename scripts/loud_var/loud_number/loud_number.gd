@@ -234,6 +234,7 @@ func _create_book() -> void:
 
 #region Setters & Getters
 
+
 func _set_text_requires_update(val: bool) -> void:
 	if text_requires_update == val:
 		return
@@ -323,11 +324,15 @@ func remove_divided(source: Variant) -> void:
 func remove_pending(source: Variant) -> void:
 	remove_change(Book.Category.PENDING, source)
 
-#endregion
 
 #endregion
+
+
+#endregion
+
 
 #region Action
+
 
 func copycat(cat: Resource) -> void:
 	copycat_num = cat
@@ -348,15 +353,19 @@ func _require_update() -> void:
 	text_requires_update = true
 	changed.emit()
 
+
 #endregion
+
 
 #region Debug
 
+
 func report() -> void:
 	Log.pr("Current:", get_text())
-	book.report()
+
 
 #endregion
+
 
 class SignalBus extends Object:
 	signal notation_changed(new_notation: Notation)
