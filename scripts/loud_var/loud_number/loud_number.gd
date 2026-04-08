@@ -74,34 +74,34 @@ var text_requires_update := true:
 #region Static
 
 
-#region - Format Number
+#region Format Number
 
 
 static func format_number(value: Variant, override_decimals: int = -1) -> String:
 	if is_zero_approx(value):
 		return "0"
-
+	
 	var _sign: float = signf(value)
 	value = abs(value) # not absi() or absf() because value is Variant
 	var floored_value: int = floori(value)
-
+	
 	return (
-		Big.new(value * _sign).get_text() if floored_value >= 1e6
-		else _format_number_gte_1e5(value, _sign) if floored_value >= 1e5
-		else _format_number_1000s(value, _sign) if floored_value >= 1000
-		else String.num(value * _sign, 0) if value is int
-		else _format_small_number(value, _sign, override_decimals) )
+			Big.new(value * _sign).get_text() if floored_value >= 1e6
+			else _format_number_gte_1e5(value, _sign) if floored_value >= 1e5
+			else _format_number_1000s(value, _sign) if floored_value >= 1000
+			else String.num(value * _sign, 0) if value is int
+			else _format_small_number(value, _sign, override_decimals))
 
 
 static func _format_number_gte_1e5(value: Variant, _sign: float) -> String:
 	var output := ""
 	var i: int = value
 	var sign_text: String = "-" if _sign < 0 else ""
-
+	
 	while i >= 1000:
 		output = ",%03d%s" % [i % 1000, output]
 		i /= 1000
-
+	
 	return "%s%s%s" % [sign_text, i, output]
 
 
@@ -109,26 +109,28 @@ static func _format_number_1000s(value: Variant, _sign: float) -> String:
 	var output: String = ""
 	var i: int = value
 	var sign_text: String = "-" if _sign < 0 else ""
-
+	
 	while i >= 1000:
 		output = ",%03d%s" % [i % 1000, output]
 		i /= 1000
-
+	
 	return "%s%s%s" % [sign_text, i, output]
 
 
-static func _format_small_number(value: Variant, _sign: float, override_decimals: int) -> String:
+static func _format_small_number(
+		value: Variant, _sign: float, override_decimals: int) -> String:
+	
 	# Log10 of value (floored) (-0.35 -> -1 | 2.82 -> 2)
 	var floor_log: int = floori(log(value) / NATURAL_LOG)
-
+	
 	var decimals: int = (
-		override_decimals if override_decimals >= 0
-		else 0 if (
-			floor_log >= 1
-			or is_equal_approx(value, int(value))
-			or floor_log <= -6 )
-		else absi(floor_log) + 2 )
-
+			override_decimals if override_decimals >= 0
+			else 0 if (
+				floor_log >= 1
+				or is_equal_approx(value, int(value))
+				or floor_log <= -6 )
+			else absi(floor_log) + 2)
+	
 	return String.num(value * _sign, decimals)
 
 #endregion

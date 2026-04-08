@@ -94,8 +94,6 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 
 
 func tie_button_pressed(_button: Control) -> void:
-	if button:
-		pass
 	button = _button
 	await Utility.process()
 	

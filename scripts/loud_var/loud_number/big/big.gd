@@ -135,7 +135,7 @@ static func rand_range(_x: Variant, _y: Variant) -> Big:
 	return result
 
 
-## Useful for Array.reduce()
+## Useful for [code]Array.reduce()[/code] to get the sum of a Big Array
 static func sum(a: Big, b: Big) -> Big:
 	return add(a, b)
 

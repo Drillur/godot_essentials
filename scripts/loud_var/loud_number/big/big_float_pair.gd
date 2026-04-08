@@ -183,7 +183,7 @@ func get_current_percent() -> float:
 
 
 func get_unclamped_percent() -> float:
-	var big_percent := Big.divide(get_current(), get_total())
+	var big_percent := current.current.divided_by(get_total())
 	if big_percent.exponent >= 307:
 		return 1.0
 	return big_percent.to_float()
