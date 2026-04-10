@@ -138,25 +138,26 @@ static func _format_small_number(
 
 ## Formats a percent float (0.0 to >= 1.0)
 static func format_percent(percent: float) -> String:
+	assert(percent >= 0.0, "We like to keep a positive environment around here")
+	
 	if percent < 0.0:
-		Log.warn("percent was negative (", percent, ")")
 		percent = 0.0
-
+	
 	percent *= 100
 	var floor_log: int = floori(log(percent) / NATURAL_LOG)
-
+	
 	# Huge percent
 	if floor_log >= 6:
 		return Big.new(percent).get_text() + "%"
-
+	
 	# Very small % to 100%
 	var decimals: int = (
-		0 if (
-			floor_log >= 1 # 10.0 to 100+
-			or is_equal_approx(percent, int(percent))
-			or floor_log <= -6 )
-		else absi(floor_log) + 1 )
-
+			0 if (
+				floor_log >= 1 # 10.0 to 100+
+				or is_equal_approx(percent, int(percent))
+				or floor_log <= -6 )
+			else absi(floor_log) + 1)
+	
 	return String.num(percent, decimals) + "%"
 
 

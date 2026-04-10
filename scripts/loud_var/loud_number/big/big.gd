@@ -289,14 +289,14 @@ static func power(_x: Variant, _y: Variant) -> Big:
 
 static func root(_x: Big) -> Big:
 	var result := Big.new(_x)
-	if result.exponent % 2 == 0:
-		result.mantissa = sqrt(result.mantissa)
-		@warning_ignore("integer_division")
-		result.exponent = result.exponent / 2
-	else:
-		result.mantissa = sqrt(result.mantissa * 10)
-		@warning_ignore("integer_division")
-		result.exponent = (result.exponent - 1) / 2
+	if result.exponent % 2 == 1:
+		result.mantissa *= 10
+		result.exponent -= 1
+	
+	result.mantissa = sqrt(result.mantissa)
+	@warning_ignore("integer_division")
+	result.exponent = result.exponent / 2
+	
 	normalize(result)
 	return result
 
@@ -460,9 +460,12 @@ func square_root() -> Big:
 	exponent = new_value.exponent
 	return self
 
+
 #endregion
 
+
 #region Comparisons
+
 
 func to_float() -> float:
 	assert(exponent < 307, "The resulting float would be too big. Fix ur fucking game")
