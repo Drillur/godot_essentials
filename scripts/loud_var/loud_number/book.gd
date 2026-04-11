@@ -99,8 +99,11 @@ func _init(_type: Type):
 
 
 func reset() -> void:
-	for category in book:
-		book[category].reset()
+	book[Category.ADDED].reset()
+	book[Category.SUBTRACTED].reset()
+	book[Category.MULTIPLIED].reset()
+	book[Category.DIVIDED].reset()
+	book[Category.PENDING].reset()
 	sync_required = true
 
 

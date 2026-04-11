@@ -142,6 +142,7 @@ func recalculate_sum() -> void:
 	reset_sum.call()
 	for value in data.values():
 		add_to_sum.call(value)
+	_changed = true
 
 
 func are_values_equal(a: Variant, b: Variant) -> bool:
@@ -222,8 +223,7 @@ func _update_keys_and_values() -> void:
 
 func reset() -> void:
 	data.clear()
-	for x in base.keys():
-		data[x] = base[x]
+	data = base.duplicate()
 	recalculate_sum()
 
 
