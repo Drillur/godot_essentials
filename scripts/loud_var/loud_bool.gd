@@ -5,8 +5,7 @@ extends LoudVar
 signal became_true
 signal became_false
 
-@export var current: bool:
-	set = _set_current
+@export var current: bool: set = _set_current
 
 var base: bool
 var copied_bool: LoudBool

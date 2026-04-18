@@ -22,14 +22,14 @@ var custom_maximum_limit := MAX_INT:
 #region Init
 
 
-func _init(_base: int = ZERO, _custom_minimum_limit := MIN_INT, _custom_maximum_limit := MAX_INT) -> void:
+func _init(_base: int = ZERO, _min := MIN_INT, _max := MAX_INT) -> void:
 	base = _base
 	current = base
 	previous = base
 	changed.connect(loud_number_init)
-
-	custom_minimum_limit = _custom_minimum_limit
-	custom_maximum_limit = _custom_maximum_limit
+	
+	custom_minimum_limit = _min
+	custom_maximum_limit = _max
 
 
 func _create_book() -> void:

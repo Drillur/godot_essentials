@@ -170,7 +170,7 @@ func get_midpoint() -> float:
 func get_random_point() -> float:
 	result_of_previous_random_point = (
 			get_total() if is_full()
-			else randf_range(current.current, total.current) )
+			else randf_range(current.current, total.current))
 	return get_previous_random_point()
 
 

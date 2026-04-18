@@ -17,7 +17,6 @@ signal toggled(_toggled: bool)
 			label.hide()
 		else:
 			label.show()
-@export var tooltip: String = ""
 @export var color := Color.WHITE:
 	set = _set_color
 @export var center_content := false:
@@ -107,9 +106,11 @@ var response: DialogueResponse:
 
 
 func _ready():
+	background.modulate = Color.WHITE
+	
 	if not Engine.is_editor_hint():
 		await Utility.physics()
-	invis_button.tooltip_text = tooltip
+	
 	color = color
 	if drop_down:
 		drop_down.visible = open_by_default
@@ -166,7 +167,7 @@ func _set_color(val: Color) -> void:
 		await ready
 	invis_button.modulate = val
 	if background:
-		background.modulate = val
+		background.self_modulate = val
 	if check_button:
 		check_button.modulate = val
 	modulate_icon = modulate_icon

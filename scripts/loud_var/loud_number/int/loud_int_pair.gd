@@ -6,15 +6,14 @@ signal filled
 signal emptied
 signal pending_changed
 
-@export var current: LoudInt:
-	set = _set_current
+@export var current: LoudInt: set = _set_current
 
 var total: LoudInt
 
 var text: String
 var text_requires_update := true
 var limit_to_zero := true
-var limit_to_total := true
+var limit_to_total := true: set = _set_limit_to_total
 
 var result_of_previous_random_point: int ## Updated by get_random_point()
 
@@ -51,6 +50,16 @@ func _set_current(_val: LoudInt) -> void:
 	current.changed.connect(check_if_empty)
 	current.changed.connect(check_if_full)
 	current.changed.connect(emit_changed)
+
+
+func _set_limit_to_total(new_val: bool) -> void:
+	if limit_to_total == new_val:
+		return
+	
+	limit_to_total = new_val
+	
+	if new_val and current.is_greater_than(get_total()):
+		fill()
 
 
 #endregion

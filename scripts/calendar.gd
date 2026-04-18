@@ -152,12 +152,11 @@ func _process(delta: float) -> void:
 
 func _add_day(n: int = 1) -> void:
 	assert(n == 1, "If you want n >= 7, change the wrapping code below")
-
+	
 	day_count = wrapi(day_count + n, 1, DAYS_PER_MONTH[month_count - 1] + 1)
-	day = wrapi(day + n, 0, 7) as Day
-
 	if day_count == 1:
 		_add_month()
+	day = wrapi(day + n, 0, 7) as Day
 
 
 func _add_month(n: int = 1) -> void:
