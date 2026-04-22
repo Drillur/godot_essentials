@@ -89,7 +89,7 @@ class TimeUnit:
 				break
 			amount.divided_by_equals(division)
 			type = Type.values()[type + 1]
-		var result: String = Big.round_down(amount).get_text()
+		var result: String = amount.round_down().get_text()
 		if brief:
 			return result + " " + WORD[type]["SHORT"]
 		return result + " " + unit_text(type, amount)

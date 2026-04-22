@@ -301,15 +301,12 @@ static func root(_x: Big) -> Big:
 	return result
 
 
-static func modulo(_x: Big, _y: Variant) -> Big:
-	var result := Big.new(_x.mantissa, _x.exponent)
-	_y = to_big(_y)
-	var big := { "mantissa": _x.mantissa, "exponent": _x.exponent }
-	result.divided_by_equals(_y)
-	Big.round_down(result)
-	result.times_equals(_y)
-	result.minus_equals(big)
-	result.mantissa = absf(result.mantissa)
+static func modulo(x: Big, y: Variant) -> Big:
+	x = to_big(x)
+	y = to_big(y)
+	var result: Big = x.divided_by(y).round_down()
+	result.times_equals(y)
+	result.set_to(x.minus(result))
 	return result
 
 
@@ -340,15 +337,6 @@ static func round_big(n: Big) -> Big:
 	else:
 		var precision: float = pow(10, mini(8, n.exponent))
 		n.mantissa = roundf(n.mantissa * precision) / precision
-	return n
-
-
-static func round_down(n: Big) -> Big:
-	if n.exponent == 0:
-		n.mantissa = floorf(n.mantissa)
-	else:
-		var precision: float = pow(10, mini(8, n.exponent))
-		n.mantissa = floorf(n.mantissa * precision) / precision
 	return n
 
 
@@ -442,6 +430,15 @@ func to_the_power_of(_n: Variant) -> Big:
 
 func to_the_power_of_equals(_n: Variant) -> Big:
 	set_to(power(self, _n))
+	return self
+
+
+func round_down() -> Big:
+	if exponent == 0:
+		mantissa = floorf(mantissa)
+	else:
+		var precision: float = pow(10, mini(8, exponent))
+		mantissa = floorf(mantissa * precision) / precision
 	return self
 
 

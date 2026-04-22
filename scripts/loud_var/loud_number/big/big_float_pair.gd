@@ -222,7 +222,7 @@ func get_average() -> Big:
 
 func get_random_point() -> Big:
 	if is_full() and cap_current:
-		return get_total()
+		return Big.new(get_total())
 	return Big.rand_range(get_current(), get_total())
 
 
