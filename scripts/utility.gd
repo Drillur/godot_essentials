@@ -20,8 +20,7 @@ var class_data: Dictionary[String, String]
 var tree: SceneTree
 var viewport: Viewport
 var window: Window
-var game_version: Dictionary[StringName, int] = {}:
-	get = _get_game_version
+var game_version: Dictionary[StringName, int] = {}: get = _get_game_version
 var rng := RandomNumberGenerator.new()
 
 
@@ -29,8 +28,7 @@ var rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
-	print("Version %s.%s.%s" % [
-			game_version.major, game_version.minor, game_version.revision])
+	print("Version " + Utility.get_readable_game_version())
 	
 	tree = get_tree()
 	viewport = get_viewport()
@@ -223,6 +221,11 @@ func quit_game() -> void:
 
 
 #region Get
+
+
+func get_readable_game_version() -> String:
+	return "%s.%s.%s" % [
+			game_version.major, game_version.minor, game_version.revision]
 
 
 func comes_after(a: String, b: String) -> bool:

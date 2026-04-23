@@ -304,7 +304,8 @@ static func root(_x: Big) -> Big:
 static func modulo(x: Big, y: Variant) -> Big:
 	x = to_big(x)
 	y = to_big(y)
-	var result: Big = x.divided_by(y).round_down()
+	var result: Big = x.divided_by(y)
+	result.round_down()
 	result.times_equals(y)
 	result.set_to(x.minus(result))
 	return result
