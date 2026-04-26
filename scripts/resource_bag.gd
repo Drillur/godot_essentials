@@ -36,7 +36,7 @@ func _ready():
 func store_all_resources() -> void:
 	dir_contents("res://groups/")
 	#dir_contents("res://mods/")
-	#dir_contents("res://mods-unpacked/")
+	dir_contents("res://mods-unpacked/")
 
 
 func dir_contents(path: String) -> void:
