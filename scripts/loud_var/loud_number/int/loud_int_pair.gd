@@ -168,7 +168,9 @@ func get_total() -> int:
 
 
 func get_current_percent() -> float:
-	return float(get_value()) / get_total()
+	if total.is_zero():
+		return 0.0
+	return current.to_float() / get_total()
 
 
 func get_pending_percent() -> float:

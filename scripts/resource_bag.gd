@@ -3,35 +3,40 @@ extends Node
 
 const ARROW_THICK_RIGHT: StringName = &"arrow_thick_right"
 
+var done := LoudBool.new()
+
 var resource_paths: Dictionary[StringName, String]
 var audio_paths: Dictionary[StringName, String]
 var dialogue_paths: Dictionary[StringName, String]
 var json_paths: Dictionary[StringName, String]
 var texture_paths: Dictionary[StringName, String]
 var script_paths: Dictionary[StringName, String]
-var done := LoudBool.new(false)
+
+## Any loaded JSON is only parsed once
+var parsed_jsons: Array[JSON]
+
+## If false, none of the base game LOREDs, Stages, Upgrade Trees, Upgrades, or
+## anything else will load.
+var load_base_game_data: bool = true
 
 
 #region Init
 
 
 func _ready():
-	dev__report_duration_of_ready_func()
-	store_all_resources()
-	done.set_true()
-
-
-func dev__report_duration_of_ready_func() -> void:
 	var start_time: int = Time.get_ticks_msec()
-	await done.became_true
+	store_all_resources()
 	if Utility.DEV_MODE:
 		Log.pr("Cached icons and nodes in", int(Time.get_ticks_msec() - start_time), "ms")
 	else:
 		print("Cached icons and nodes in %s ms" % int(Time.get_ticks_msec() - start_time))
+	done.set_true()
 
 
 func store_all_resources() -> void:
 	dir_contents("res://groups/")
+	#dir_contents("res://mods/")
+	#dir_contents("res://mods-unpacked/")
 
 
 func dir_contents(path: String) -> void:
@@ -49,6 +54,11 @@ func dir_contents(path: String) -> void:
 				dir_contents(path.path_join(filename))
 		else:
 			var _name: String = filename.split(".")[0]
+			
+			if _name == "all_data" and not load_base_game_data:
+				filename = directory.get_next()
+				continue
+			
 			var extension: String = filename
 			extension = extension.replace(".remap", "")
 			extension = extension.replace(".import", "")
@@ -149,13 +159,20 @@ func get_icon_text_from_icon(icon: Texture2D) -> String:
 
 
 func get_json_category(_category: StringName) -> Dictionary:
+	for json: JSON in parsed_jsons:
+		if json.data.has(_category):
+			var result: Dictionary = json.data[_category]
+			result.erase("")
+			return result
+	
 	for _name: StringName in json_paths.keys():
 		var file := FileAccess.open(json_paths[_name], FileAccess.READ)
 		var text := file.get_as_text()
 		var json := JSON.new()
 		json.parse(text)
+		parsed_jsons.append(json)
 		if json.data.has(_category):
-			var result: Dictionary = json.data.get(_category)
+			var result: Dictionary = json.data[_category]
 			result.erase("")
 			return result
 	return {}

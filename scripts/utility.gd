@@ -223,6 +223,23 @@ func quit_game() -> void:
 #region Get
 
 
+func get_parsed_json_data(json_path: String) -> Dictionary:
+	var file := FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("FileAccess.open failed")
+		return {}
+	var json_text: String = file.get_as_text()
+	var json: JSON = JSON.new()
+	var parse_error: Error = json.parse(json_text)
+	
+	if not parse_error == OK:
+		Log.prn(json.data)
+		assert(parse_error == OK,
+				"The JSON failed to parse. %s" % error_string(parse_error))
+	
+	return json.data
+
+
 func get_readable_game_version() -> String:
 	return "%s.%s.%s" % [
 			game_version.major, game_version.minor, game_version.revision]

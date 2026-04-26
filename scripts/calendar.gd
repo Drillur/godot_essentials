@@ -2,13 +2,14 @@ class_name Calendar
 extends Resource
 
 
+signal minute_changed(new_minute: int, previous_minute: int)
+signal hour_changed(new_hour: int, previous_hour: int)
 signal day_changed(new_day: Day, previous_day: Day)
 signal month_changed(new_month: Month, previous_month: Month)
 signal year_changed(new_year: int)
 
 enum Day { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY }
-enum Month {
-		JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE,
+enum Month {JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE,
 		JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER }
 
 const DAYS_PER_MONTH: Array[int] = [
@@ -18,6 +19,8 @@ const DAYS_PER_MONTH: Array[int] = [
 @export var month_count: int = 1 ## Human-readable month number, like Jan = 1
 @export var day_count: int = 1 ## Human-readable day, such as Jan [code]1[/code]
 
+var minute: int = 0: set = _set_minute
+var hour: int = 0: set = _set_hour
 var day: Day: set = _set_day
 var month: Month: set = _set_month
 
@@ -136,6 +139,22 @@ func _set_month(new_month: Month) -> void:
 	month_changed.emit(month, previous)
 
 
+func _set_hour(new_hour: int) -> void:
+	if hour == new_hour:
+		return
+	var previous: int = hour
+	hour = new_hour
+	hour_changed.emit(hour, previous)
+
+
+func _set_minute(new_minute: int) -> void:
+	if minute == new_minute:
+		return
+	var previous: int = minute
+	minute = new_minute
+	minute_changed.emit(minute, previous)
+
+
 #endregion
 
 
@@ -148,6 +167,10 @@ func _process(delta: float) -> void:
 	if day_progress >= day_duration.val():
 		day_progress -= day_duration.val()
 		_add_day()
+	
+	var t: float = day_progress / day_duration.val()
+	hour = int(t * 24)
+	minute = int(t * 1440) % 60
 
 
 func _add_day(n: int = 1) -> void:
@@ -185,6 +208,8 @@ func recalc_day_and_month() -> void:
 	total_days += day_count - 1
 	
 	day = total_days % 7 as Day
+	hour = 0
+	minute = 0
 	
 	#Log.pr("Recalculated day and month!")
 	#Log.pr(" - ", "Day: %s -> %s" % [Day.keys()[prev_day], Day.keys()[day]])

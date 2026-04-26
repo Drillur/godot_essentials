@@ -144,6 +144,8 @@ func get_total() -> float:
 
 
 func get_current_percent() -> float:
+	if total.is_zero():
+		return 0.0
 	return get_value() / get_total()
 
 
