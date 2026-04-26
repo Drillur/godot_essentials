@@ -12,12 +12,18 @@ var json_paths: Dictionary[StringName, String]
 var texture_paths: Dictionary[StringName, String]
 var script_paths: Dictionary[StringName, String]
 
-## Any loaded JSON is only parsed once
-var parsed_jsons: Array[JSON]
+## All parsed data from [code]all_data.json[/code] and JSON files from mods
+var data: Dictionary[StringName, Dictionary] = {
+		&"Currencies": {}, &"Emotes": {}, &"Hands": {}, &"Help": {}, &"Jobs": {},
+		&"LOREDs": {}, &"Stages": {}, &"Upgrades": {}, &"UpgradeTrees": {},
+		&"DiscordUsernames": {}, }
 
-## If false, none of the base game LOREDs, Stages, Upgrade Trees, Upgrades, or
-## anything else will load.
-var load_base_game_data: bool = true
+## The key should be the name of the JSON file. The value will be an array of
+## any categories you want to skip during [method init_data].
+## In this example, the game will not have any of the default Currencies or
+## LOREDs:[code]
+## skipped_data[&"all_data"] = [&"Currencies", &"LOREDs"][/code]
+var skipped_data: Dictionary[StringName, Array] = {}
 
 
 #region Init
@@ -26,11 +32,15 @@ var load_base_game_data: bool = true
 func _ready():
 	var start_time: int = Time.get_ticks_msec()
 	store_all_resources()
+	init_data()
 	if Utility.DEV_MODE:
 		Log.pr("Cached icons and nodes in", int(Time.get_ticks_msec() - start_time), "ms")
 	else:
 		print("Cached icons and nodes in %s ms" % int(Time.get_ticks_msec() - start_time))
 	done.set_true()
+
+
+#region Store All Resources
 
 
 func store_all_resources() -> void:
@@ -54,10 +64,6 @@ func dir_contents(path: String) -> void:
 				dir_contents(path.path_join(filename))
 		else:
 			var _name: String = filename.split(".")[0]
-			
-			if _name == "all_data" and not load_base_game_data:
-				filename = directory.get_next()
-				continue
 			
 			var extension: String = filename
 			extension = extension.replace(".remap", "")
@@ -114,12 +120,38 @@ func extension_is_invalid(extension: StringName) -> bool:
 #endregion
 
 
+## Populates [code]data[/code] with all of the information in all of the JSON
+## files in the base game and mods. By extending this method, you can make any
+## change to the data you want.
+func init_data() -> void:
+	for filename: StringName in json_paths.keys():
+		var file := FileAccess.open(json_paths[filename], FileAccess.READ)
+		var text: String = file.get_as_text()
+		var json: JSON = JSON.new()
+		json.parse(text)
+		for category: StringName in json.data:
+			if skipped_data.get_or_add(filename, []).has(category):
+				continue
+			assert(data.has(category), "%s isn't in data" % category)
+			data.get_or_add(category, {}).merge(json.data[category])
+			data[category].erase("")
+			data[category].erase("0")
+
+
+#endregion
+
+
 func get_resource(_name: StringName, _default: Variant = null) -> Resource:
-	return ResourceLoader.load(resource_paths[_name], "", ResourceLoader.CACHE_MODE_REUSE)
+	return ResourceLoader.load(
+			resource_paths[_name], "", ResourceLoader.CACHE_MODE_REUSE)
+
+
+#region Get Icon
 
 
 func get_icon(_name: StringName) -> Texture2D:
-	return ResourceLoader.load(get_texture_path(_name), "", ResourceLoader.CACHE_MODE_REUSE)
+	return ResourceLoader.load(
+			get_texture_path(_name), "", ResourceLoader.CACHE_MODE_REUSE)
 
 
 ## Returns path of the image or icon.svg (if no _name exists)
@@ -128,12 +160,11 @@ func get_texture_path(_name: StringName) -> String:
 	return texture_paths.get(_name, DEFAULT)
 
 
-func get_scene(_name: StringName) -> PackedScene:
-	return get_resource(_name)
+#endregion
 
 
 func instantiate(_name: StringName) -> Node:
-	return get_scene(_name).instantiate()
+	return get_resource(_name).instantiate()
 
 
 func get_theme(_name: StringName) -> Theme:
@@ -142,7 +173,8 @@ func get_theme(_name: StringName) -> Theme:
 
 func get_dialogue(_key: StringName) -> DialogueResource:
 	if dialogue_paths.has(_key):
-		return ResourceLoader.load(dialogue_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
+		return ResourceLoader.load(
+				dialogue_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
 	return null
 
 
@@ -154,28 +186,8 @@ func get_icon_text(_name: StringName, _color := Color.WHITE) -> String:
 			get_texture_path(_name)]
 
 
-func get_icon_text_from_icon(icon: Texture2D) -> String:
-	return "[img=<16>]%s[/img]" % icon.get_path()
-
-
-func get_json_category(_category: StringName) -> Dictionary:
-	for json: JSON in parsed_jsons:
-		if json.data.has(_category):
-			var result: Dictionary = json.data[_category]
-			result.erase("")
-			return result
-	
-	for _name: StringName in json_paths.keys():
-		var file := FileAccess.open(json_paths[_name], FileAccess.READ)
-		var text := file.get_as_text()
-		var json := JSON.new()
-		json.parse(text)
-		parsed_jsons.append(json)
-		if json.data.has(_category):
-			var result: Dictionary = json.data[_category]
-			result.erase("")
-			return result
-	return {}
+func get_data(category: StringName) -> Dictionary:
+	return data[category]
 
 
 func get_all_dialogues() -> Array:
@@ -186,4 +198,5 @@ func get_all_dialogues() -> Array:
 
 
 func get_audio(_key: StringName) -> AudioStream:
-	return ResourceLoader.load(audio_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
+	return ResourceLoader.load(
+			audio_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
