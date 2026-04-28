@@ -10,11 +10,12 @@ signal process_frame(delta: float)
 enum AudioLayer { MASTER, UI, MUSIC }
 enum Platform { PC, BROWSER }
 
-const DEV_MODE: bool = true
 const PLATFORM: Platform = Platform.PC
-const SCROLL_SPEED: int = 25
 
 @export var current_clock: float = Time.get_unix_time_from_system()
+
+var dev_mode: bool = false
+var scroll_speed: int = 25 
 
 var class_data: Dictionary[String, String]
 var tree: SceneTree
@@ -46,7 +47,6 @@ func cache_class_paths() -> void:
 
 
 #endregion
-
 
 
 #region Getters
@@ -221,6 +221,16 @@ func quit_game() -> void:
 
 
 #region Get
+
+
+func is_mod_loaded(_filename) -> bool:
+	return ModLoaderMod.is_mod_loaded(_filename)
+	#return false
+
+
+func are_any_mods_loaded() -> bool:
+	return not ModLoaderStore.mod_data.is_empty()
+	#return false
 
 
 func get_parsed_json_data(json_path: String) -> Dictionary:
@@ -423,7 +433,7 @@ func validate_color_darkness(color: Color, limit := 1.0) -> Color:
 
 
 func report(object: Object) -> void:
-	if not Utility.DEV_MODE:
+	if not Utility.dev_mode:
 		return
 	var _class_name: String = object.get_class()
 	Log.prn("Report:", _class_name, object, _get_object_report_dictionary(object))
@@ -461,7 +471,7 @@ func print_when_changed(loud_var: LoudVar, var_name: String) -> void:
 
 
 func _print_when_changed(loud_var: LoudVar, var_name: String) -> void:
-	if Utility.DEV_MODE:
+	if Utility.dev_mode:
 		Log.pr(var_name, loud_var.get_text())
 	else:
 		printt(var_name, loud_var.get_text())

@@ -33,10 +33,10 @@ func _ready():
 	var start_time: int = Time.get_ticks_msec()
 	store_all_resources()
 	init_data()
-	if Utility.DEV_MODE:
+	if Utility.dev_mode:
 		Log.pr("Cached icons and nodes in", int(Time.get_ticks_msec() - start_time), "ms")
-	else:
-		print("Cached icons and nodes in %s ms" % int(Time.get_ticks_msec() - start_time))
+	#else:
+		#print("Cached icons and nodes in %s ms" % int(Time.get_ticks_msec() - start_time))
 	done.set_true()
 
 
@@ -45,8 +45,37 @@ func _ready():
 
 func store_all_resources() -> void:
 	dir_contents("res://groups/")
-	#dir_contents("res://mods/")
-	dir_contents("res://mods-unpacked/")
+	dir_contents__mods_unpacked()
+
+
+func dir_contents__mods_unpacked() -> void:
+	var path: String = "res://mods-unpacked/"
+	var directory := DirAccess.open(path)
+	if not directory:
+		push_warning("DirAccess failed to open '%s' -" % path, error_string(DirAccess.get_open_error()))
+		return
+	
+	directory.list_dir_begin()
+	var filename: String = directory.get_next()
+	
+	var statement: String = "Loading mods..."
+	var cached_at_least_one_mod: bool = false
+	
+	while not filename.is_empty():
+		var ok: bool = (
+				Utility.is_mod_loaded(filename)
+				and not filename == "manifest.json")
+		if ok:
+			dir_contents(path.path_join(filename))
+			statement += "\n - %s loaded" % filename
+		else:
+			statement += "\n - %s is not enabled. Skipping loading" % filename
+		filename = directory.get_next()
+		
+		cached_at_least_one_mod = true
+	
+	if cached_at_least_one_mod:
+		print(statement)
 
 
 func dir_contents(path: String) -> void:
@@ -58,11 +87,16 @@ func dir_contents(path: String) -> void:
 	directory.list_dir_begin()
 	var filename: String = directory.get_next()
 	
+	
 	while not filename.is_empty():
 		if directory.current_is_dir():
 			if not folder_is_invalid(filename):
 				dir_contents(path.path_join(filename))
 		else:
+			if invalid_filename(filename):
+				filename = directory.get_next()
+				continue
+			
 			var _name: String = filename.split(".")[0]
 			
 			var extension: String = filename
@@ -95,6 +129,11 @@ func dir_contents(path: String) -> void:
 func folder_is_invalid(filename: StringName) -> bool:
 	const INVALID_FOLDER: String = "no_cache"
 	return filename == INVALID_FOLDER
+
+
+func invalid_filename(filename: StringName) -> bool:
+	const INVALID_FILENAMES: Array[String] = [&"manifest.json"]
+	return INVALID_FILENAMES.has(filename)
 
 
 func extension_is_invalid(extension: StringName) -> bool:
@@ -130,15 +169,29 @@ func init_data() -> void:
 		var json: JSON = JSON.new()
 		json.parse(text)
 		for category: StringName in json.data:
-			if skipped_data.get_or_add(filename, []).has(category):
+			if skipped_data.has(filename) and skipped_data[filename].has(category):
 				continue
-			assert(data.has(category), "%s isn't in data" % category)
 			data.get_or_add(category, {}).merge(json.data[category])
 			data[category].erase("")
 			data[category].erase("0")
 
 
 #endregion
+
+
+#region Helper Methods
+
+
+## Easy way to ensure the game is scrubbed of any vanilla objects
+func skip_base_data() -> void:
+	skipped_data[&"all_data"] = [&"Currencies", &"Emotes", &"Hands", &"Help",
+			&"Jobs", &"LOREDs", &"Stages", &"Upgrades", &"UpgradeTrees"]
+
+
+#endregion
+
+
+#region Get
 
 
 func get_resource(_name: StringName, _default: Variant = null) -> Resource:
@@ -200,3 +253,6 @@ func get_all_dialogues() -> Array:
 func get_audio(_key: StringName) -> AudioStream:
 	return ResourceLoader.load(
 			audio_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
+
+
+#endregion

@@ -137,6 +137,7 @@ func clamp_current() -> void:
 			current.current = maxi(get_current(), 0)
 
 
+## Sets current to total
 func fill() -> void:
 	current.set_to(get_total())
 

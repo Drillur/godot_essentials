@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cnygr4pwivdv1"]
+[gd_scene format=3 uid="uid://cnygr4pwivdv1"]
 
 [ext_resource type="Theme" uid="uid://bbsyitixspj7m" path="res://groups/essentials/themes/standard/standard.tres" id="1_uuvv5"]
 [ext_resource type="Script" uid="uid://cdqy3dn2x4ufs" path="res://groups/essentials/hud/rich_label/rich_label.gd" id="2_7d7ni"]
 
-[node name="RichLabel" type="RichTextLabel"]
+[node name="RichLabel" type="RichTextLabel" unique_id=960659047]
 clip_contents = false
 offset_right = 51.0
 offset_bottom = 15.0
