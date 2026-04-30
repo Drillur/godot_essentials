@@ -30,6 +30,8 @@ static func get_color_from_dict(_data: Dictionary) -> Color:
 func _init(r: Variant = Color.WHITE, g := 1.0, b := 1.0, a := 1.0) -> void:
 	if r is Color:
 		base = r
+	elif r is String:
+		base = Color.html(r)
 	else:
 		base = Color(r, g, b, a)
 	current = base

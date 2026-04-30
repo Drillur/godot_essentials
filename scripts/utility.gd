@@ -223,14 +223,8 @@ func quit_game() -> void:
 #region Get
 
 
-func is_mod_loaded(_filename) -> bool:
-	return ModLoaderMod.is_mod_loaded(_filename)
-	#return false
-
-
 func are_any_mods_loaded() -> bool:
 	return not ModLoaderStore.mod_data.is_empty()
-	#return false
 
 
 func get_parsed_json_data(json_path: String) -> Dictionary:
