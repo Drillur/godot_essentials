@@ -4,8 +4,7 @@ extends LoudVar
 
 signal changed_with_color(color)
 
-@export var current: Color:
-	set = set_current
+@export var current: Color: set = _set_current
 
 var base: Color
 
@@ -45,7 +44,7 @@ func _init(r: Variant = Color.WHITE, g := 1.0, b := 1.0, a := 1.0) -> void:
 #region Setters
 
 
-func set_current(new_current: Color) -> void:
+func _set_current(new_current: Color) -> void:
 	if current == new_current:
 		return
 	
