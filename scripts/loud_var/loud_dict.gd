@@ -221,9 +221,19 @@ func _update_keys_and_values() -> void:
 #region Action
 
 
+## Clears data; duplicates base
 func reset() -> void:
 	data.clear()
 	data = base.duplicate()
+	recalculate_sum()
+
+
+## Should have a similar effect to reset, but slower
+func erase_all() -> void:
+	for key in keys().duplicate():
+		erase(key)
+	for key in base.keys():
+		add(key, base[key])
 	recalculate_sum()
 
 

@@ -107,6 +107,15 @@ func reset() -> void:
 	sync_required = true
 
 
+func erase_all() -> void:
+	book[Category.ADDED].erase_all()
+	book[Category.SUBTRACTED].erase_all()
+	book[Category.MULTIPLIED].erase_all()
+	book[Category.DIVIDED].erase_all()
+	book[Category.PENDING].erase_all()
+	sync_required = true
+
+
 func reset_pending() -> void:
 	book[Book.Category.PENDING].reset()
 	pending_changed.emit()
