@@ -151,7 +151,8 @@ static func get_time_text_from_dict(dict: Dictionary) -> String:
 	var minutes: int = dict.get(&"minutes", 0)
 	var seconds: int = dict.get(&"seconds", 0)
 	
-	var texts := []
+	var texts: Array[String] = []
+	
 	if years > 0:
 		texts.append("%sy" % years)
 	if days > 0:
@@ -162,6 +163,7 @@ static func get_time_text_from_dict(dict: Dictionary) -> String:
 		texts.append("%sm" % minutes)
 	if seconds > 0:
 		texts.append("%ss" % seconds)
+	
 	return ", ".join(texts)
 
 
@@ -202,7 +204,7 @@ func start() -> void:
 	if random:
 		wait_time.edit_change(Book.Category.ADDED, wait_time_range, wait_time_range.get_random_point())
 	timer_wait_time = wait_time.get_value()
-	timer = Main.instance.get_tree().create_timer(timer_wait_time)
+	timer = Utility.tree.create_timer(timer_wait_time)
 	timer.timeout.connect(timer_timeout)
 	
 	running.set_true()

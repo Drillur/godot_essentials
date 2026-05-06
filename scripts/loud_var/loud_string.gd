@@ -2,14 +2,14 @@ class_name LoudString
 extends LoudVar
 
 
-@export var current: String:
-	set = set_text
+signal became_empty
+signal became_non_empty
+
+@export var current: String: set = _set_text
 
 var base: String
 var copycat_string: LoudString
 
-
-#region Init
 
 #region Init
 
@@ -19,10 +19,18 @@ func _init(_base := "") -> void:
 	current = base
 
 
-func set_text(new_value: String) -> void:
+func _set_text(new_value: String) -> void:
 	if current == new_value:
 		return
+	
+	var previous_value: String = current
 	current = new_value
+	
+	if current.is_empty():
+		became_empty.emit()
+	elif previous_value.is_empty():
+		became_non_empty.emit()
+	
 	changed.emit()
 
 

@@ -63,7 +63,7 @@ func dir_contents__mods_unpacked() -> void:
 	
 	while not filename.is_empty():
 		var ok: bool = (
-				Main.is_mod_active(filename)
+				Utility.is_mod_active(filename)
 				and not filename == "manifest.json")
 		if ok:
 			dir_contents(path.path_join(filename))

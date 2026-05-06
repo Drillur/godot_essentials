@@ -223,8 +223,36 @@ func quit_game() -> void:
 #region Get
 
 
+#region Mod
+
+
+## The mod (according to [param mod_id]) is loaded and active
+func is_mod_active(mod_id: String) -> bool:
+	return ModLoaderMod.is_mod_active(mod_id)
+
+
+func create_mod_profile(profile_name: String) -> bool:
+	var success: bool = ModLoaderUserProfile.create_profile(profile_name)
+	if success:
+		var profile := ModLoaderUserProfile.get_profile(profile_name)
+		for mod_id: String in profile.mod_list:
+			profile.mod_list[mod_id]["is_active"] = false
+	return success
+
+
 func are_any_mods_loaded() -> bool:
 	return not ModLoaderStore.mod_data.is_empty()
+
+
+func mod_profile_exists(profile_name: String) -> bool:
+	return ModLoaderStore.user_profiles.has(profile_name)
+
+
+func is_mod_installed(mod_id: String) -> bool:
+	return ModLoaderStore.mod_data.has(mod_id)
+
+
+#endregion
 
 
 func get_parsed_json_data(json_path: String) -> Dictionary:
@@ -244,9 +272,9 @@ func get_parsed_json_data(json_path: String) -> Dictionary:
 	return json.data
 
 
-func get_readable_game_version() -> String:
+func get_readable_game_version(version: Dictionary = game_version) -> String:
 	return "%s.%s.%s" % [
-			game_version.major, game_version.minor, game_version.revision]
+			int(version.major), int(version.minor), int(version.revision)]
 
 
 func comes_after(a: String, b: String) -> bool:
@@ -365,6 +393,23 @@ func string_to_key_event(key_string: String) -> InputEventKey:
 	event.physical_keycode = keycode
 	return event
 
+
+func dictionaries_share_keys(dict1: Dictionary, dict2: Dictionary) -> bool:
+	if dict1.size() != dict2.size():
+		return false
+	var keys1: Array = dict1.keys()
+	var keys2: Array = dict2.keys()
+	return arrays_share_keys(keys1, keys2)
+
+
+func arrays_share_keys(arr1: Array, arr2: Array) -> bool:
+	if arr1.size() != arr2.size():
+		return false
+	var keys1: Array = arr1.duplicate()
+	var keys2: Array = arr2.duplicate()
+	keys1.sort()
+	keys2.sort()
+	return keys1 == keys2
 
 
 #region Color

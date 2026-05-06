@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bfi0uovwegdxj"]
+[gd_scene format=3 uid="uid://bfi0uovwegdxj"]
 
 [ext_resource type="Script" uid="uid://ce4qf4j0yk7yh" path="res://groups/essentials/buttons/rich_button/rich_button.gd" id="1_pwhdq"]
 [ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://groups/essentials/themes/subtle_background.tres" id="2_n80am"]
 [ext_resource type="Texture2D" uid="uid://d5nd0gmcf7pr" path="res://groups/essentials/icons/reset/reset_16.svg" id="3_71o7q"]
 [ext_resource type="PackedScene" uid="uid://bq01sk2sxisnx" path="res://groups/essentials/buttons/invis_button/no_cache/invis_button.tscn" id="3_87imt"]
-[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://groups/essentials/hud/rich_label/no_cache/rich_label.tscn" id="4_g5ow3"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://groups/essentials/hud/rich_label/rich_label.tscn" id="4_g5ow3"]
 [ext_resource type="Theme" uid="uid://bbsyitixspj7m" path="res://groups/essentials/themes/standard/standard.tres" id="5_5dgkt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nrvo0"]

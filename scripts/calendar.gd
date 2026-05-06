@@ -106,7 +106,7 @@ func _init(
 
 
 func _connect_signals() -> void:
-	await Cacher.done
+	await Cacher.done.became_true
 	SaveManager.loading_ended.connect(recalc_day_and_month)
 
 

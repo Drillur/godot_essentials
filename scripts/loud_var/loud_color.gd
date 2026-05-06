@@ -32,6 +32,8 @@ func _init(r: Variant = Color.WHITE, g := 1.0, b := 1.0, a := 1.0) -> void:
 		base = r
 	elif r is String:
 		base = Color.html(r)
+	elif r is LoudColor:
+		base = r.val()
 	else:
 		base = Color(r, g, b, a)
 	current = base
@@ -75,6 +77,7 @@ func subscribe_node(node: CanvasItem) -> void:
 	var has_color: bool = node.get("color") != null
 	var is_scroll_container: bool = node is ScrollContainer
 	var is_tab_container: bool = node is TabContainer
+	
 	var update_color := func():
 		if has_color:
 			node.color = get_value()
@@ -85,7 +88,8 @@ func subscribe_node(node: CanvasItem) -> void:
 			node.add_theme_color_override(_NAME, get_value())
 		else:
 			node.modulate = get_value()
-	node.tree_exiting.connect(func(): changed.disconnect(update_color))
+	
+	node.tree_exiting.connect(changed.disconnect.bind(update_color))
 	changed.connect(update_color)
 	update_color.call()
 
