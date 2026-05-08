@@ -3,12 +3,10 @@ class_name Folder
 extends MarginContainer
 
 
-@export var icon: Texture2D = null:
-	set = _set_icon
-@export var header_label_text: String = "Folder":
-	set = _set_header_label_text
-@export var is_open: bool = false:
-	set = _set_is_open
+@export var icon: Texture2D = null: set = _set_icon
+@export var header_label_text: String = "Folder": set = _set_header_label_text
+@export var is_open: bool = false: set = _set_is_open
+@export var color: Color = Color.WHITE: set = _set_color
 
 #region Onready Variables
 
@@ -17,6 +15,7 @@ extends MarginContainer
 @onready var arrow_texture_rect: TextureRect = %ArrowTextureRect
 @onready var content_container: MarginContainer = %ContentContainer
 @onready var header_button: InvisButton = %HeaderButton
+@onready var background: Panel = $Background
 
 #endregion
 
@@ -72,6 +71,17 @@ func _set_is_open(new_val: bool) -> void:
 	is_open = new_val
 	
 	_update()
+
+
+func _set_color(new_color: Color) -> void:
+	if not is_node_ready():
+		await ready
+	
+	color = new_color
+	arrow_texture_rect.modulate = color
+	background.modulate = color
+	if icon_texture_rect != null:
+		icon_texture_rect.modulate = color
 
 
 #endregion
