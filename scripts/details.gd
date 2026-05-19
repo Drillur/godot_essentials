@@ -4,10 +4,8 @@ extends RefCounted
 
 #region Setter/getter vars
 
-var name: String:
-	set = _set_name, get = _get_name
-var brief_name: String:
-	set = _set_brief_name, get = _get_brief_name
+var name: String: set = _set_name, get = _get_name
+var brief_name: String: set = _set_brief_name, get = _get_brief_name
 var plural_name: String: get = get_plural_name
 var icon: Texture2D = null: get = get_icon
 

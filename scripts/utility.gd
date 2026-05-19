@@ -15,9 +15,9 @@ const PLATFORM: Platform = Platform.PC
 @export var current_clock: float = Time.get_unix_time_from_system()
 
 var dev_mode: bool = true
-var scroll_speed: int = 25 
+var scroll_speed: int = 25
 
-var class_data: Dictionary[String, String]
+var class_paths: Dictionary[String, String]
 var tree: SceneTree
 var viewport: Viewport
 var window: Window
@@ -35,15 +35,15 @@ func _ready() -> void:
 	viewport = get_viewport()
 	window = viewport.get_window()
 	
-	cache_class_paths()
+	_cache_class_paths()
 	_tick_seconds()
 
 
-func cache_class_paths() -> void:
+func _cache_class_paths() -> void:
 	for x: Dictionary in ProjectSettings.get_global_class_list():
-		if class_data.has(x["class"]):
+		if class_paths.has(x["class"]):
 			continue
-		class_data[x["class"]] = x["path"]
+		class_paths[x["class"]] = x["path"]
 
 
 #endregion
@@ -282,7 +282,7 @@ func comes_after(a: String, b: String) -> bool:
 
 
 func get_class_path(_class_name: String) -> String:
-	return class_data.get(_class_name, "")
+	return class_paths.get(_class_name, "")
 
 
 ## Calculates the total price for [code]n[/code] levels starting from level

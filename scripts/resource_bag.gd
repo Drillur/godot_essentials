@@ -14,8 +14,8 @@ var script_paths: Dictionary[StringName, String]
 
 ## All parsed data from [code]all_data.json[/code] and JSON files from mods
 var data: Dictionary[StringName, Dictionary] = {
-		&"Currencies": {}, &"Emotes": {}, &"Hands": {}, &"Help": {}, &"Jobs": {},
-		&"LOREDs": {}, &"Stages": {}, &"Upgrades": {}, &"UpgradeTrees": {},
+		&"Achievements": {}, &"Currencies": {}, &"Emotes": {}, &"Hands": {}, &"Help": {},
+		&"Jobs": {}, &"LOREDs": {}, &"Stages": {}, &"Upgrades": {}, &"UpgradeTrees": {},
 		&"DiscordUsernames": {}, }
 
 ## The key should be the name of the JSON file. The value will be an array of
