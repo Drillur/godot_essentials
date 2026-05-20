@@ -15,7 +15,7 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 shadow_color = Color(0, 0, 0, 0.34902)
 
-[node name="RichButton" type="MarginContainer"]
+[node name="RichButton" type="MarginContainer" unique_id=1164064086]
 custom_minimum_size = Vector2(36, 36)
 offset_right = 36.0
 offset_bottom = 40.0
@@ -24,14 +24,15 @@ mouse_filter = 2
 script = ExtResource("1_pwhdq")
 text = "Menu"
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=286749376]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+mouse_filter = 2
 theme = ExtResource("2_n80am")
 theme_override_styles/panel = SubResource("StyleBoxFlat_nrvo0")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=48252869]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 8
@@ -39,13 +40,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="HBox" type="HBoxContainer" parent="MarginContainer"]
+[node name="HBox" type="HBoxContainer" parent="MarginContainer" unique_id=1027237012]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="IconContainer" type="Control" parent="MarginContainer/HBox"]
+[node name="IconContainer" type="Control" parent="MarginContainer/HBox" unique_id=1480645091]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(24, 24)
@@ -53,7 +54,7 @@ layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBox/IconContainer"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBox/IconContainer" unique_id=2056121635]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 0
@@ -65,7 +66,7 @@ texture = ExtResource("3_71o7q")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Label" parent="MarginContainer/HBox" instance=ExtResource("4_g5ow3")]
+[node name="Label" parent="MarginContainer/HBox" unique_id=1412610252 instance=ExtResource("4_g5ow3")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -73,15 +74,16 @@ size_flags_vertical = 4
 text = "Menu"
 autowrap_mode = 0
 
-[node name="CheckButton" type="CheckButton" parent="MarginContainer/HBox"]
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/HBox" unique_id=943970587]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 8
+mouse_filter = 2
 theme = ExtResource("5_5dgkt")
 button_pressed = true
 
-[node name="InvisButton" parent="." instance=ExtResource("3_87imt")]
+[node name="InvisButton" parent="." unique_id=684536073 instance=ExtResource("3_87imt")]
 layout_mode = 2
 
 [connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
