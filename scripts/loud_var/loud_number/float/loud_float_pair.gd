@@ -22,7 +22,7 @@ var result_of_previous_random_point: float
 #region Init
 
 
-func _init(base_value: float, base_total: float, _limit_to_total = true):
+func _init(base_value: float, base_total: float, _limit_to_total: bool = true):
 	current = LoudFloat.new(base_value)
 	total = LoudFloat.new(base_total)
 	limit_to_total = _limit_to_total
