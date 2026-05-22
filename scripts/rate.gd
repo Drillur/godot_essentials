@@ -54,7 +54,6 @@ static func reset(source: Variant) -> void:
 	rate._apply()
 
 
-
 #endregion
 
 
