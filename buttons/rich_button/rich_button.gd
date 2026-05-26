@@ -2,7 +2,6 @@
 class_name RichButton
 extends MarginContainer
 
-
 signal pressed
 signal right_pressed
 signal toggled(_toggled: bool)
@@ -45,7 +44,6 @@ signal toggled(_toggled: bool)
 	set = _set_audio_enabled
 @export var separate_audios: bool = true:
 	set = _set_separate_audios
-	
 
 @export_group("Icon")
 @export var icon: Texture2D:
@@ -101,27 +99,25 @@ var response: DialogueResponse:
 
 #endregion
 
-
 #region Init
-
 
 func _ready():
 	background.modulate = Color.WHITE
-	
+
 	if not Engine.is_editor_hint():
 		await Utility.physics()
-	
+
 	color = color
 	if drop_down:
 		drop_down.visible = open_by_default
 	if second_drop_down:
 		second_drop_down.visible = not drop_down.visible
-	
+
 	if text == "":
 		label.hide()
 	else:
 		label.show()
-	
+
 	if not Engine.is_editor_hint():
 		if in_bottom_left:
 			invis_button.theme = ResourceBag.get_theme(&"invis_bottom_left")
@@ -129,16 +125,16 @@ func _ready():
 			invis_button.theme = ResourceBag.get_theme(&"invis_bottom_right")
 		else:
 			invis_button.theme = ResourceBag.get_theme(&"invis")
-	
+
 	invis_button.right_pressed.connect(right_pressed.emit)
 	invis_button.gui_input.connect(gui_input.emit)
-	
+
 	if not Engine.is_editor_hint():
 		await Utility.physics()
-	
+
 	update_icon()
 	update_check_button_visibility()
-	
+
 	if not Engine.is_editor_hint():
 		if not Main.done.is_true():
 			await Main.done.became_true
@@ -154,12 +150,9 @@ func _ready_focus() -> void:
 	invis_button.focus_next = focus_next
 	invis_button.focus_previous = focus_previous
 
-
 #endregion
 
-
 #region Set & Get
-
 
 func _set_color(val: Color) -> void:
 	color = val
@@ -224,12 +217,12 @@ func _set_center_content(val: bool) -> void:
 
 func _set_disabled(val: bool) -> void:
 	disabled = val
-	
+
 	if not is_node_ready():
 		await ready
-	
+
 	modulate_icon = modulate_icon
-	
+
 	modulate = Color(0.5, 0.5, 0.5) if disabled else Color.WHITE
 	invis_button.disabled = disabled
 	invis_button.mouse_default_cursor_shape = (
@@ -249,17 +242,17 @@ func _set_check_button_mode(val: bool) -> void:
 func _set_button_pressed(val: bool) -> void:
 	if button_pressed == val or not check_button_mode:
 		return
-	
+
 	if not is_node_ready():
 		await ready
 		await get_tree().physics_frame
-	
+
 	if val:
 		button_pressed = val
-	
+
 	if drop_down:
 		drop_down.visible = val
-	
+
 	button_pressed = val
 	update_background_visibility()
 	update_icon()
@@ -286,11 +279,11 @@ func set_button_pressed_displays_background(val: bool) -> void:
 
 func update_icon() -> void:
 	icon_container.visible = (
-		icon != null or 
-		check_button_mode and (
-			pressed_icon != null or
-			not_pressed_icon != null
-		)
+			icon != null or
+			check_button_mode and (
+					pressed_icon != null or
+					not_pressed_icon != null
+			)
 	)
 	if icon_container.visible:
 		if button_pressed:
@@ -310,7 +303,6 @@ func update_background_visibility() -> void:
 		background.visible = button_pressed
 	else:
 		background.visible = display_background
-
 
 
 func update_check_button_visibility() -> void:
@@ -337,9 +329,7 @@ func _set_audio_enabled(val: bool) -> void:
 		await ready
 	invis_button.audio_enabled = val
 
-
 #endregion
-
 
 func _on_button_left_pressed() -> void:
 	if drop_down:
@@ -396,19 +386,14 @@ func hide_text() -> void:
 func set_color(val: Color) -> void:
 	color = val
 
-
 #region Signals
-
 
 func _on_focus_entered() -> void:
 	invis_button.grab_focus.call_deferred()
 
-
 #endregion
 
-
 #region Focus
-
 
 func _update_focus_mode() -> void:
 	if not allow_focus:
@@ -419,6 +404,5 @@ func _update_focus_mode() -> void:
 	else:
 		focus_mode = Control.FOCUS_NONE
 		invis_button.focus_mode = Control.FOCUS_NONE
-
 
 #endregion

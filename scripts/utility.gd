@@ -1,7 +1,6 @@
 # class_name Utility
 extends Node
 
-
 signal application_focus_in(time_away: float)
 signal one_second
 signal physics_frame(delta: float)
@@ -21,20 +20,19 @@ var class_paths: Dictionary[String, String]
 var tree: SceneTree
 var viewport: Viewport
 var window: Window
-var game_version: Dictionary[StringName, int] = {}: get = _get_game_version
+var game_version: Dictionary[StringName, int] = { }:
+	get = _get_game_version
 var rng := RandomNumberGenerator.new()
-
 
 #region Ready
 
-
 func _ready() -> void:
 	print("Version " + Utility.get_readable_game_version())
-	
+
 	tree = get_tree()
 	viewport = get_viewport()
 	window = viewport.get_window()
-	
+
 	_cache_class_paths()
 	_tick_seconds()
 
@@ -45,29 +43,24 @@ func _cache_class_paths() -> void:
 			continue
 		class_paths[x["class"]] = x["path"]
 
-
 #endregion
 
-
 #region Getters
-
 
 func _get_game_version() -> Dictionary[StringName, int]:
 	if game_version.is_empty():
 		var version: String = ProjectSettings.get("application/config/version")
 		var version_split: Array = version.split(".")
 		game_version = {
-				&"major": int(version_split[0]),
-				&"minor": int(version_split[1]),
-				&"revision": int(version_split[2])}
+			&"major": int(version_split[0]),
+			&"minor": int(version_split[1]),
+			&"revision": int(version_split[2]),
+		}
 	return game_version
-
 
 #endregion
 
-
 #region Signals
-
 
 var time_left_game: float
 var game_has_focus := LoudBool.new(true)
@@ -77,7 +70,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		time_left_game = Time.get_unix_time_from_system()
 		game_has_focus.set_false()
-	
+
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		var current_time: float = Time.get_unix_time_from_system()
 		var time_away: float = current_time - current_clock
@@ -93,12 +86,9 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	physics_frame.emit(delta)
 
-
 #endregion
 
-
 #region Private
-
 
 func _tick_seconds() -> void:
 	await timer(1.0)
@@ -107,12 +97,9 @@ func _tick_seconds() -> void:
 		one_second.emit()
 		current_clock = Time.get_unix_time_from_system()
 
-
 #endregion
 
-
 #region Await
-
 
 func timer(_duration: float) -> void:
 	_duration = maxf(_duration, 0.05)
@@ -139,12 +126,9 @@ func second(_n: int = 1) -> void:
 	for __ in _n:
 		await one_second
 
-
 #endregion
 
-
 #region Control
-
 
 func set_input_as_handled() -> void:
 	viewport.set_input_as_handled()
@@ -154,9 +138,7 @@ func kill_tween(tween: Tween) -> void:
 	if tween:
 		tween.kill()
 
-
 #region Audio
-
 
 var audio_stream_players_in_use: int = 0
 var available_audio_stream_players: Array[AudioStreamPlayer]
@@ -168,7 +150,7 @@ func play_audio(audio: AudioStream, layer: AudioLayer) -> void:
 
 	if audio == null:
 		return
-	
+
 	var player: AudioStreamPlayer = _get_audio_player()
 	player.stream = audio
 	player.pitch_scale = randf_range(0.9, 1.1)
@@ -185,7 +167,7 @@ func _get_audio_player() -> AudioStreamPlayer:
 		add_child(player)
 		player.finished.connect(_free_audio_stream_player.bind(player))
 		return player
-	
+
 	return available_audio_stream_players.pop_back()
 
 
@@ -193,12 +175,9 @@ func _free_audio_stream_player(player: AudioStreamPlayer) -> void:
 	available_audio_stream_players.append(player)
 	audio_stream_players_in_use -= 1
 
-
 #endregion
 
-
 #region Game Control
-
 
 func restart_game() -> void:
 	create_new_game_instance()
@@ -213,18 +192,13 @@ func create_new_game_instance() -> void:
 func quit_game() -> void:
 	tree.quit()
 
-
 #endregion
 
-
 #endregion
-
 
 #region Get
 
-
 #region Mod
-
 
 ## The mod (according to [param mod_id]) is loaded and active
 func is_mod_active(mod_id: String) -> bool:
@@ -251,30 +225,33 @@ func mod_profile_exists(profile_name: String) -> bool:
 func is_mod_installed(mod_id: String) -> bool:
 	return ModLoaderStore.mod_data.has(mod_id)
 
-
 #endregion
-
 
 func get_parsed_json_data(json_path: String) -> Dictionary:
 	var file := FileAccess.open(json_path, FileAccess.READ)
 	if not file:
 		print("FileAccess.open failed")
-		return {}
+		return { }
 	var json_text: String = file.get_as_text()
 	var json: JSON = JSON.new()
 	var parse_error: Error = json.parse(json_text)
-	
+
 	if not parse_error == OK:
 		Log.prn(json.data)
-		assert(parse_error == OK,
-				"The JSON failed to parse. %s" % error_string(parse_error))
-	
+		assert(
+			parse_error == OK,
+			"The JSON failed to parse. %s" % error_string(parse_error),
+		)
+
 	return json.data
 
 
 func get_readable_game_version(version: Dictionary = game_version) -> String:
 	return "%s.%s.%s" % [
-			int(version.major), int(version.minor), int(version.revision)]
+		int(version.major),
+		int(version.minor),
+		int(version.revision),
+	]
 
 
 func comes_after(a: String, b: String) -> bool:
@@ -289,29 +266,33 @@ func get_class_path(_class_name: String) -> String:
 ## [code]current_level[/code] given the [code]base[/code] price and the
 ## [code]increase[/code] multiplier
 func get_price_of_n_purchases(
-		current_level: int, n: int, base: Big, increase: float) -> Big:
-	
+		current_level: int,
+		n: int,
+		base: Big,
+		increase: float,
+) -> Big:
 	var base_price := Big.new(base)
 	var multiplier := Big.new(increase)
-	
+
 	if multiplier.is_equal_to(Big.ONE):
 		return base_price.times(n)
-	
+
 	# This is sum of geometric series:
 	# 	base * multiplier^start * (multiplier^n - 1) / (multiplier - 1)
-	
+
 	var first_term: Big = base_price.times(Big.power(multiplier, current_level))
 	var numerator: Big = Big.power(multiplier, n).minus(Big.ONE)
 	var denominator: Big = multiplier.minus(Big.ONE)
 	var series_sum: Big = numerator.divided_by(denominator)
-	
+
 	return Big.multiply(first_term, series_sum)
 
 
 func get_random_point_in_rect(rect: Rect2) -> Vector2:
 	return Vector2(
-			rect.position.x + (randf() * rect.size.x),
-			rect.position.y + (randf() * rect.size.y))
+		rect.position.x + (randf() * rect.size.x),
+		rect.position.y + (randf() * rect.size.y),
+	)
 
 
 func get_red_to_green_fade(percent: float) -> Color:
@@ -329,7 +310,7 @@ func running_above_minimum_fps() -> bool:
 func get_script_variables(script: Script) -> Array[String]:
 	const ALLOWED_USAGES: Array[int] = [
 		PROPERTY_USAGE_SCRIPT_VARIABLE,
-		4102 # @export vars (there is no constant for this
+		4102, # @export vars (there is no constant for this
 	]
 	var variable_names: Array[String] = []
 	for property in script.get_script_property_list():
@@ -341,7 +322,6 @@ func get_script_variables(script: Script) -> Array[String]:
 ## Loads a resource to the ResourceLoader singleton. It can be fetched with:
 ## ResourceLoader.load_threaded_get(path)
 func load_file_at_path(_path: String, _await: bool = true) -> ResourceLoader.ThreadLoadStatus:
-	
 	## Begin loading a resource with ResourceLoader.load_threaded_request().
 	## You may also skip that step and call this function, it will do it.
 	## If `_await` is true, this function will only return when the resource
@@ -349,12 +329,16 @@ func load_file_at_path(_path: String, _await: bool = true) -> ResourceLoader.Thr
 
 	var load_status: ResourceLoader.ThreadLoadStatus = (
 			ResourceLoader.load_threaded_get_status(_path))
-	
+
 	# If loading has not yet begun, start the loading now.
 	if load_status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
 		ResourceLoader.load_threaded_request(
-				_path, "", false, ResourceLoader.CACHE_MODE_REUSE)
-	
+			_path,
+			"",
+			false,
+			ResourceLoader.CACHE_MODE_REUSE,
+		)
+
 	if _await:
 		while load_status != ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
 			await Utility.process()
@@ -362,7 +346,7 @@ func load_file_at_path(_path: String, _await: bool = true) -> ResourceLoader.Thr
 			if load_status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
 				printerr("ResourceLoader THREAD_LOAD_FAILED. Path: " + _path)
 				return load_status
-	
+
 	return load_status
 
 
@@ -375,21 +359,28 @@ func strip_bbcode(text: String) -> String:
 
 func string_to_key_event(key_string: String) -> InputEventKey:
 	const SHIFTED_SYMBOLS: Dictionary[String, Key] = {
-		"!": KEY_1, "@": KEY_2, "#": KEY_3, "$": KEY_4,
-		"%": KEY_5, "^": KEY_6, "&": KEY_7, "*": KEY_8,
-		"(": KEY_9, ")": KEY_0
+		"!": KEY_1,
+		"@": KEY_2,
+		"#": KEY_3,
+		"$": KEY_4,
+		"%": KEY_5,
+		"^": KEY_6,
+		"&": KEY_7,
+		"*": KEY_8,
+		"(": KEY_9,
+		")": KEY_0,
 	}
-	
+
 	key_string = key_string.strip_edges()
 	var event := InputEventKey.new()
-	
+
 	var keycode: Key
 	if SHIFTED_SYMBOLS.has(key_string):
 		event.shift_pressed = true
 		keycode = SHIFTED_SYMBOLS[key_string]
 	else:
 		keycode = OS.find_keycode_from_string(key_string)
-	
+
 	event.physical_keycode = keycode
 	return event
 
@@ -411,22 +402,20 @@ func arrays_share_keys(arr1: Array, arr2: Array) -> bool:
 	keys2.sort()
 	return keys1 == keys2
 
-
 #region Color
-
 
 func get_color_from_string(x: String) -> Color:
 	if x == "random":
 		return Utility.get_random_bright_color()
-	
+
 	if x.count(", ") == 2:
 		# "0.5, 1, 0"
 		var color_data: Array = x.split(", ")
 		return Color(float(color_data[0]), float(color_data[1]), float(color_data[2]))
-	
+
 	if x.begins_with("#"):
 		return Color.html(x)
-	
+
 	return Color.NAVY_BLUE
 
 
@@ -461,15 +450,11 @@ func validate_color_darkness(color: Color, limit := 1.0) -> Color:
 		color.b /= 1.1
 	return color
 
-
 #endregion -
-
 
 #endregion
 
-
 #region Dev
-
 
 func report(object: Object) -> void:
 	if not Utility.dev_mode:
@@ -480,17 +465,17 @@ func report(object: Object) -> void:
 
 func _get_object_report_dictionary(object: Object) -> Dictionary:
 	if object.get_script() == null:
-		return {}
-	
+		return { }
+
 	var vars: Array[String] = get_script_variables(object.get_script())
-	var dict: Dictionary = {}
-	
+	var dict: Dictionary = { }
+
 	for var_name: String in vars:
 		if var_name == "_class_name":
 			continue
-		
+
 		var val: Variant = object.get(var_name)
-		
+
 		if val is LoudInt or val is LoudFloat:
 			dict[var_name] = val.current
 		elif val is LoudIntPair or val is LoudFloatPair:
@@ -499,7 +484,7 @@ func _get_object_report_dictionary(object: Object) -> Dictionary:
 			dict[var_name] = val.get_text()
 		else:
 			dict[var_name] = val
-	
+
 	return dict
 
 
@@ -514,6 +499,5 @@ func _print_when_changed(loud_var: LoudVar, var_name: String) -> void:
 		Log.pr(var_name, loud_var.get_text())
 	else:
 		printt(var_name, loud_var.get_text())
-
 
 #endregion

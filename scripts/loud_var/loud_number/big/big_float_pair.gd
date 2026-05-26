@@ -1,7 +1,6 @@
 class_name BigFloatPair
 extends Resource
 
-
 signal filled
 signal emptied
 
@@ -10,30 +9,25 @@ signal emptied
 var total: BigFloat
 var cap_current := true
 
-
 #region Init
-
 
 func _init(base_value = 1.0, base_total = base_value) -> void:
 	current = BigFloat.new(base_value)
 	total = BigFloat.new(base_total)
-	
+
 	current.changed.connect(emit_changed)
 	current.increased.connect(check_if_full.unbind(1))
 	current.decreased.connect(check_if_empty.unbind(1))
 	total.changed.connect(emit_changed)
 	total.changed.connect(check_if_full)
 	total.changed.connect(check_if_empty)
-	
+
 	check_if_full()
 	check_if_empty()
 
-
 #endregion
 
-
 #region Signals
-
 
 func check_if_full() -> void:
 	if is_full():
@@ -46,12 +40,9 @@ func check_if_empty() -> void:
 	if is_empty():
 		emptied.emit()
 
-
 #endregion
 
-
 #region Action
-
 
 func reset():
 	current.reset()
@@ -160,11 +151,15 @@ func dump() -> void:
 	set_to(Big.ZERO)
 
 
+func fill_or_dump(condition: bool) -> void:
+	if condition:
+		fill()
+	else:
+		dump()
+
 #endregion
 
-
 #region Get
-
 
 func get_current() -> Big:
 	return current.current
@@ -278,6 +273,5 @@ func is_full() -> bool:
 
 func is_not_full() -> bool:
 	return not is_full()
-
 
 #endregion

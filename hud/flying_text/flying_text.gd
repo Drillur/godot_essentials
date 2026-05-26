@@ -36,12 +36,12 @@ func _ready() -> void:
 
 
 func set_text(_text: String) -> void:
-	label._set_text(_text)
+	label.write(_text)
 	label.show()
 
 
 func set_crit_text(_text: String) -> void:
-	crit_label._set_text(_text)
+	crit_label.write(_text)
 	crit_label.show()
 
 
@@ -80,7 +80,7 @@ func kill_tween() -> void:
 func _become_available() -> void:
 	hide()
 	linger_duration = 0.3
-	label._set_text("")
+	label.write("")
 	crit_label.hide()
 	modulate = Color(1, 1, 1, 1)
 	position = Vector2.ZERO

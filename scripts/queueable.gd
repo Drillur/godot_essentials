@@ -1,7 +1,6 @@
 class_name Queueable
 extends RefCounted
 
-
 signal method_called
 
 enum CooldownType { PROCESS, PHYSICS_PROCESS, DURATION }
@@ -24,9 +23,7 @@ var node: CanvasItem
 var parent: CanvasItem
 var parent_visible_in_tree := false
 
-
 #region Static
-
 
 static func new_node_queueable(_node: CanvasItem, _cooldown_type := CooldownType.PROCESS, _cooldown_duration := -1.0) -> Queueable:
 	var queue := Queueable.new(QueueType.NODE, _cooldown_type, _cooldown_duration)
@@ -48,9 +45,8 @@ static func new_permanent_node_queueable(
 		_signals: Array[Signal],
 		_node: CanvasItem,
 		_cooldown_type := CooldownType.PROCESS,
-		_cooldown_duration := -1.0
-	) -> void:
-	
+		_cooldown_duration := -1.0,
+) -> void:
 	var queue := await new_node_queueable(_node, _cooldown_type, _cooldown_duration)
 	queue.method = _method
 	for sig: Signal in _signals:
@@ -70,9 +66,8 @@ static func new_permanent_resource_queueable(
 		_method: Callable,
 		_signals: Array[Signal],
 		_cooldown_type := CooldownType.PROCESS,
-		_cooldown_duration := -1.0
-	) -> void:
-	
+		_cooldown_duration := -1.0,
+) -> void:
 	var queue := new_resource_queueable(_cooldown_type, _cooldown_duration)
 	queue.method = _method
 	for sig: Signal in _signals:
@@ -88,23 +83,22 @@ static func new_duration_resource(duration: float) -> Queueable:
 	return new_resource_queueable(CooldownType.DURATION, duration)
 
 
+static func call_deferred_duration(_method: Callable, duration: float = 1.0) -> void:
+	await Utility.timer(duration)
+	_method.call()
+
 #endregion
 
-
 #region Init
-
 
 func _init(_type: QueueType, _cooldown_type: CooldownType, _cooldown_duration := -1.0) -> void:
 	type = _type
 	cooldown_type = _cooldown_type
 	cooldown_duration = _cooldown_duration
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_method(val: Callable) -> void:
 	if method:
@@ -113,12 +107,9 @@ func _set_method(val: Callable) -> void:
 	reset()
 	method = val
 
-
 #endregion
 
-
 #region Node
-
 
 func _on_visibility_changed():
 	parent_visible_in_tree = (
@@ -129,20 +120,16 @@ func _on_visibility_changed():
 		method.call()
 		method_called.emit()
 
-
 #endregion
-
 
 #region Method
 
-
 #region Interact
-
 
 func call_method() -> void:
 	if not is_method_assigned():
 		return
-	
+
 	if queued:
 		return
 	if Main.done.is_false():
@@ -152,21 +139,21 @@ func call_method() -> void:
 	if cooldown:
 		queued = true
 		return
-	
+
 	var should_enqueue: bool = type == QueueType.NODE and (
 			not parent_visible_in_tree
 			or not node.visible)
 	if should_enqueue:
 		queued = true
 		return
-	
+
 	queued = false
 	method.call_deferred()
 	cooldown = true
 	method_called.emit()
-	
+
 	await _cooldown_period()
-	
+
 	if _should_call_method_again():
 		cooldown = false
 		if queued:
@@ -178,8 +165,8 @@ func _should_call_method_again() -> bool:
 	return is_method_assigned() and (
 			type == QueueType.RESOURCE
 			or (
-				is_instance_valid(node)
-				and is_instance_valid(parent)))
+					is_instance_valid(node)
+					and is_instance_valid(parent)))
 
 
 func reset() -> void:
@@ -210,18 +197,13 @@ func _cooldown_period() -> void:
 		CooldownType.DURATION:
 			await Utility.timer(cooldown_duration)
 
-
 #endregion
 
-
 #region Get
-
 
 func is_method_assigned() -> bool:
 	return method != null
 
-
 #endregion
-
 
 #endregion
