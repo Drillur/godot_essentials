@@ -1,50 +1,46 @@
 class_name LoudBool
 extends LoudVar
 
-
 signal became_true
 signal became_false
 
-@export var current: bool: set = _set_current
+@export var current: bool:
+	set = _set_current
 
 var base: bool
+
+var time_became_true: float = -1.0
 var copied_bool: LoudBool
 var button: Control
 var display_node: Control
 
-
 #region Init
-
 
 func _init(_base: bool = false) -> void:
 	base = _base
 	current = _base
 
-
 #endregion
 
-
 #region Set Get
-
 
 func _set_current(new_current: bool) -> void:
 	if current == new_current:
 		return
-	
+
 	current = new_current
-	
+
 	changed.emit()
 	if new_current:
+		time_became_true = Time.get_unix_time_from_system()
 		became_true.emit()
 	else:
+		time_became_true = -1.0
 		became_false.emit()
-
 
 #endregion
 
-
 #region Action
-
 
 func invert() -> void:
 	set_to(not current)
@@ -88,18 +84,16 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 	changed.connect(update)
 	update.call()
 
-
 #region Button
-
 
 func tie_button_pressed(_button: Control) -> void:
 	button = _button
 	await Utility.process()
-	
+
 	if not is_instance_valid(button):
 		button = null
 		return
-	
+
 	button.button_pressed = is_true()
 	if not changed.is_connected(_update_button_pressed):
 		changed.connect(_update_button_pressed)
@@ -131,12 +125,9 @@ func _update_button_pressed() -> void:
 		return
 	button.button_pressed = is_true()
 
-
 #endregion
 
-
 #region Copycat
-
 
 func copycat(_copied_bool: LoudBool) -> void:
 	assert(not is_copycat(), "already a copycat")
@@ -172,15 +163,11 @@ func contradict_changed() -> void:
 func is_copycat() -> bool:
 	return copied_bool != null
 
-
 #endregion
 
-
 #endregion
-
 
 #region Get
-
 
 func get_value() -> bool:
 	return current
@@ -205,5 +192,35 @@ func is_false() -> bool:
 func default() -> bool:
 	return base
 
+
+## Returns how long this bool has been true for
+func duration_true() -> float:
+	if is_false():
+		return -1.0
+	return Time.get_unix_time_from_system() - time_became_true
+
+#endregion
+
+#region Await
+
+## If true, returns immediately. If false, awaits became_false
+func await_true() -> void:
+	if is_false():
+		await became_true
+
+
+## If false, returns immediately. If true, awaits became_false
+func await_false() -> void:
+	if is_true():
+		await became_false
+
+
+## Returns only when duration_true() is >= [param duration]. This should only be used on bools which
+## only turn true once, or it might get freaky-deaky
+func await_duration_true(duration: float = 0.0) -> void:
+	await await_true()
+	if duration > 0.0:
+		while duration_true() < duration:
+			await Utility.physics_frame
 
 #endregion
