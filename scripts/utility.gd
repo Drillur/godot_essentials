@@ -218,6 +218,14 @@ func are_any_mods_loaded() -> bool:
 	return not ModLoaderStore.mod_data.is_empty()
 
 
+func are_any_mods_active() -> bool:
+	for mod_id: String in ModLoaderStore.mod_data.keys():
+		var mod_data: ModData = ModLoaderStore.mod_data[mod_id]
+		if mod_data.is_active:
+			return true
+	return false
+
+
 func mod_profile_exists(profile_name: String) -> bool:
 	return ModLoaderStore.user_profiles.has(profile_name)
 

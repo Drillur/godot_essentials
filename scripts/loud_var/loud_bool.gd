@@ -10,6 +10,7 @@ signal became_false
 var base: bool
 
 var time_became_true: float = -1.0
+var time_became_false: float = -1.0
 var copied_bool: LoudBool
 var button: Control
 var display_node: Control
@@ -33,8 +34,10 @@ func _set_current(new_current: bool) -> void:
 	changed.emit()
 	if new_current:
 		time_became_true = Time.get_unix_time_from_system()
+		time_became_false = -1.0
 		became_true.emit()
 	else:
+		time_became_false = Time.get_unix_time_from_system()
 		time_became_true = -1.0
 		became_false.emit()
 
@@ -199,6 +202,13 @@ func duration_true() -> float:
 		return -1.0
 	return Time.get_unix_time_from_system() - time_became_true
 
+
+## Returns how long this bool has been false for
+func duration_false() -> float:
+	if is_true():
+		return -1.0
+	return Time.get_unix_time_from_system() - time_became_false
+
 #endregion
 
 #region Await
@@ -215,12 +225,19 @@ func await_false() -> void:
 		await became_false
 
 
-## Returns only when duration_true() is >= [param duration]. This should only be used on bools which
-## only turn true once, or it might get freaky-deaky
+## Returns only when duration_true() is >= [param duration]
 func await_duration_true(duration: float = 0.0) -> void:
 	await await_true()
 	if duration > 0.0:
 		while duration_true() < duration:
-			await Utility.physics_frame
+			await Utility.physics(6) # 0.1 sec
+
+
+## Returns only when duration_false() is >= [param duration]
+func await_duration_false(duration: float = 0.0) -> void:
+	await await_false()
+	if duration > 0.0:
+		while duration_false() < duration:
+			await Utility.physics(6) # 0.1 sec
 
 #endregion
