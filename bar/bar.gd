@@ -1,7 +1,6 @@
 class_name Bar
 extends MarginContainer
 
-
 @export var kill_background := false
 @export var default_color: Color
 @export var animate := false
@@ -27,38 +26,33 @@ var bar_size: LoudInt = LoudInt.new(-1)
 
 #endregion
 
-
 #region Ready
-
 
 func _ready() -> void:
 	set_process(false)
-	
+
 	if performant_updates:
 		queue = await Queueable.new_node_queueable(self, Queueable.CooldownType.DURATION, 0.25)
 	else:
 		queue = await Queueable.new_node_queueable(self, Queueable.CooldownType.PHYSICS_PROCESS)
-	
+
 	if default_color != Color.BLACK:
 		color = default_color
 	if kill_background:
 		background.hide()
-	
+
 	bar_size.changed.connect(_update_progress_bar_size_x)
 	_update_progress_bar_size_x()
-	
+
 	visibility_changed.connect(_on_visibility_changed)
 	tree_exiting.connect(kill_tween)
-	
+
 	resized.connect(_on_resized)
 	_on_resized.call_deferred()
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_color(new_color: Color) -> void:
 	if color == new_color:
@@ -78,12 +72,9 @@ func _set_progress(new_progress: float) -> void:
 	if animate:
 		new_animation(previous, progress)
 
-
 #endregion
 
-
 #region Signals
-
 
 func _on_resized():
 	bar_size.custom_maximum_limit = floori(size.x)
@@ -95,40 +86,32 @@ func _on_visibility_changed():
 	if visible:
 		animation_cd.start()
 
-
 #endregion
 
-
 #region Update
-
 
 func _update_progress_bar_size_x() -> void:
 	progress_bar.size.x = bar_size.val()
 
-
 #endregion
-
 
 #region Attachments
 
-
 func attach_timer(timer: LoudTimer, timer_inverted_mode := false) -> void:
 	assert(timer != null, "Why is timer null?")
-	
+
 	var update: Callable
-	
+
 	if timer_inverted_mode:
 		update = func() -> void:
 			set_deferred("progress", timer.get_inverted_percent())
 	else:
 		update = func() -> void:
 			set_deferred("progress", timer.get_percent())
-	
+
 	get_tree().process_frame.connect(update)
 
-
 #region - Color
-
 
 var watched_color: LoudColor
 
@@ -157,12 +140,9 @@ func _clear_color() -> void:
 	watched_color = null
 	queue.clear()
 
-
 #endregion - Color
 
-
 #region - LoudFloat and LoudInt
-
 
 func attach_float(_float: LoudFloat) -> void:
 	var update: Callable = func() -> void:
@@ -179,12 +159,9 @@ func attach_int(x: LoudInt, divisor := 1.0) -> void:
 	x.changed.connect(queue.call_method)
 	queue.call_method()
 
-
 #endregion - LoudFloat and LoudInt
 
-
 #region - LoudPairs
-
 
 var loud_pair: Resource
 
@@ -193,11 +170,15 @@ func _update_pair_progress() -> void:
 	assert(loud_pair != null, "Why is this called if loud_pair is null?")
 	if not loud_pair:
 		return
-	
+
 	if display_pending:
-		set_deferred("progress", loud_pair.get_pending_percent())
+		assert(not logarithmic_mode, "Add code for pending logarithmic percent")
+		set_deferred(&"progress", loud_pair.get_pending_percent())
 	else:
-		set_deferred("progress", loud_pair.get_current_percent())
+		if logarithmic_mode:
+			set_deferred(&"progress", loud_pair.get_current_logarithmic_percent())
+		else:
+			set_deferred(&"progress", loud_pair.get_current_percent())
 
 
 func attach_float_pair(_float_pair: LoudFloatPair) -> void:
@@ -241,12 +222,9 @@ func clear_loud_pair() -> void:
 	loud_pair = null
 	queue.clear()
 
-
 #endregion - LoudPairs
 
-
 #region - Price
-
 
 var price: Price
 
@@ -267,21 +245,17 @@ func _update_price() -> void:
 			else price.get_logarithmic_progress_percent() if logarithmic_mode
 			else price.get_progress_percent())
 	set_deferred("progress", _progress)
-	
+
 	var display_edge: bool = (
 			not price.get_pending_progress_percent() == 1.0 if display_pending
 			else not price.get_progress_percent() == 1.0)
 	edge.set_deferred("visible", display_edge)
 
-
 #endregion - Price
-
 
 #endregion Attachments
 
-
 #region Animate
-
 
 var animation_cd := LoudTimer.new(0.35)
 var tween: Tween
@@ -296,7 +270,7 @@ func new_animation(_previous: float, _next: float) -> void:
 	var highlight_size := minf(size.x, delta * size.x)
 	if highlight_size < 5:
 		return
-	
+
 	animation_container.size.x = highlight_size
 	animation_container.size.y = size.y
 	animation_container.modulate = color
@@ -308,7 +282,7 @@ func new_animation(_previous: float, _next: float) -> void:
 		animation_container.get_node("Panel").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		animation_container.position.x = edge.position.x
 	animation_container.show()
-	
+
 	var tween_existed: bool = tween != null and tween.is_valid()
 	kill_tween()
 	tween = get_tree().create_tween()
@@ -325,6 +299,5 @@ func stop_animation() -> void:
 
 func kill_tween() -> void:
 	Utility.kill_tween(tween)
-
 
 #endregion

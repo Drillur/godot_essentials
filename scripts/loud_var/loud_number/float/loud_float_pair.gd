@@ -1,7 +1,6 @@
 class_name LoudFloatPair
 extends Resource
 
-
 signal filled
 signal emptied
 signal pending_changed
@@ -18,9 +17,7 @@ var limit_to_total := true
 ## Calling get_random_point() updates this value
 var result_of_previous_random_point: float
 
-
 #region Init
-
 
 func _init(base_value: float, base_total: float, _limit_to_total: bool = true):
 	current = LoudFloat.new(base_value)
@@ -35,12 +32,9 @@ func _init(base_value: float, base_total: float, _limit_to_total: bool = true):
 	current.changed.connect(emit_changed)
 	total.changed.connect(emit_changed)
 
-
 #endregion
 
-
 #region Internal
-
 
 func text_changed() -> void:
 	text_requires_update = true
@@ -59,12 +53,9 @@ func check_if_empty() -> void:
 			dump()
 		emptied.emit()
 
-
 #endregion
 
-
 #region Action
-
 
 func do_not_limit_to_total() -> LoudFloatPair:
 	limit_to_total = false
@@ -120,12 +111,9 @@ func dump() -> void:
 	if not is_empty():
 		current.set_to(0.0)
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> float:
 	return current.get_value()
@@ -147,6 +135,12 @@ func get_current_percent() -> float:
 	if total.is_zero():
 		return 0.0
 	return get_value() / get_total()
+
+
+func get_current_logarithmic_percent() -> float:
+	if current.is_less_than_or_equal_to(0.0):
+		return 0.0
+	return log(get_current()) / log(get_total())
 
 
 func get_pending_percent() -> float:
@@ -213,6 +207,5 @@ func is_empty() -> bool:
 
 func has(amount: int) -> bool:
 	return current.is_greater_than_or_equal_to(amount)
-
 
 #endregion

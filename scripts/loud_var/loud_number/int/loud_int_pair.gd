@@ -1,25 +1,24 @@
 class_name LoudIntPair
 extends Resource
 
-
 signal filled
 signal emptied
 signal pending_changed
 
-@export var current: LoudInt: set = _set_current
+@export var current: LoudInt:
+	set = _set_current
 
 var total: LoudInt
 
 var text: String
 var text_requires_update := true
 var limit_to_zero := true
-var limit_to_total := true: set = _set_limit_to_total
+var limit_to_total := true:
+	set = _set_limit_to_total
 
 var result_of_previous_random_point: int ## Updated by get_random_point()
 
-
 #region Init
-
 
 func _init(base_value: int, base_total: int, _limit_to_total: bool = true):
 	current = LoudInt.new(base_value)
@@ -30,12 +29,9 @@ func _init(base_value: int, base_total: int, _limit_to_total: bool = true):
 	total.changed.connect(check_if_full)
 	total.changed.connect(emit_changed)
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_current(_val: LoudInt) -> void:
 	if current:
@@ -55,18 +51,15 @@ func _set_current(_val: LoudInt) -> void:
 func _set_limit_to_total(new_val: bool) -> void:
 	if limit_to_total == new_val:
 		return
-	
+
 	limit_to_total = new_val
-	
+
 	if new_val and current.is_greater_than(get_total()):
 		fill()
 
-
 #endregion
 
-
 #region Internal
-
 
 func text_changed() -> void:
 	text_requires_update = true
@@ -85,12 +78,9 @@ func check_if_empty() -> void:
 			dump()
 		emptied.emit()
 
-
 #endregion
 
-
 #region Action
-
 
 func do_not_limit_to_total() -> LoudIntPair:
 	limit_to_total = false
@@ -145,12 +135,9 @@ func fill() -> void:
 func dump() -> void:
 	current.set_to(LoudInt.ZERO)
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> int:
 	return current.get_value()
@@ -172,6 +159,12 @@ func get_current_percent() -> float:
 	if total.is_zero():
 		return 0.0
 	return current.to_float() / get_total()
+
+
+func get_current_logarithmic_percent() -> float:
+	if current.is_less_than_or_equal_to(0.0):
+		return 0.0
+	return log(get_current()) / log(get_total())
 
 
 func get_pending_percent() -> float:
@@ -196,7 +189,7 @@ func get_midpoint() -> int:
 
 func get_random_point() -> int:
 	result_of_previous_random_point = (
-		get_total() if is_full() else randi_range(get_current(), get_total())
+			get_total() if is_full() else randi_range(get_current(), get_total())
 	)
 	return get_previous_random_point()
 
@@ -238,6 +231,5 @@ func is_empty() -> bool:
 
 func is_zero() -> bool:
 	return current.is_zero()
-
 
 #endregion

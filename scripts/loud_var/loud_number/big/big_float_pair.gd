@@ -177,6 +177,10 @@ func get_current_percent() -> float:
 	return get_current().percent_of(get_total())
 
 
+func get_current_logarithmic_percent() -> float:
+	return get_current().to_log() / get_total().to_log()
+
+
 func get_unclamped_percent() -> float:
 	var big_percent := current.current.divided_by(get_total())
 	if big_percent.exponent >= 307:
