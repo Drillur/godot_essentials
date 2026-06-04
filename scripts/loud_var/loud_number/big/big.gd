@@ -10,6 +10,7 @@ static var ZERO: Big = Big.new(0.0, 0)
 static var ONE: Big = Big.new(1.0, 0)
 static var TEN: Big = Big.new(10.0, 0)
 static var SIXTY: Big = Big.new(60.0, 0)
+static var ONE_E_10: Big = Big.new("1e10")
 
 var mantissa: float
 var exponent: int
@@ -198,12 +199,13 @@ static func divide(_x: Variant, _y: Variant) -> Big:
 	return result
 
 
-static func power(_x: Variant, _y: Variant) -> Big:
-	var result := Big.new(_x)
+static func power(base: Variant, raised: Variant) -> Big:
+	assert(raised is not Big)
+	var result := Big.new(base)
 
-	if typeof(_y) == TYPE_INT:
-		if _y <= 0:
-			if _y < 0:
+	if typeof(raised) == TYPE_INT:
+		if raised <= 0:
+			if raised < 0:
 				printerr("Big Error: Negative exponents are not supported!")
 			result.mantissa = 1.0
 			result.exponent = 0
@@ -212,34 +214,34 @@ static func power(_x: Variant, _y: Variant) -> Big:
 		var y_mantissa: float = 1.0
 		var y_exponent: int = 0
 
-		while _y > 1:
+		while raised > 1:
 			normalize(result)
-			if _y % 2 == 0:
+			if raised % 2 == 0:
 				result.exponent *= 2
 				result.mantissa **= 2
-				_y = _y / 2
+				raised = raised / 2
 			else:
 				y_mantissa = result.mantissa * y_mantissa
 				y_exponent = result.exponent + y_exponent
 				result.exponent *= 2
 				result.mantissa **= 2
-				_y = (_y - 1) / 2
+				raised = (raised - 1) / 2
 
 		result.exponent = y_exponent + result.exponent
 		result.mantissa = y_mantissa * result.mantissa
 		normalize(result)
 		return result
 
-	if typeof(_y) == TYPE_FLOAT:
+	if typeof(raised) == TYPE_FLOAT:
 		if result.mantissa == 0.0:
 			return result
 
 		# fast track
-		var temp: float = result.exponent * _y
-		var new_mantissa: float = result.mantissa ** _y
+		var temp: float = result.exponent * raised
+		var new_mantissa: float = result.mantissa ** raised
 
 		var fast_track: bool = (
-				roundi(_y) == _y
+				roundi(raised) == raised
 				and temp <= LoudNumber.MAX_INT
 				and temp >= LoudNumber.MIN_INT
 				and is_finite(temp)
@@ -254,34 +256,34 @@ static func power(_x: Variant, _y: Variant) -> Big:
 		# a bit slower, still supports floats
 		var new_exponent: int = int(temp)
 		var residue: float = temp - new_exponent
-		new_mantissa = 10 ** (_y * LoudNumber.log10(result.mantissa) + residue)
+		new_mantissa = 10 ** (raised * LoudNumber.log10(result.mantissa) + residue)
 		if new_mantissa != INF and new_mantissa != -INF:
 			result.mantissa = new_mantissa
 			result.exponent = new_exponent
 			normalize(result)
 			return result
 
-		if round(_y) != _y:
+		if round(raised) != raised:
 			printerr("Big Error: Power function does not support large floats, use integers!")
 
-		return power(_x, int(_y))
+		return power(base, int(raised))
 
-	if _y is Big:
-		# warning - this might be slow!
-		if _y.is_equal_to(ZERO):
-			return Big.new(ONE)
-		if _y.is_less_than(ZERO):
-			printerr("Big Error: Negative exponents are not supported!")
-			return Big.new(ZERO)
-
-		var exponent_decremented: Big = _y.minus(ONE)
-		while exponent_decremented.is_greater_than(Big.ZERO):
-			result.times_equals(_x)
-			exponent_decremented.minus_equals(ONE)
-		return result
+	#if raised is Big:
+	## warning - this might be slow!
+	#if raised.is_equal_to(ZERO):
+	#return Big.new(ONE)
+	#if raised.is_less_than(ZERO):
+	#printerr("Big Error: Negative exponents are not supported!")
+	#return Big.new(ZERO)
+	#
+	#var exponent_decremented: Big = raised.minus(ONE)
+	#while exponent_decremented.is_greater_than(Big.ZERO):
+	#result.times_equals(base)
+	#exponent_decremented.minus_equals(ONE)
+	#return result
 
 	printerr("Big Error: Unknown/unsupported data type passed as an exponent in power function!")
-	return _x
+	return base
 
 
 static func root(_x: Big) -> Big:
