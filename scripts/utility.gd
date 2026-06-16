@@ -106,24 +106,24 @@ func timer(_duration: float) -> void:
 	await tree.create_timer(_duration).timeout
 
 
-## Awaits [b]n[/b] physics frames
-func physics(_n: int = 1) -> void:
-	assert(_n >= 1, "_n should be at least 1")
-	for __ in _n:
+## Awaits [param n] physics frames
+func physics(n: int = 1) -> void:
+	assert(n >= 1, "n should be at least 1")
+	for i in n:
 		await physics_frame
 
 
-## Awaits [b]n[/b] process frames
-func process(_n: int = 1) -> void:
-	assert(_n >= 1, "_n should be at least 1")
-	for __ in _n:
+## Awaits [param n] process frames
+func process(n: int = 1) -> void:
+	assert(n >= 1, "n should be at least 1")
+	for i in n:
 		await process_frame
 
 
-## Awaits [b]n[/b] seconds
-func second(_n: int = 1) -> void:
-	assert(_n >= 1, "_n should be at least 1")
-	for __ in _n:
+## Awaits [param n] seconds
+func second(n: int = 1) -> void:
+	assert(n >= 1, "n should be at least 1")
+	for i in n:
 		await one_second
 
 #endregion
