@@ -17,7 +17,6 @@ shadow_size = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jeci1"]
 bg_color = Color(0.735357, 0.735357, 0.735357, 0.05)
-border_width_bottom = 8
 border_color = Color(0.7372549, 0.7372549, 0.7372549, 0.101960786)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
@@ -42,11 +41,6 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jeci1")
 metadata/_edit_lock_ = true
-
-[node name="BottomButton" parent="." unique_id=1244325111 instance=ExtResource("2_m84jn")]
-custom_minimum_size = Vector2(10, 8)
-layout_mode = 2
-size_flags_vertical = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2031284282]
 layout_mode = 2
@@ -124,5 +118,4 @@ theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[connection signal="left_pressed" from="BottomButton" to="." method="_on_bottom_button_left_pressed"]
 [connection signal="left_pressed" from="VBoxContainer/Header/HeaderButton" to="." method="_on_header_button_left_pressed"]
