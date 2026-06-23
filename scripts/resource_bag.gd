@@ -225,20 +225,12 @@ func skip_base_data() -> void:
 #region Get
 
 func get_resource(_name: StringName, _default: Variant = null) -> Resource:
-	return ResourceLoader.load(
-		resource_paths[_name],
-		"",
-		ResourceLoader.CACHE_MODE_REUSE,
-	)
+	return ResourceLoader.load(resource_paths[_name], "", ResourceLoader.CACHE_MODE_REUSE)
 
 #region Get Icon
 
 func get_icon(_name: StringName) -> Texture2D:
-	return ResourceLoader.load(
-		get_texture_path(_name),
-		"",
-		ResourceLoader.CACHE_MODE_REUSE,
-	)
+	return ResourceLoader.load(get_texture_path(_name), "", ResourceLoader.CACHE_MODE_REUSE)
 
 
 ## Returns path of the image or icon.svg (if no _name exists)
@@ -258,21 +250,14 @@ func get_theme(_name: StringName) -> Theme:
 
 func get_dialogue(_key: StringName) -> DialogueResource:
 	if dialogue_paths.has(_key):
-		return ResourceLoader.load(
-			dialogue_paths[_key],
-			"",
-			ResourceLoader.CACHE_MODE_REUSE,
-		)
+		return ResourceLoader.load(dialogue_paths[_key], "", ResourceLoader.CACHE_MODE_REUSE)
 	return null
 
 
 func get_icon_text(_name: StringName, _color := Color.WHITE) -> String:
 	if _color == Color.WHITE:
 		return "[img=<16>]%s[/img]" % get_texture_path(_name)
-	return "[img=<16> color=#%s]%s[/img]" % [
-		_color.to_html(),
-		get_texture_path(_name),
-	]
+	return "[img=<16> color=#%s]%s[/img]" % [_color.to_html(), get_texture_path(_name)]
 
 
 func get_data(category: StringName) -> Dictionary:

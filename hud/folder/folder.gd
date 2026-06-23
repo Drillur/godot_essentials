@@ -8,8 +8,15 @@ extends MarginContainer
 	set = _set_header_label_text
 @export var is_open: bool = false:
 	set = _set_is_open
+
+@export_group("Color")
 @export var color: Color = Color.WHITE:
 	set = _set_color
+@export var currency_color: StringName = &""
+@export var lored_color: StringName = &""
+@export var stage_color: StringName = &""
+@export var tree_color: StringName = &""
+@export_group("")
 
 #region Onready Variables
 
@@ -26,10 +33,22 @@ extends MarginContainer
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
+		_ready_color()
 		if not icon:
 			icon_texture_rect.queue_free()
 		await Utility.process()
 	_update()
+
+
+func _ready_color() -> void:
+	if not currency_color.is_empty():
+		color = Currency.get_color(currency_color)
+	elif not lored_color.is_empty():
+		color = LORED.get_details(lored_color).get_color()
+	elif not stage_color.is_empty():
+		color = Stage.get_color(stage_color)
+	elif not tree_color.is_empty():
+		color = UpgradeTree.fetch(tree_color).details.get_color()
 
 #endregion
 
@@ -77,7 +96,7 @@ func _set_color(new_color: Color) -> void:
 
 	color = new_color
 	arrow_texture_rect.modulate = color
-	background.modulate = color
+	header_label.modulate = color
 	if icon_texture_rect != null:
 		icon_texture_rect.modulate = color
 

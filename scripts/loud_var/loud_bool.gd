@@ -90,8 +90,10 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 #region Button
 
 func tie_button_pressed(button: Control) -> void:
+	if buttons.has(button):
+		return
+	_validate_buttons()
 	await Utility.process()
-
 	if not is_instance_valid(button):
 		button = null
 		return
@@ -129,8 +131,17 @@ func _update_button_pressed() -> void:
 	if buttons.is_empty():
 		clear_button()
 		return
+	_validate_buttons()
 	for button: Control in buttons:
 		button.button_pressed = is_true()
+
+
+func _validate_buttons() -> void:
+	buttons.clear()
+	var duplicated_buttons: Array = buttons.duplicate()
+	for obj in duplicated_buttons:
+		if obj != null and is_instance_valid(obj):
+			buttons.append(obj)
 
 #endregion
 
