@@ -151,6 +151,7 @@ func dump() -> void:
 	set_to(Big.ZERO)
 
 
+## If [param condition] is true, this pair is filled. Otherwise, it is set to 0.
 func fill_or_dump(condition: bool) -> void:
 	if condition:
 		fill()

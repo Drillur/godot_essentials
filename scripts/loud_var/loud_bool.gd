@@ -12,7 +12,7 @@ var base: bool
 var time_became_true: float = -1.0
 var time_became_false: float = -1.0
 var copied_bool: LoudBool
-var buttons: Array[Control] ## Used for tie_button_pressed()
+var button: Control
 var display_node: Control
 
 #region Init
@@ -89,16 +89,13 @@ func tie_node_visibility(_node: Control, _equal_to: bool = true) -> void:
 
 #region Button
 
-func tie_button_pressed(button: Control) -> void:
-	if buttons.has(button):
-		return
-	_validate_buttons()
+func tie_button_pressed(_button: Control) -> void:
 	await Utility.process()
-	if not is_instance_valid(button):
-		button = null
+	if not is_instance_valid(_button):
 		return
 
-	buttons.append(button)
+	button = _button
+
 	button.button_pressed = is_true()
 	if not changed.is_connected(_update_button_pressed):
 		changed.connect(_update_button_pressed)
@@ -107,41 +104,27 @@ func tie_button_pressed(button: Control) -> void:
 
 
 func clear_button() -> void:
-	if changed.is_connected(_update_button_pressed):
-		changed.disconnect(_update_button_pressed)
-	for button: Control in buttons:
-		if button:
-			button.toggled.disconnect(_button_toggled)
-	buttons.clear()
+	changed.disconnect(_update_button_pressed)
+	if button:
+		button.toggled.disconnect(_button_toggled)
+	button = null
 
 
 func _button_toggled(_toggled: bool) -> void:
-	var button: Control = buttons[0]
 	button.toggled.disconnect(_button_toggled)
 	set_to(_toggled)
 	await Utility.process()
-	if buttons.is_empty():
+	if not button:
 		clear_button()
-	else:
-		if not button.toggled.is_connected(_button_toggled):
-			button.toggled.connect(_button_toggled)
+	elif not button.toggled.is_connected(_button_toggled):
+		button.toggled.connect(_button_toggled)
 
 
 func _update_button_pressed() -> void:
-	if buttons.is_empty():
+	if not button:
 		clear_button()
 		return
-	_validate_buttons()
-	for button: Control in buttons:
-		button.button_pressed = is_true()
-
-
-func _validate_buttons() -> void:
-	buttons.clear()
-	var duplicated_buttons: Array = buttons.duplicate()
-	for obj in duplicated_buttons:
-		if obj != null and is_instance_valid(obj):
-			buttons.append(obj)
+	button.button_pressed = is_true()
 
 #endregion
 

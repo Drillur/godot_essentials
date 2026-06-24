@@ -23,6 +23,8 @@ enum AttachType {
 	set = _set_font_size
 @export var prepended_text: String = ""
 @export var appended_text: String = ""
+## If true, custom_minimum_size will update when size changes to match the largest size
+@export var autosize: bool = false
 @export_group("Time Mode")
 @export var time_mode := false
 @export var short_time_text := false
@@ -57,6 +59,10 @@ func _ready() -> void:
 		Settings.stretch_mode.changed.connect(update_theme)
 		standard_theme = theme == MSDF_THEMES[0]
 		update_theme()
+
+	if autosize:
+		text = ""
+		item_rect_changed.connect(_update_custom_minimum_size)
 
 
 func update_theme() -> void:
@@ -451,6 +457,15 @@ func update_text_price() -> void:
 	if not hide_icon:
 		result_text += currency.details.get_icon_and_name()
 	write.call_deferred(result_text)
+
+
+func _update_custom_minimum_size() -> void:
+	if size.x > custom_minimum_size.x:
+		Log.prn(name, custom_minimum_size.x, ">", size.x)
+		custom_minimum_size.x = size.x
+	if size.y > custom_minimum_size.y:
+		Log.prn(name, custom_minimum_size.y, ">", size.y)
+		custom_minimum_size.y = size.y
 
 
 func clear_currency() -> void:

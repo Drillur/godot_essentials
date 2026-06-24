@@ -245,10 +245,10 @@ func _set_button_pressed(val: bool) -> void:
 
 	if not is_node_ready():
 		await ready
-		await get_tree().physics_frame
+		await Utility.process()
 
-	if val:
-		button_pressed = val
+	#if val:
+	#button_pressed = val
 
 	if drop_down:
 		drop_down.visible = val
