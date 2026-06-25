@@ -109,7 +109,7 @@ func attach_timer(timer: LoudTimer, timer_inverted_mode := false) -> void:
 		update = func() -> void:
 			set_deferred("progress", timer.get_percent())
 
-	get_tree().process_frame.connect(update)
+	Utility.process_frame.connect(update.unbind(1))
 
 #region - Color
 
@@ -253,7 +253,7 @@ func _update_price() -> void:
 
 #endregion - Price
 
-#endregion Attachments
+#endregion
 
 #region Animate
 

@@ -24,11 +24,12 @@ enum AttachType {
 @export var prepended_text: String = ""
 @export var appended_text: String = ""
 ## If true, custom_minimum_size will update when size changes to match the largest size
-@export var autosize: bool = false
 @export_group("Time Mode")
 @export var time_mode := false
 @export var short_time_text := false
 @export_group("")
+
+var done := LoudBool.new()
 
 var color := Color.WHITE
 var queue: Queueable
@@ -60,9 +61,7 @@ func _ready() -> void:
 		standard_theme = theme == MSDF_THEMES[0]
 		update_theme()
 
-	if autosize:
-		text = ""
-		item_rect_changed.connect(_update_custom_minimum_size)
+	done.set_true()
 
 
 func update_theme() -> void:
@@ -79,15 +78,14 @@ func update_theme() -> void:
 
 
 func set_base_text() -> void:
-	if center:
-		base_text = "[center]"
+	base_text = ""
 	if font_size != 12:
 		base_text += "[font_size=%s]" % str(font_size)
 	if italics:
 		base_text += "[i]"
 	if bold:
 		base_text += "[b]"
-	base_text = prepended_text + base_text + "%s" + appended_text
+	base_text = ("[center]" if center else "") + prepended_text + base_text + "%s" + appended_text
 
 #endregion
 
@@ -457,15 +455,6 @@ func update_text_price() -> void:
 	if not hide_icon:
 		result_text += currency.details.get_icon_and_name()
 	write.call_deferred(result_text)
-
-
-func _update_custom_minimum_size() -> void:
-	if size.x > custom_minimum_size.x:
-		Log.prn(name, custom_minimum_size.x, ">", size.x)
-		custom_minimum_size.x = size.x
-	if size.y > custom_minimum_size.y:
-		Log.prn(name, custom_minimum_size.y, ">", size.y)
-		custom_minimum_size.y = size.y
 
 
 func clear_currency() -> void:
