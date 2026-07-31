@@ -211,7 +211,7 @@ func duration_false() -> float:
 
 #region Await
 
-## If true, returns immediately. If false, awaits became_false
+## If true, returns immediately. If false, awaits became_true
 func await_true() -> void:
 	if is_false():
 		await became_true

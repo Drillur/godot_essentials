@@ -37,6 +37,8 @@ func _ready() -> void:
 		if not icon:
 			icon_texture_rect.queue_free()
 		await Utility.process()
+		Settings.joypad_detected.changed.connect(_update_focus_mode)
+		_update_focus_mode()
 	_update()
 
 
@@ -96,6 +98,7 @@ func _set_color(new_color: Color) -> void:
 
 	color = new_color
 	arrow_texture_rect.modulate = color
+	header_button.modulate = color
 	header_label.modulate = color
 	if icon_texture_rect != null:
 		icon_texture_rect.modulate = color
@@ -129,5 +132,11 @@ func close() -> void:
 
 func _on_header_button_left_pressed() -> void:
 	is_open = not is_open
+
+
+func _update_focus_mode() -> void:
+	header_button.focus_mode = (
+		Control.FOCUS_ALL if Settings.joypad_detected.is_true() else Control.FOCUS_NONE
+	)
 
 #endregion
