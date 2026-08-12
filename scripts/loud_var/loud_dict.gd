@@ -1,15 +1,13 @@
 class_name LoudDict
 extends LoudVar
 
-
 class Int:
 	extends LoudDict
-	
-	
+
 	var sum := 0
-	
-	
-	func _init(_data := {}) -> void:
+
+
+	func _init(_data := { }) -> void:
 		super(_data)
 		if multiplicative:
 			add_to_sum = func(value):
@@ -30,12 +28,11 @@ class Int:
 
 class Float:
 	extends LoudDict
-	
-	
+
 	var sum := 0.0
-	
-	
-	func _init(_data := {}) -> void:
+
+
+	func _init(_data := { }) -> void:
 		super(_data)
 		if multiplicative:
 			add_to_sum = func(value):
@@ -64,12 +61,11 @@ class Float:
 
 class _Big:
 	extends LoudDict
-	
-	
+
 	var sum: Big
-	
-	
-	func _init(_data := {}) -> void:
+
+
+	func _init(_data := { }) -> void:
 		super(_data)
 		if multiplicative:
 			reset_sum = func():
@@ -88,8 +84,8 @@ class _Big:
 		sum = Big.new(1.0 if multiplicative else 0.0)
 
 
-var data := {}
-var base := {}
+var data := { }
+var base := { }
 var multiplicative: bool
 var add_to_sum: Callable
 var subtract_from_sum: Callable
@@ -105,8 +101,7 @@ var _values: PackedFloat32Array
 
 #endregion
 
-
-func _init(_data := {}) -> void:
+func _init(_data := { }) -> void:
 	multiplicative = _data.get("multiplicative", false)
 	_data.erase("multiplicative")
 	base = _data
@@ -134,9 +129,7 @@ func _init(_data := {}) -> void:
 		would_divide_by_zero = func(_value) -> bool:
 			return false
 
-
 #region Internal
-
 
 func recalculate_sum() -> void:
 	reset_sum.call()
@@ -149,11 +142,11 @@ func are_values_equal(a: Variant, b: Variant) -> bool:
 	var a_type: int = typeof(a)
 	if not (a_type == TYPE_INT or a_type == TYPE_FLOAT):
 		return a.is_equal_to(b)
-		
+
 	var b_type: int = typeof(b)
 	if not (b_type == TYPE_INT or b_type == TYPE_FLOAT):
 		return b.is_equal_to(a)
-	
+
 	return a == b
 
 
@@ -187,6 +180,7 @@ func get_random_value(rng: RandomNumberGenerator) -> Variant:
 	return _values[rng.rand_weighted(_values)]
 
 
+## Returns a key based on the weights of the values
 func get_random_key(rng: RandomNumberGenerator = Utility.rng) -> Variant:
 	if _changed:
 		_update_keys_and_values()
@@ -214,12 +208,9 @@ func _update_keys_and_values() -> void:
 	_keys = data.keys()
 	_values = data.values()
 
-
 #endregion
 
-
 #region Action
-
 
 ## Clears data; duplicates base
 func reset() -> void:
@@ -246,7 +237,7 @@ func edit(key: Variant, value: Variant) -> bool:
 		if are_values_equal(previous_value, value):
 			return false
 		erase(key)
-	
+
 	if is_value_redundant.call(value):
 		# If had the key already:
 		# 	The value is being edited from non-zero to zero (ie 5 -> 0)
@@ -254,16 +245,13 @@ func edit(key: Variant, value: Variant) -> bool:
 		# If the key didn't exist:
 		# 	It's trying to add zero or multiply by 1
 		return has_key
-	
+
 	add(key, value)
 	return true
 
-
 #endregion
 
-
 #region Get
-
 
 func has(key: Variant) -> bool:
 	return data.has(key)
@@ -291,6 +279,5 @@ func is_empty() -> bool:
 
 func get_text() -> String:
 	return str(data)
-
 
 #endregion

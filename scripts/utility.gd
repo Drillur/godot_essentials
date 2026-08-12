@@ -458,14 +458,14 @@ func validate_color_darkness(color: Color, limit := 1.0) -> Color:
 		color.b /= 1.1
 	return color
 
-#endregion -
+#endregion
 
 #endregion
 
 #region Dev
 
-func report(object: Object) -> void:
-	if not Utility.dev_mode:
+func report(object: Object, ignore_dev_mode: bool = false) -> void:
+	if not ignore_dev_mode and not Utility.dev_mode:
 		return
 	var _class_name: String = object.get_class()
 	Log.prn("Report:", _class_name, object, _get_object_report_dictionary(object))

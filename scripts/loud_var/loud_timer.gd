@@ -1,7 +1,6 @@
 class_name LoudTimer
 extends LoudVar
 
-
 signal timeout
 signal started
 signal stopped
@@ -20,9 +19,7 @@ var timer_wait_time: float ## The wait_time when the timer was started.
 var wait_time: LoudFloat
 var wait_time_range: LoudFloatPair
 
-
 #region Init
-
 
 func _init(_wait_time := 0.0, optional_maximum_duration := 0.0) -> void:
 	if optional_maximum_duration > 0.0:
@@ -33,12 +30,9 @@ func _init(_wait_time := 0.0, optional_maximum_duration := 0.0) -> void:
 		wait_time = LoudFloat.new(_wait_time)
 	wait_time.custom_minimum_limit = LoudTimer.MINIMUM_DURATION
 
-
 #endregion
 
-
 #region Static
-
 
 class TimeUnit:
 	enum Type {
@@ -68,19 +62,20 @@ class TimeUnit:
 		Type.BLACK_HOLE: 1,
 	}
 	const WORD := {
-		Type.SECOND: {"SINGULAR": "second", "PLURAL": "seconds", "SHORT": "s"},
-		Type.MINUTE: {"SINGULAR": "minute", "PLURAL": "minutes", "SHORT": "m"},
-		Type.HOUR: {"SINGULAR": "hour", "PLURAL": "hours", "SHORT": "h"},
-		Type.DAY: {"SINGULAR": "day", "PLURAL": "days", "SHORT": "d"},
-		Type.YEAR: {"SINGULAR": "year", "PLURAL": "years", "SHORT": "y"},
-		Type.DECADE: {"SINGULAR": "decade", "PLURAL": "decades", "SHORT": "dec"},
-		Type.CENTURY: {"SINGULAR": "century", "PLURAL": "centuries", "SHORT": "cen"},
-		Type.MILLENIUM: {"SINGULAR": "millenium", "PLURAL": "millenia", "SHORT": "mil"},
-		Type.EON: {"SINGULAR": "eon", "PLURAL": "eons", "SHORT": "eon"},
-		Type.QUETTASECOND: {"SINGULAR": "quettasecond", "PLURAL": "quettaseconds", "SHORT": "qs"},
-		Type.BLACK_HOLE: {"SINGULAR": "black hole life span", "PLURAL": "consecutive black hole life spans", "SHORT": "bh"},
+		Type.SECOND: { "SINGULAR": "second", "PLURAL": "seconds", "SHORT": "s" },
+		Type.MINUTE: { "SINGULAR": "minute", "PLURAL": "minutes", "SHORT": "m" },
+		Type.HOUR: { "SINGULAR": "hour", "PLURAL": "hours", "SHORT": "h" },
+		Type.DAY: { "SINGULAR": "day", "PLURAL": "days", "SHORT": "d" },
+		Type.YEAR: { "SINGULAR": "year", "PLURAL": "years", "SHORT": "y" },
+		Type.DECADE: { "SINGULAR": "decade", "PLURAL": "decades", "SHORT": "dec" },
+		Type.CENTURY: { "SINGULAR": "century", "PLURAL": "centuries", "SHORT": "cen" },
+		Type.MILLENIUM: { "SINGULAR": "millenium", "PLURAL": "millenia", "SHORT": "mil" },
+		Type.EON: { "SINGULAR": "eon", "PLURAL": "eons", "SHORT": "eon" },
+		Type.QUETTASECOND: { "SINGULAR": "quettasecond", "PLURAL": "quettaseconds", "SHORT": "qs" },
+		Type.BLACK_HOLE: { "SINGULAR": "black hole life span", "PLURAL": "consecutive black hole life spans", "SHORT": "bh" },
 	}
-	
+
+
 	static func get_text(amount: Big, brief: bool) -> String:
 		var type = Type.SECOND
 		while type < Type.size() - 1:
@@ -93,7 +88,8 @@ class TimeUnit:
 		if brief:
 			return result + " " + WORD[type]["SHORT"]
 		return result + " " + unit_text(type, amount)
-	
+
+
 	static func unit_text(type: int, amount: Big) -> String:
 		if amount.is_equal_to(1):
 			return WORD[type]["SINGULAR"]
@@ -107,7 +103,7 @@ static func format_time(seconds: float) -> String:
 		# for really long times
 		var time_dict = get_time_dict(int(seconds))
 		return get_time_text_from_dict(time_dict)
-	
+
 	if seconds < ONE_MINUTE:
 		if seconds < 10:
 			return String.num(seconds, 2) + "s"
@@ -125,7 +121,7 @@ static func get_time_dict(time: int) -> Dictionary[StringName, float]:
 		&"minutes": 0,
 		&"seconds": 0,
 	}
-	
+
 	var result: Dictionary[StringName, float] = BASE.duplicate()
 	if time >= ONE_YEAR:
 		result[&"years"] = float(time) / ONE_YEAR
@@ -140,7 +136,7 @@ static func get_time_dict(time: int) -> Dictionary[StringName, float]:
 		result[&"minutes"] = float(time) / ONE_MINUTE
 		time = time % ONE_MINUTE
 	result[&"seconds"] = float(time)
-	
+
 	return result
 
 
@@ -150,9 +146,9 @@ static func get_time_text_from_dict(dict: Dictionary) -> String:
 	var hours: int = dict.get(&"hours", 0)
 	var minutes: int = dict.get(&"minutes", 0)
 	var seconds: int = dict.get(&"seconds", 0)
-	
+
 	var texts: Array[String] = []
-	
+
 	if years > 0:
 		texts.append("%sy" % years)
 	if days > 0:
@@ -163,7 +159,7 @@ static func get_time_text_from_dict(dict: Dictionary) -> String:
 		texts.append("%sm" % minutes)
 	if seconds > 0:
 		texts.append("%ss" % seconds)
-	
+
 	return ", ".join(texts)
 
 
@@ -173,31 +169,25 @@ static func format_big_time(time: Big) -> String:
 		return format_time(time.to_float())
 	return TimeUnit.get_text(time, false)
 
-
 #endregion
 
-
 #region Signals
-
 
 func timer_timeout() -> void:
 	if timer:
 		timer.timeout.disconnect(timer_timeout)
 		timer = null
-	
+
 	if is_stopped():
 		return
-	
+
 	running.set_false()
 	stopped.emit()
 	timeout.emit()
 
-
 #endregion
 
-
 #region Action
-
 
 func start() -> void:
 	stop()
@@ -206,7 +196,7 @@ func start() -> void:
 	timer_wait_time = wait_time.get_value()
 	timer = Utility.tree.create_timer(timer_wait_time)
 	timer.timeout.connect(timer_timeout)
-	
+
 	running.set_true()
 	started.emit()
 
@@ -215,10 +205,10 @@ func stop() -> void:
 	if timer:
 		timer.timeout.disconnect(timer_timeout)
 	timer = null
-	
+
 	if is_stopped():
 		return
-	
+
 	running.set_false()
 	stopped.emit()
 
@@ -237,11 +227,15 @@ func disable_looping() -> void:
 		timeout.disconnect(start)
 
 
+## Sets wait_time based on [param duration], starts the timer, and awaits [signal timeout]
+func await_timeout(duration: float) -> void:
+	set_wait_time(duration)
+	start()
+	await timeout
+
 #endregion
 
-
 #region Get
-
 
 func get_wait_time() -> float:
 	return wait_time.get_value()
@@ -290,7 +284,7 @@ func get_time_elapsed_text() -> String:
 func get_text() -> String:
 	return "%s/%s" % [
 		LoudNumber.format_number(get_time_elapsed()),
-		get_wait_time_text()
+		get_wait_time_text(),
 	]
 
 
@@ -304,6 +298,5 @@ func get_maximum_duration() -> float:
 	if random:
 		return wait_time_range.get_total() * wait_time.get_value()
 	return wait_time.get_value()
-
 
 #endregion

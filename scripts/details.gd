@@ -1,5 +1,7 @@
 class_name Details
 extends RefCounted
+## Useful class for holding a bunch of cosmetic shit like name, plural name, icon, color. Has 
+## some utility-type stuff! See the Get region!
 
 #region Setter/getter vars
 
@@ -41,7 +43,7 @@ func _init() -> void:
 func _value_set() -> void:
 	if (
 			color.is_set and details_icon.is_set and not details_icon.is_colored
-			and details_icon.text == ""
+			and details_icon.text.is_empty()
 	):
 		details_icon.text = details_icon.text % color.html
 
