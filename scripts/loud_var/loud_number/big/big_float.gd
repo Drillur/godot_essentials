@@ -1,7 +1,6 @@
 class_name BigFloat
 extends LoudNumber
 
-
 @warning_ignore("unused_private_class_variable")
 @export var saved_value: String
 @export var saved_pending_value: String
@@ -18,9 +17,7 @@ var custom_maximum_limit: Big:
 	set = _set_maximum_limit
 var save_pending: bool = false
 
-
 #region Init
-
 
 func _init(x: Variant = 1.0) -> void:
 	base = Big.new(x)
@@ -35,28 +32,25 @@ func _create_book() -> void:
 	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
-
 
 #region Setters
 
-
 func _set_current(n: Big) -> void:
 	previous.set_to(current)
-	
-	if custom_maximum_limit or custom_minimum_limit:
+
+	if custom_maximum_limit != null or custom_minimum_limit != null:
 		#unclamped_value.set_to(n)
-		
-		if custom_maximum_limit:
+
+		if custom_maximum_limit != null:
 			n = Big.get_min(n, custom_maximum_limit)
-		if custom_minimum_limit:
+		if custom_minimum_limit != null:
 			n = Big.get_max(n, custom_minimum_limit)
-	
+
 	if not current.is_equal_to(n):
 		current.set_to(n)
 		text_requires_update = true
-	
+
 	if not previous.is_equal_to(current):
 		_emit_signals(previous, current)
 
@@ -69,22 +63,19 @@ func _get_current() -> Big:
 func _set_minimum_limit(n: Big) -> void:
 	custom_minimum_limit = n
 	#if not unclamped_value:
-		#unclamped_value = Big.new(0.0)
+	#unclamped_value = Big.new(0.0)
 	clamp_current()
 
 
 func _set_maximum_limit(n: Big) -> void:
 	custom_maximum_limit = n
 	#if not unclamped_value:
-		#unclamped_value = Big.new(0.0)
+	#unclamped_value = Big.new(0.0)
 	clamp_current()
-
 
 #endregion
 
-
 #region Save
-
 
 func save_current_value() -> void:
 	saved_value = current.to_plain_scientific()
@@ -98,34 +89,28 @@ func load_saved_value() -> void:
 	if save_pending and not saved_pending_value.is_empty():
 		plus_equals(saved_pending_value)
 
-
 #endregion
-
 
 #region Signals
 
-
 func _emit_signals(_previous: Big, _current: Big) -> void:
 	assert(not _previous.is_equal_to(_current), "Do not emit signals if nothing changed.")
-	
+
 	if _previous.is_greater_than(_current):
 		decreased.emit(_previous.minus(_current))
 	elif _previous.is_less_than(_current):
 		increased.emit(_current.minus(_previous))
-	
+
 	if _previous.is_zero():
 		became_non_zero.emit(_current)
 	elif _current.is_zero():
 		became_zero.emit(_previous)
-	
-	changed.emit()
 
+	changed.emit()
 
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current.set_to(base)
@@ -199,12 +184,9 @@ func clear_copycat() -> void:
 	cat.changed.disconnect(copy)
 	cat = null
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> Big:
 	return current
@@ -224,7 +206,7 @@ func get_text() -> String:
 		#if not unclamped_value or current.is_equal_to(unclamped_value.val()):
 		text = current.get_text()
 		#else:
-			#text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
+		#text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
 	return text
 
 
@@ -266,12 +248,10 @@ func is_less_than(n: Variant) -> bool:
 
 func is_zero() -> bool:
 	return (
-		current.mantissa == Big.ZERO.mantissa
-		and current.exponent == Big.ZERO.exponent )
-
+			current.mantissa == Big.ZERO.mantissa
+			and current.exponent == Big.ZERO.exponent)
 
 #region - Operations
-
 
 func plus(_amount: Variant) -> Big:
 	return current.plus(_amount)
@@ -292,8 +272,6 @@ func divided_by(_amount: Variant) -> Big:
 func to_the_power_of(_n: Variant) -> Big:
 	return current.to_the_power_of(_n)
 
-
 #endregion
-
 
 #endregion
