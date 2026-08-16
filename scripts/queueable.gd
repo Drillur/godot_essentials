@@ -52,7 +52,7 @@ static func new_permanent_node_queueable(
 	for sig: Signal in _signals:
 		sig.connect(queue.call_method)
 	list.append(queue)
-	await Main.await_done()
+	await Main.done.await_true()
 	queue.call_method()
 
 
@@ -73,7 +73,7 @@ static func new_permanent_resource_queueable(
 	for sig: Signal in _signals:
 		sig.connect(queue.call_method)
 	list.append(queue)
-	await Main.await_done()
+	await Main.done.await_true()
 	queue.call_method()
 
 
