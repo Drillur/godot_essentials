@@ -141,16 +141,6 @@ func copycat_changed() -> void:
 	set_to(copied_bool.val())
 
 
-func remove_copycat() -> void:
-	if not copied_bool:
-		return
-	if copied_bool.changed.is_connected(copycat_changed):
-		copied_bool.changed.disconnect(copycat_changed)
-	if copied_bool.changed.is_connected(contradict_changed):
-		copied_bool.changed.disconnect(contradict_changed)
-	copied_bool = null
-
-
 func contradict(_bool: LoudBool) -> void: # has the opposite effect of copycat
 	copied_bool = _bool
 	_bool.changed.connect(contradict_changed)
@@ -159,6 +149,16 @@ func contradict(_bool: LoudBool) -> void: # has the opposite effect of copycat
 
 func contradict_changed() -> void:
 	set_to(copied_bool.is_false())
+
+
+func remove_copycat() -> void:
+	if not is_copycat():
+		return
+	if copied_bool.changed.is_connected(copycat_changed):
+		copied_bool.changed.disconnect(copycat_changed)
+	if copied_bool.changed.is_connected(contradict_changed):
+		copied_bool.changed.disconnect(contradict_changed)
+	copied_bool = null
 
 
 func is_copycat() -> bool:

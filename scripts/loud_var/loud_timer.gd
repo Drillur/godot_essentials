@@ -189,6 +189,7 @@ func timer_timeout() -> void:
 
 #region Action
 
+## Stops the timer and then starts it based on wait_time
 func start() -> void:
 	stop()
 	if random:

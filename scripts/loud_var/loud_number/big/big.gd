@@ -380,8 +380,7 @@ func plus(_n: Variant) -> Big:
 
 
 func plus_equals(_n: Variant) -> Big:
-	set_to(add(self, _n))
-	return self
+	return set_to_sum(self, _n)
 
 
 func minus(_n: Variant) -> Big:
@@ -389,8 +388,7 @@ func minus(_n: Variant) -> Big:
 
 
 func minus_equals(_n: Variant) -> Big:
-	set_to(Big.subtract(self, _n))
-	return self
+	return set_to_difference(self, _n)
 
 
 func times(_n: Variant) -> Big:
@@ -398,8 +396,7 @@ func times(_n: Variant) -> Big:
 
 
 func times_equals(_n: Variant) -> Big:
-	set_to(Big.multiply(self, _n))
-	return self
+	return set_to_product(self, _n)
 
 
 func divided_by(_n: Variant) -> Big:
@@ -407,8 +404,7 @@ func divided_by(_n: Variant) -> Big:
 
 
 func divided_by_equals(_n: Variant) -> Big:
-	set_to(Big.divide(self, _n))
-	return self
+	return set_to_quotient(self, _n)
 
 
 func mod(_n: Variant) -> Big:
@@ -416,8 +412,7 @@ func mod(_n: Variant) -> Big:
 
 
 func mod_equals(_n: Variant) -> Big:
-	set_to(Big.modulo(self, _n))
-	return self
+	return set_to(Big.modulo(self, _n))
 
 
 func to_the_power_of(_n: Variant) -> Big:
@@ -425,8 +420,7 @@ func to_the_power_of(_n: Variant) -> Big:
 
 
 func to_the_power_of_equals(_n: Variant) -> Big:
-	set_to(power(self, _n))
-	return self
+	return set_to(power(self, _n))
 
 
 func round_down() -> Big:
@@ -438,14 +432,126 @@ func squared() -> Big:
 
 
 func squared_equals() -> Big:
-	set_to(squared())
-	return self
+	return set_to(squared())
 
 
-func square_root() -> Big:
+func to_square_root() -> Big:
 	var new_value := Big.root(self)
 	mantissa = new_value.mantissa
 	exponent = new_value.exponent
+	return self
+
+
+func set_to_sum(_x: Variant, _y: Variant) -> Big:
+	var old_m := mantissa
+	var old_e := exponent
+	_x = to_big(_x)
+	_y = to_big(_y)
+	var exponent_delta: int = _y.exponent - _x.exponent
+	if exponent_delta < 12.0:
+		mantissa = _x.mantissa + _y.mantissa * pow(10, exponent_delta)
+		exponent = _x.exponent
+	elif _x.is_less_than(_y):
+		mantissa = _y.mantissa
+		exponent = _y.exponent
+	else:
+		mantissa = _x.mantissa
+		exponent = _x.exponent
+	if mantissa != old_m or exponent != old_e:
+		normalize(self)
+		changed.emit()
+	return self
+
+
+func set_to_difference(_x: Variant, _y: Variant) -> Big:
+	_x = to_big(_x)
+	_y = to_big(_y)
+	var old_m := mantissa
+	var old_e := exponent
+	var neg_mantissa: float = -_y.mantissa
+	var exponent_delta: int = _y.exponent - _x.exponent
+	if exponent_delta < 12.0:
+		mantissa = _x.mantissa + neg_mantissa * pow(10, exponent_delta)
+		exponent = _x.exponent
+	elif _x.is_less_than(_y):
+		mantissa = neg_mantissa
+		exponent = _y.exponent
+	else:
+		mantissa = _x.mantissa
+		exponent = _x.exponent
+	if mantissa != old_m or exponent != old_e:
+		normalize(self)
+		changed.emit()
+	return self
+
+
+func set_to_product(_x: Variant, _y: Variant) -> Big:
+	var old_m := mantissa
+	var old_e := exponent
+	_x = to_big(_x)
+	_y = to_big(_y)
+	exponent = _x.exponent + _y.exponent
+	mantissa = _x.mantissa * _y.mantissa
+	while mantissa >= 10.0:
+		mantissa /= 10.0
+		exponent += 1
+	if mantissa != old_m or exponent != old_e:
+		normalize(self)
+		changed.emit()
+	return self
+
+
+func set_to_quotient(_x: Variant, _y: Variant) -> Big:
+	_x = to_big(_x)
+	_y = to_big(_y)
+	if _y.mantissa == 0.0:
+		printerr("Big Error: Divide by ZERO. %se%s" % [_y.mantissa, _y.exponent])
+		set_to(_x)
+		return self
+	var old_m := mantissa
+	var old_e := exponent
+	exponent = _x.exponent - _y.exponent
+	mantissa = _x.mantissa / _y.mantissa
+	while mantissa > 0.0 and mantissa < 1.0 and exponent > 0:
+		mantissa *= 10.0
+		exponent -= 1
+	if mantissa != old_m or exponent != old_e:
+		normalize(self)
+		changed.emit()
+	return self
+
+
+func set_to_min(_x: Variant, _y: Variant) -> Big:
+	_x = to_big(_x)
+	_y = to_big(_y)
+	if _x.is_less_than(_y):
+		if _x.mantissa == mantissa and _x.exponent == exponent:
+			return self
+		mantissa = _x.mantissa
+		exponent = _x.exponent
+	else:
+		if _y.mantissa == mantissa and _y.exponent == exponent:
+			return self
+		mantissa = _y.mantissa
+		exponent = _y.exponent
+	changed.emit()
+	return self
+
+
+func set_to_max(_x: Variant, _y: Variant) -> Big:
+	_x = to_big(_x)
+	_y = to_big(_y)
+	if _x.is_greater_than(_y):
+		if _x.mantissa == mantissa and _x.exponent == exponent:
+			return self
+		mantissa = _x.mantissa
+		exponent = _x.exponent
+	else:
+		if _y.mantissa == mantissa and _y.exponent == exponent:
+			return self
+		mantissa = _y.mantissa
+		exponent = _y.exponent
+	changed.emit()
 	return self
 
 #endregion

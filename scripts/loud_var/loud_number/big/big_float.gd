@@ -122,27 +122,39 @@ func set_to(amount: Variant) -> void:
 
 
 func plus_equals(amount: Variant) -> void:
-	set_to(Big.add(current, amount))
+	previous.set_to(current)
+	current.set_to_sum(current, amount)
+	_apply_change()
 
 
 func plus_equals_one() -> void:
-	set_to(Big.add(current, LoudInt.ONE))
+	previous.set_to(current)
+	current.set_to_sum(current, LoudInt.ONE)
+	_apply_change()
 
 
 func minus_equals(amount: Variant) -> void:
-	set_to(Big.subtract(current, amount))
+	previous.set_to(current)
+	current.set_to_difference(current, amount)
+	_apply_change()
 
 
 func minus_equals_one() -> void:
-	set_to(Big.subtract(current, LoudInt.ONE))
+	previous.set_to(current)
+	current.set_to_difference(current, LoudInt.ONE)
+	_apply_change()
 
 
 func times_equals(amount: Variant) -> void:
-	set_to(Big.multiply(current, amount))
+	previous.set_to(current)
+	current.set_to_product(current, amount)
+	_apply_change()
 
 
 func divided_by_equals(amount: Variant) -> void:
-	set_to(Big.divide(current, amount))
+	previous.set_to(current)
+	current.set_to_quotient(current, amount)
+	_apply_change()
 
 
 func sync() -> void:
@@ -153,11 +165,16 @@ func sync() -> void:
 
 func clamp_current() -> void:
 	if custom_maximum_limit:
-		if current.is_greater_than(custom_maximum_limit):
-			current.set_to(custom_maximum_limit)
+		current.set_to_min(current, custom_maximum_limit)
 	if custom_minimum_limit:
-		if current.is_less_than(custom_minimum_limit):
-			current.set_to(custom_minimum_limit)
+		current.set_to_max(current, custom_minimum_limit)
+
+
+func _apply_change() -> void:
+	clamp_current()
+	if not previous.is_equal_to(current):
+		text_requires_update = true
+		_emit_signals(previous, current)
 
 
 func set_default_value(n: Variant) -> void:
