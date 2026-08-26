@@ -162,13 +162,13 @@ func add(key: Variant, value: Variant) -> void:
 
 
 func erase(key: Variant) -> void:
-	if not data.keys().has(key):
+	if not data.has(key):
 		return
-	if would_divide_by_zero.call(get_value(key)):
+	var value: Variant = get_value(key)
+	if would_divide_by_zero.call(value):
 		data.erase(key)
 		recalculate_sum()
 		return
-	var value: Variant = get_value(key)
 	subtract_from_sum.call(value)
 	_changed = true
 	data.erase(key)
@@ -212,19 +212,9 @@ func _update_keys_and_values() -> void:
 
 #region Action
 
-## Clears data; duplicates base
+## Sets data to the base values and then recalculates the sum
 func reset() -> void:
-	data.clear()
 	data = base.duplicate()
-	recalculate_sum()
-
-
-## Should have a similar effect to reset, but slower
-func erase_all() -> void:
-	for key in keys().duplicate():
-		erase(key)
-	for key in base.keys():
-		add(key, base[key])
 	recalculate_sum()
 
 

@@ -1,9 +1,12 @@
 class_name Bar
 extends MarginContainer
 
+signal bar_size_changed
+
 @export var kill_background := false
 @export var default_color: Color
-@export var animate := false
+@export var animate := false:
+	set = _set_animate
 @export var color_red_to_green := false
 @export var display_pending := false
 @export var logarithmic_mode := false ## Progress is based on the log values
@@ -14,7 +17,8 @@ var color: Color:
 var progress: float = -1:
 	set = _set_progress
 var queue: Queueable
-var bar_size: LoudInt = LoudInt.new(-1)
+var bar_size: int = -1:
+	set = _set_bar_size
 
 #region Onready Variables
 
@@ -23,6 +27,7 @@ var bar_size: LoudInt = LoudInt.new(-1)
 @onready var control: Control = %Control
 @onready var background: Panel = %background
 @onready var animation_container: MarginContainer = %AnimationContainer
+@onready var animation_panel: Panel = %AnimationPanel
 
 #endregion
 
@@ -41,18 +46,25 @@ func _ready() -> void:
 	if kill_background:
 		background.hide()
 
-	bar_size.changed.connect(_update_progress_bar_size_x)
+	bar_size_changed.connect(_update_progress_bar_size_x)
 	_update_progress_bar_size_x()
 
 	visibility_changed.connect(_on_visibility_changed)
-	tree_exiting.connect(kill_tween)
+	tree_exiting.connect(Utility.kill_tween.bind(tween))
 
-	resized.connect(_on_resized)
 	_on_resized.call_deferred()
 
 #endregion
 
 #region Setters
+
+func _set_animate(new_val: bool) -> void:
+	animate = new_val
+	if Engine.is_editor_hint():
+		return
+	if animate:
+		animation_cd = LoudTimer.new(0.35)
+
 
 func _set_color(new_color: Color) -> void:
 	if color == new_color:
@@ -66,32 +78,44 @@ func _set_progress(new_progress: float) -> void:
 	if is_equal_approx(previous, new_progress):
 		return
 	progress = new_progress
-	bar_size.set_to(floori(progress * size.x))
+	bar_size = floori(progress * size.x)
 	if color_red_to_green:
 		color = Utility.get_red_to_green_fade(progress)
 	if animate:
 		new_animation(previous, progress)
+
+
+func _set_bar_size(new_size: int) -> void:
+	var size_limit: int = floori(size.x)
+	if new_size > size_limit:
+		new_size = size_limit
+	if bar_size == new_size:
+		return
+	bar_size = new_size
+	bar_size_changed.emit()
 
 #endregion
 
 #region Signals
 
 func _on_resized():
-	bar_size.custom_maximum_limit = floori(size.x)
-	bar_size.set_to(floori(progress * size.x))
+	bar_size = mini(floori(progress * size.x), floori(size.x))
 	progress_bar.size.y = size.y
+	if not resized.is_connected(_on_resized):
+		resized.connect(_on_resized)
 
 
 func _on_visibility_changed():
 	if visible:
-		animation_cd.start()
+		if animation_cd != null:
+			animation_cd.start()
 
 #endregion
 
 #region Update
 
 func _update_progress_bar_size_x() -> void:
-	progress_bar.size.x = bar_size.val()
+	progress_bar.size.x = bar_size
 
 #endregion
 
@@ -110,37 +134,6 @@ func attach_timer(timer: LoudTimer, timer_inverted_mode := false) -> void:
 			set_deferred("progress", timer.get_percent())
 
 	Utility.process_frame.connect(update.unbind(1))
-
-#region - Color
-
-var watched_color: LoudColor
-
-
-func attach_color(_color: LoudColor) -> void:
-	if watched_color:
-		assert(watched_color != _color, "Why assigning this LoudColor twice?")
-		if watched_color == _color:
-			return
-		_clear_color()
-	watched_color = _color
-	queue.method = _update_color
-	watched_color.changed.connect(queue.call_method)
-	queue.call_method()
-
-
-func _update_color() -> void:
-	var _color: Color = watched_color.val()
-	color = _color
-
-
-func _clear_color() -> void:
-	if not watched_color:
-		return
-	watched_color.changed.disconnect(queue.call_method)
-	watched_color = null
-	queue.clear()
-
-#endregion - Color
 
 #region - LoudFloat and LoudInt
 
@@ -216,7 +209,7 @@ func clear_loud_pair() -> void:
 		return
 	if display_pending:
 		loud_pair.pending_changed.disconnect(queue.call_method)
-	stop_animation()
+	_stop_animation()
 	loud_pair.changed.disconnect(queue.call_method)
 	loud_pair.filled.disconnect(queue.call_method)
 	loud_pair = null
@@ -257,7 +250,7 @@ func _update_price() -> void:
 
 #region Animate
 
-var animation_cd := LoudTimer.new(0.35)
+var animation_cd: LoudTimer
 var tween: Tween
 
 
@@ -274,30 +267,31 @@ func new_animation(_previous: float, _next: float) -> void:
 	animation_container.size.x = highlight_size
 	animation_container.size.y = size.y
 	animation_container.modulate = color
-	animation_container.get_node("Panel").custom_minimum_size.x = animation_container.size.x
+	animation_panel.custom_minimum_size.x = animation_container.size.x
 	if _previous < _next:
-		animation_container.get_node("Panel").size_flags_horizontal = Control.SIZE_SHRINK_END
+		animation_panel.size_flags_horizontal = Control.SIZE_SHRINK_END
 		animation_container.position.x = edge.position.x + 1 - animation_container.size.x
 	else:
-		animation_container.get_node("Panel").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		animation_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		animation_container.position.x = edge.position.x
 	animation_container.show()
 
 	var tween_existed: bool = tween != null and tween.is_valid()
-	kill_tween()
+	Utility.kill_tween(tween)
 	tween = get_tree().create_tween()
 	if not tween_existed:
 		tween.tween_interval(0.15)
-	tween.tween_property(animation_container.get_node("Panel"), "custom_minimum_size", Vector2(0, size.x), 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		animation_panel,
+		"custom_minimum_size",
+		Vector2(0, size.y),
+		0.25,
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	tween.tween_callback(animation_container.hide)
 
 
-func stop_animation() -> void:
+func _stop_animation() -> void:
 	animation_container.hide()
-	kill_tween()
-
-
-func kill_tween() -> void:
 	Utility.kill_tween(tween)
 
 #endregion

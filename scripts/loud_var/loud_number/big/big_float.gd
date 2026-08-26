@@ -151,6 +151,12 @@ func times_equals(amount: Variant) -> void:
 	_apply_change()
 
 
+func times_equals_ten() -> void:
+	previous.set_to(current)
+	current.times_equals_ten()
+	_apply_change()
+
+
 func divided_by_equals(amount: Variant) -> void:
 	previous.set_to(current)
 	current.set_to_quotient(current, amount)
@@ -280,6 +286,10 @@ func minus(_amount: Variant) -> Big:
 
 func times(_amount: Variant) -> Big:
 	return current.times(_amount)
+
+
+func times_ten() -> Big:
+	return current.times_ten()
 
 
 func divided_by(_amount: Variant) -> Big:

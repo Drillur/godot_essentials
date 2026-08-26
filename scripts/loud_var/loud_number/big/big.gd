@@ -12,6 +12,35 @@ static var TEN: Big = Big.new(10.0, 0)
 static var SIXTY: Big = Big.new(60.0, 0)
 static var ONE_E_10: Big = Big.new("1e10")
 
+const POW10_OFFSET: int = 12
+## Used for quicker pow(10, x) as long as x is >= -12 and <= 11
+const POW10: Array[float] = [
+	1e-12,
+	1e-11,
+	1e-10,
+	1e-9,
+	1e-8,
+	1e-7,
+	1e-6,
+	1e-5,
+	1e-4,
+	1e-3,
+	1e-2,
+	1e-1,
+	1.0,
+	10.0,
+	1e2,
+	1e3,
+	1e4,
+	1e5,
+	1e6,
+	1e7,
+	1e8,
+	1e9,
+	1e10,
+	1e11,
+]
+
 var mantissa: float
 var exponent: int
 
@@ -147,8 +176,8 @@ static func add(_x: Variant, _y: Variant) -> Big:
 	var result := Big.new(_x)
 
 	var exponent_delta: int = _y.exponent - _x.exponent
-	if exponent_delta < 12.0:
-		var scaled_mantissa: float = _y.mantissa * pow(10, exponent_delta)
+	if absi(exponent_delta) < 12:
+		var scaled_mantissa: float = _y.mantissa * POW10[exponent_delta + POW10_OFFSET]
 		result.mantissa = _x.mantissa + scaled_mantissa
 
 	elif _x.is_less_than(_y):
@@ -375,34 +404,61 @@ func set_to(_n: Variant) -> Big:
 	return self
 
 
+## Allocates a new Big
 func plus(_n: Variant) -> Big:
 	return add(self, _n)
 
 
+## Does not allocate a new Big
 func plus_equals(_n: Variant) -> Big:
 	return set_to_sum(self, _n)
 
 
+## Allocates a new Big
 func minus(_n: Variant) -> Big:
 	return Big.subtract(self, _n)
 
 
+## Does not allocate a new Big
 func minus_equals(_n: Variant) -> Big:
 	return set_to_difference(self, _n)
 
 
+## Allocates a new Big
 func times(_n: Variant) -> Big:
 	return Big.multiply(self, _n)
 
 
+## Allocates a new Big with an exponent 1 greater than this one's.
+func times_ten() -> Big:
+	return Big.new(mantissa, exponent + 1)
+
+
+## Does not allocate a new Big
 func times_equals(_n: Variant) -> Big:
 	return set_to_product(self, _n)
 
 
+## Does not allocate a new Big
+func times_equals_ten() -> Big:
+	exponent += 1
+	changed.emit()
+	return self
+
+
+## Does not allocate a new Big
+func times_equals_n_tens(n: int) -> Big:
+	exponent += n
+	changed.emit()
+	return self
+
+
+## Allocates a new Big
 func divided_by(_n: Variant) -> Big:
 	return Big.divide(self, _n)
 
 
+## Does not allocate a new Big
 func divided_by_equals(_n: Variant) -> Big:
 	return set_to_quotient(self, _n)
 
@@ -448,8 +504,8 @@ func set_to_sum(_x: Variant, _y: Variant) -> Big:
 	_x = to_big(_x)
 	_y = to_big(_y)
 	var exponent_delta: int = _y.exponent - _x.exponent
-	if exponent_delta < 12.0:
-		mantissa = _x.mantissa + _y.mantissa * pow(10, exponent_delta)
+	if absi(exponent_delta) < 12:
+		mantissa = _x.mantissa + _y.mantissa * POW10[exponent_delta + POW10_OFFSET]
 		exponent = _x.exponent
 	elif _x.is_less_than(_y):
 		mantissa = _y.mantissa
@@ -470,8 +526,8 @@ func set_to_difference(_x: Variant, _y: Variant) -> Big:
 	var old_e := exponent
 	var neg_mantissa: float = -_y.mantissa
 	var exponent_delta: int = _y.exponent - _x.exponent
-	if exponent_delta < 12.0:
-		mantissa = _x.mantissa + neg_mantissa * pow(10, exponent_delta)
+	if absi(exponent_delta) < 12:
+		mantissa = _x.mantissa + neg_mantissa * POW10[exponent_delta + POW10_OFFSET]
 		exponent = _x.exponent
 	elif _x.is_less_than(_y):
 		mantissa = neg_mantissa
@@ -560,10 +616,9 @@ func set_to_max(_x: Variant, _y: Variant) -> Big:
 
 func to_float() -> float:
 	assert(exponent < 307, "The resulting float would be too big. Fix ur fucking game")
-	return snappedf(
-		float("%se%s" % [mantissa, exponent]),
-		MANTISSA_PRECISION,
-	)
+	if exponent < 12:
+		return snappedf(mantissa * POW10[exponent + POW10_OFFSET], MANTISSA_PRECISION)
+	return snappedf(mantissa * (10.0 ** exponent), MANTISSA_PRECISION)
 
 
 ## Returns the log (base 10) value of this Big
@@ -614,7 +669,6 @@ func is_greater_than_or_equal_to(_n: Variant) -> bool:
 
 func is_less_than(_n: Variant) -> bool:
 	_n = to_big(_n)
-	normalize(_n)
 	if (
 			mantissa == 0 and (
 					_n.mantissa > MANTISSA_PRECISION or
@@ -639,10 +693,9 @@ func is_less_than(_n: Variant) -> bool:
 
 func is_less_than_or_equal_to(_n: Variant) -> bool:
 	_n = to_big(_n)
-	normalize(_n)
-	if is_less_than(_n):
-		return true
 	if _n.exponent == exponent and is_equal_approx(_n.mantissa, mantissa):
+		return true
+	if is_less_than(_n):
 		return true
 	return false
 
@@ -653,6 +706,10 @@ func is_zero() -> bool:
 
 func is_positive() -> bool:
 	return mantissa >= LoudFloat.ZERO
+
+
+func is_negative() -> bool:
+	return mantissa < LoudFloat.ZERO
 
 
 func percent_of(_n: Variant) -> float:
