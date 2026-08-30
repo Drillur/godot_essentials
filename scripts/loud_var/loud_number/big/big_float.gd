@@ -123,7 +123,7 @@ func set_to(amount: Variant) -> void:
 
 func plus_equals(amount: Variant) -> void:
 	previous.set_to(current)
-	current.set_to_sum(current, amount)
+	current.plus_equals(amount)
 	_apply_change()
 
 

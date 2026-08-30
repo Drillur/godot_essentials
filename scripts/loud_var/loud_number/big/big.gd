@@ -51,7 +51,7 @@ func _init(m: Variant = 1.0, e: int = 0) -> void:
 		mantissa = m.mantissa
 		exponent = m.exponent
 	elif typeof(m) == TYPE_STRING or typeof(m) == TYPE_STRING_NAME:
-		var scientific: PackedStringArray = m.split("e")
+		var scientific: PackedStringArray = m.to_lower().split("e")
 		mantissa = float(scientific[0])
 		exponent = int(scientific[1]) if scientific.size() > 1 else 0
 	else:
@@ -297,39 +297,11 @@ static func power(base: Variant, raised: Variant) -> Big:
 
 		return power(base, int(raised))
 
-	#if raised is Big:
-	## warning - this might be slow!
-	#if raised.is_equal_to(ZERO):
-	#return Big.new(ONE)
-	#if raised.is_less_than(ZERO):
-	#printerr("Big Error: Negative exponents are not supported!")
-	#return Big.new(ZERO)
-	#
-	#var exponent_decremented: Big = raised.minus(ONE)
-	#while exponent_decremented.is_greater_than(Big.ZERO):
-	#result.times_equals(base)
-	#exponent_decremented.minus_equals(ONE)
-	#return result
-
 	printerr("Big Error: Unknown/unsupported data type passed as an exponent in power function!")
 	return base
 
 
-static func root(_x: Big) -> Big:
-	var result := Big.new(_x)
-	if result.exponent % 2 == 1:
-		result.mantissa *= 10
-		result.exponent -= 1
-
-	result.mantissa = sqrt(result.mantissa)
-	@warning_ignore("integer_division")
-	result.exponent = result.exponent / 2
-
-	normalize(result)
-	return result
-
-
-static func modulo(x: Big, y: Variant) -> Big:
+static func modulo(x: Variant, y: Variant) -> Big:
 	x = to_big(x)
 	y = to_big(y)
 	var result: Big = x.divided_by(y)
@@ -337,36 +309,6 @@ static func modulo(x: Big, y: Variant) -> Big:
 	result.times_equals(y)
 	result.set_to(x.minus(result))
 	return result
-
-
-static func round_up_to_even_power_of_10(x: Big) -> Big:
-	# If mantissa is 1.0, it's at 10^n which is already a power of 10
-	if x.mantissa == 1.0:
-		return x
-
-	# Round up to 10.0 (next power of 10)
-	x.mantissa = 10.0
-	normalize(x)
-
-	return x
-
-
-static func round_up(n: Big) -> Big:
-	if n.exponent == 0:
-		n.mantissa = ceilf(n.mantissa)
-	else:
-		var precision: float = pow(10, mini(8, n.exponent))
-		n.mantissa = ceilf(n.mantissa * precision) / precision
-	return n
-
-
-static func round_big(n: Big) -> Big:
-	if n.exponent == 0:
-		n.mantissa = roundf(n.mantissa)
-	else:
-		var precision: float = pow(10, mini(8, n.exponent))
-		n.mantissa = roundf(n.mantissa * precision) / precision
-	return n
 
 
 ## Returns the minimum of the given values
@@ -409,7 +351,7 @@ func plus(_n: Variant) -> Big:
 	return add(self, _n)
 
 
-## Does not allocate a new Big
+## Alters this Big
 func plus_equals(_n: Variant) -> Big:
 	return set_to_sum(self, _n)
 
@@ -419,7 +361,7 @@ func minus(_n: Variant) -> Big:
 	return Big.subtract(self, _n)
 
 
-## Does not allocate a new Big
+## Alters this Big
 func minus_equals(_n: Variant) -> Big:
 	return set_to_difference(self, _n)
 
@@ -434,19 +376,19 @@ func times_ten() -> Big:
 	return Big.new(mantissa, exponent + 1)
 
 
-## Does not allocate a new Big
+## Alters this Big
 func times_equals(_n: Variant) -> Big:
 	return set_to_product(self, _n)
 
 
-## Does not allocate a new Big
+## Alters this Big
 func times_equals_ten() -> Big:
 	exponent += 1
 	changed.emit()
 	return self
 
 
-## Does not allocate a new Big
+## Alters this Big
 func times_equals_n_tens(n: int) -> Big:
 	exponent += n
 	changed.emit()
@@ -458,7 +400,7 @@ func divided_by(_n: Variant) -> Big:
 	return Big.divide(self, _n)
 
 
-## Does not allocate a new Big
+## Alters this Big
 func divided_by_equals(_n: Variant) -> Big:
 	return set_to_quotient(self, _n)
 
@@ -479,22 +421,69 @@ func to_the_power_of_equals(_n: Variant) -> Big:
 	return set_to(power(self, _n))
 
 
+func rounded() -> Big:
+	var precision: float = POW10[mini(11, exponent) + POW10_OFFSET]
+	mantissa = roundf(mantissa * precision) / precision
+	changed.emit()
+	return self
+
+
+func round_up() -> Big:
+	var precision: float = POW10[mini(11, exponent) + POW10_OFFSET]
+	mantissa = ceilf(mantissa * precision) / precision
+	changed.emit()
+	return self
+
+
+## Round up to 10.0 (next power of 10). 4.5 -> 10 || 8.323e13 -> 1e14
+func round_up_tens() -> Big:
+	if mantissa != 1.0:
+		mantissa = 1.0
+		exponent += 1
+		changed.emit()
+	return self
+
+
 func round_down() -> Big:
-	return round_big(self)
+	var precision: float = POW10[mini(11, exponent) + POW10_OFFSET]
+	mantissa = floorf(mantissa * precision) / precision
+	changed.emit()
+	return self
 
 
+## Allocates a new Big
 func squared() -> Big:
-	return to_the_power_of(2)
+	return power(self, 2)
 
 
+## Alters this Big
 func squared_equals() -> Big:
 	return set_to(squared())
 
 
-func to_square_root() -> Big:
-	var new_value := Big.root(self)
-	mantissa = new_value.mantissa
-	exponent = new_value.exponent
+## Allocates a new Big
+func square_root() -> Big:
+	assert(mantissa >= 0, "Can't square root a negative!")
+	var result := Big.new(self)
+	if result.exponent % 2 == 1:
+		result.mantissa *= 10
+		result.exponent -= 1
+	result.mantissa = sqrt(result.mantissa)
+	result.exponent /= 2
+	normalize(result)
+	return result
+
+
+## Alters this Big
+func square_root_equals() -> Big:
+	assert(mantissa >= 0, "Can't square root a negative!")
+	if exponent % 2 == 1:
+		mantissa *= 10
+		exponent -= 1
+	mantissa = sqrt(mantissa)
+	exponent /= 2
+	normalize(self)
+	changed.emit()
 	return self
 
 
@@ -622,19 +611,16 @@ func to_float() -> float:
 
 
 ## Returns the log (base 10) value of this Big
-func to_log() -> float:
+func log10() -> float:
 	if mantissa <= 0.0:
 		return 0.0
 	var result: float = float(exponent) + LoudNumber.log10(mantissa)
 	return result
 
 
-## Multiply the common log of this Big by log(10), resulting in ln(this Big)
-## In GDScript, log(10) = ~2.302585
-## Natural log of x: log(x)
-## Common log of x: log(x) / log(10)
-func to_natural_log() -> float:
-	return to_log() * LoudNumber.NATURAL_LOG
+## Returns the natural log (base e) value of this Big
+func ln() -> float:
+	return log10() * LoudNumber.NATURAL_LOG
 
 
 func to_int() -> int:
@@ -848,31 +834,13 @@ func to_scientific_notation() -> String:
 	return BASE_TEXT % [mantissa_text, exponent_text]
 
 
+## Returns [code]mantisa + "e" + exponent[/code] with no formatting or rounding
 func to_plain_scientific() -> String:
 	const BASE_TEXT: String = "%se%s"
-
 	if is_nan(mantissa):
 		mantissa = 1.0
 	if is_nan(exponent):
 		exponent = 0
-
-	if not is_positive():
-		mantissa = 0.0
-
 	return BASE_TEXT % [mantissa, exponent]
-
-#endregion
-
-#region Leftovers. Uncomment if u need em i guess
-
-# func ln() -> float:
-# 	return 2.302585092994045 * logN(10)
-
-# func logN(base) -> float:
-# 	return (2.302585092994046 / log(base)) * (exponent + Big.LoudNumber.log10(mantissa))
-
-# func pow10(value: int) -> void:
-# 	mantissa = 10 ** (value % 1)
-# 	exponent = int(value)
 
 #endregion

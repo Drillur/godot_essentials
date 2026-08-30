@@ -179,7 +179,7 @@ func get_current_percent() -> float:
 
 
 func get_current_logarithmic_percent() -> float:
-	return get_current().to_log() / get_total().to_log()
+	return get_current().log10() / get_total().log10()
 
 
 func get_unclamped_percent() -> float:
