@@ -376,6 +376,11 @@ func times_ten() -> Big:
 	return Big.new(mantissa, exponent + 1)
 
 
+## Allocates a new Big with an exponent 1 less than this one's.
+func divided_by_ten() -> Big:
+	return Big.new(mantissa, exponent - 1)
+
+
 ## Alters this Big
 func times_equals(_n: Variant) -> Big:
 	return set_to_product(self, _n)
