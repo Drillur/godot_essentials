@@ -6,7 +6,7 @@ signal one_second
 signal physics_frame(delta: float)
 signal process_frame(delta: float)
 
-enum AudioLayer { MASTER, UI, MUSIC }
+enum AudioLayer { MASTER, UI, MUSIC, DIALOGUE }
 enum Platform { PC, BROWSER }
 
 const PLATFORM: Platform = Platform.PC
@@ -144,19 +144,20 @@ var audio_stream_players_in_use: int = 0
 var available_audio_stream_players: Array[AudioStreamPlayer]
 
 
-func play_audio(audio: AudioStream, layer: AudioLayer) -> void:
+func play_audio(audio: AudioStream, layer: AudioLayer, randomize_pitch: bool) -> AudioStreamPlayer:
 	if audio_stream_players_in_use >= 32:
-		return
+		return null
 
 	if audio == null:
-		return
+		return null
 
 	var player: AudioStreamPlayer = _get_audio_player()
 	player.stream = audio
-	player.pitch_scale = randf_range(0.9, 1.1)
+	player.pitch_scale = randf_range(0.9, 1.1) if randomize_pitch else 1.0
 	player.bus = AudioLayer.keys()[layer].capitalize()
 	player.volume_db = AudioServer.get_bus_volume_db(layer)
 	player.play()
+	return player
 
 
 func _get_audio_player() -> AudioStreamPlayer:

@@ -4,14 +4,6 @@ extends RefCounted
 signal changed
 
 const MANTISSA_PRECISION: float = 0.0000001
-
-static var NEGATIVE_ONE: Big = Big.new(-1.0)
-static var ZERO: Big = Big.new(0.0, 0)
-static var ONE: Big = Big.new(1.0, 0)
-static var TEN: Big = Big.new(10.0, 0)
-static var SIXTY: Big = Big.new(60.0, 0)
-static var ONE_E_10: Big = Big.new("1e10")
-
 const POW10_OFFSET: int = 12
 ## Used for quicker pow(10, x) as long as x is >= -12 and <= 11
 const POW10: Array[float] = [
@@ -40,6 +32,14 @@ const POW10: Array[float] = [
 	1e10,
 	1e11,
 ]
+
+# Do not alter these! They are used throughout the code base for comparisons etc.
+static var NEGATIVE_ONE: Big = Big.new(-1.0)
+static var ZERO: Big = Big.new(0.0, 0)
+static var ONE: Big = Big.new(1.0, 0)
+static var TEN: Big = Big.new(10.0, 0)
+static var SIXTY: Big = Big.new(60.0, 0)
+static var ONE_E_10: Big = Big.new("1e10")
 
 var mantissa: float
 var exponent: int
@@ -259,6 +259,7 @@ static func power(base: Variant, raised: Variant) -> Big:
 		result.exponent = y_exponent + result.exponent
 		result.mantissa = y_mantissa * result.mantissa
 		normalize(result)
+		result.changed.emit()
 		return result
 
 	if typeof(raised) == TYPE_FLOAT:
@@ -290,6 +291,7 @@ static func power(base: Variant, raised: Variant) -> Big:
 			result.mantissa = new_mantissa
 			result.exponent = new_exponent
 			normalize(result)
+			result.changed.emit()
 			return result
 
 		if round(raised) != raised:

@@ -198,9 +198,17 @@ func init_data() -> void:
 		for category: StringName in json.data:
 			if skipped_data.has(filename) and skipped_data[filename].has(category):
 				continue
-			data.get_or_add(category, { }).merge(json.data[category], true)
+			deep_merge(data.get_or_add(category, { }), json.data[category])
 			data[category].erase("")
 			data[category].erase("0")
+
+
+func deep_merge(base: Dictionary, overlay: Dictionary) -> void:
+	for key: Variant in overlay:
+		if overlay[key] is Dictionary and key in base and base[key] is Dictionary:
+			deep_merge(base[key], overlay[key])
+		else:
+			base[key] = overlay[key]
 
 #endregion
 

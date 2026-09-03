@@ -265,6 +265,10 @@ func is_less_than_or_equal_to(n: Variant) -> bool:
 	return is_less_than(n) or is_equal_to(n)
 
 
+func lte(n: Variant) -> bool:
+	return is_less_than_or_equal_to(n)
+
+
 func is_less_than(n: Variant) -> bool:
 	return current.is_less_than(n)
 
