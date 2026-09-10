@@ -36,6 +36,7 @@ const POW10: Array[float] = [
 # Do not alter these! They are used throughout the code base for comparisons etc.
 static var NEGATIVE_ONE: Big = Big.new(-1.0)
 static var ZERO: Big = Big.new(0.0, 0)
+static var ONE_PERCENT: Big = Big.new(0.01)
 static var ONE: Big = Big.new(1.0, 0)
 static var TEN: Big = Big.new(10.0, 0)
 static var SIXTY: Big = Big.new(60.0, 0)
@@ -662,26 +663,13 @@ func is_greater_than_or_equal_to(_n: Variant) -> bool:
 
 func is_less_than(_n: Variant) -> bool:
 	_n = to_big(_n)
-	if (
-			mantissa == 0 and (
-					_n.mantissa > MANTISSA_PRECISION or
-					mantissa < MANTISSA_PRECISION
-			) and _n.mantissa == 0
-	):
+	if mantissa == 0.0 and _n.mantissa == 0.0:
 		return false
 	if exponent < _n.exponent:
-		if exponent == _n.exponent - 1 and mantissa > 10 * _n.mantissa:
-			return false
-		return true
-
+		return exponent != _n.exponent - 1 or mantissa < 10 * _n.mantissa
 	if exponent == _n.exponent:
-		if mantissa < _n.mantissa:
-			return true
-		return false
-
-	if exponent == _n.exponent + 1 and mantissa * 10 < _n.mantissa:
-		return true
-	return false
+		return mantissa < _n.mantissa
+	return exponent == _n.exponent + 1 and mantissa * 10 < _n.mantissa
 
 
 func is_less_than_or_equal_to(_n: Variant) -> bool:

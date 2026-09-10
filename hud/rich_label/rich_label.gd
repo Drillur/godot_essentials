@@ -260,6 +260,7 @@ func clear_string() -> void:
 #region LoudNumber (value)
 
 var value: RefCounted
+var offset: Big
 
 
 func clear_value() -> void:
@@ -267,6 +268,7 @@ func clear_value() -> void:
 	if value:
 		value.changed.disconnect(queue.call_method)
 		value = null
+	offset = null
 	match attach_type:
 		AttachType.PRICE, AttachType.CURRENCY:
 			if currency:
@@ -335,13 +337,15 @@ func attach_big_float_pair(_value: BigFloatPair) -> void:
 	queue.call_method()
 
 
-func attach_big_float(_value: BigFloat) -> void:
+func attach_big_float(_value: BigFloat, _offset: Variant = null) -> void:
 	_validate_queue()
 	if value:
-		if value == _value:
+		var new_offset: Big = Big.new(_offset) if _offset != null else null
+		if value == _value and ((offset == null and new_offset == null) or offset.is_equal_to(new_offset)):
 			return
 		clear_value()
 	value = _value
+	offset = Big.new(_offset) if _offset != null else null
 	queue.method = _update_text_from_value
 	value.changed.connect(queue.call_method)
 	queue.call_method()
@@ -369,14 +373,17 @@ func _update_text_from_value() -> void:
 	elif time_mode:
 		_update_text__time_mode()
 	else:
-		# NOTE - If value is a Big, this must be -1
+		var display_value: Variant = value
+		if offset != null and (value is Big or value is BigFloat):
+			display_value = value.plus(offset)
+		# NOTE - If display_value is a Big, this must be -1
 		match custom_decimal_places:
 			-1:
-				write(value.get_text())
+				write(display_value.get_text())
 			0:
-				write(str(roundi(value.val())))
+				write(str(roundi(display_value.val())))
 			_:
-				write(str(snappedf(value.val(), 1.0 / (10 ** custom_decimal_places))))
+				write(str(snappedf(display_value.val(), 1.0 / (10 ** custom_decimal_places))))
 
 
 func _update_text__percent_mode() -> void:

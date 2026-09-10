@@ -226,7 +226,7 @@ func _set_disabled(val: bool) -> void:
 	modulate = Color(0.5, 0.5, 0.5) if disabled else Color.WHITE
 	invis_button.disabled = disabled
 	invis_button.mouse_default_cursor_shape = (
-		Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
+			Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
 	)
 
 
@@ -241,12 +241,16 @@ func _set_check_button_mode(val: bool) -> void:
 
 
 func _set_button_pressed(val: bool) -> void:
-	if button_pressed == val or not check_button_mode:
+	if not check_button_mode:
 		return
 
 	if not is_node_ready():
 		await ready
 		await Utility.process()
+
+	if button_pressed == val:
+		check_button.button_pressed = val
+		return
 
 	#if val:
 	#button_pressed = val
@@ -279,7 +283,7 @@ func set_button_pressed_displays_background(val: bool) -> void:
 
 func update_icon() -> void:
 	icon_container.visible = (
-		icon != null or check_button_mode and (pressed_icon != null or not_pressed_icon != null)
+			icon != null or check_button_mode and (pressed_icon != null or not_pressed_icon != null)
 	)
 	if icon_container.visible:
 		if button_pressed:
@@ -393,10 +397,13 @@ func _on_focus_entered() -> void:
 
 func _update_focus_mode() -> void:
 	focus_mode = (
-		Control.FOCUS_ALL
-		if allow_focus and Settings.joypad_detected.is_true()
-		else Control.FOCUS_NONE
+			Control.FOCUS_ALL
+			if allow_focus and Settings.joypad_detected.is_true()
+			else Control.FOCUS_NONE
 	)
 	invis_button.focus_mode = focus_mode
 
 #endregion
+
+func _on_confirm_mouse_entered() -> void:
+	pass # Replace with function body.

@@ -173,6 +173,11 @@ func _get_audio_player() -> AudioStreamPlayer:
 
 
 func _free_audio_stream_player(player: AudioStreamPlayer) -> void:
+	var self_connection: Callable = _free_audio_stream_player.bind(player)
+	for connection: Dictionary in player.finished.get_connections():
+		if connection.callable == self_connection:
+			continue
+		connection.signal.disconnect(connection.callable)
 	available_audio_stream_players.append(player)
 	audio_stream_players_in_use -= 1
 
@@ -304,12 +309,6 @@ func get_random_point_in_rect(rect: Rect2) -> Vector2:
 	)
 
 
-func get_red_to_green_fade(percent: float) -> Color:
-	var r: float = minf(2 - (percent / 0.5), 1.0)
-	var g: float = minf(percent / 0.5, 1.0)
-	return Color(r, g, 0.0)
-
-
 func running_above_minimum_fps() -> bool:
 	const MINIMUM_FPS: int = 60
 	return Engine.get_frames_per_second() >= MINIMUM_FPS
@@ -412,6 +411,19 @@ func arrays_share_keys(arr1: Array, arr2: Array) -> bool:
 	return keys1 == keys2
 
 #region Color
+
+func fade_color(a: Color, b: Color, weight: float) -> Color:
+	var red: float = lerpf(a.r, b.r, weight)
+	var green: float = lerpf(a.g, b.g, weight)
+	var blue: float = lerpf(a.b, b.b, weight)
+	return Color(red, green, blue)
+
+
+func get_red_to_green_fade(percent: float) -> Color:
+	var r: float = minf(2 - (percent / 0.5), 1.0)
+	var g: float = minf(percent / 0.5, 1.0)
+	return Color(r, g, 0.0)
+
 
 func get_color_from_string(x: String) -> Color:
 	if x == "random":

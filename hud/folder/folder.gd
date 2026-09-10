@@ -89,7 +89,8 @@ func _set_is_open(new_val: bool) -> void:
 
 	is_open = new_val
 
-	_update()
+	if is_node_ready():
+		_update()
 
 
 func _set_color(new_color: Color) -> void:
@@ -136,7 +137,7 @@ func _on_header_button_left_pressed() -> void:
 
 func _update_focus_mode() -> void:
 	header_button.focus_mode = (
-		Control.FOCUS_ALL if Settings.joypad_detected.is_true() else Control.FOCUS_NONE
+			Control.FOCUS_ALL if Settings.joypad_detected.is_true() else Control.FOCUS_NONE
 	)
 
 #endregion
