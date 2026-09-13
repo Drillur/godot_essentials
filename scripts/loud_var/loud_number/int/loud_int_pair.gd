@@ -127,6 +127,20 @@ func clamp_current() -> void:
 			current.current = maxi(get_current(), 0)
 
 
+## If [param visible_only_when_full] is true, then [param control] will be visible as long as
+## this pair is full. Otherwise, [param control] will be be visible only when the pair is not full
+func tie_node_visibility(control: Control, visible_only_when_full: bool = false) -> void:
+	if not is_instance_valid(control) or control == null:
+		printerr("tie_node_visibility() - control is invalid or null")
+		return
+	var _update: Callable = func():
+		control.visible = is_full() if visible_only_when_full else not is_full()
+	filled.connect(_update)
+	current.decreased.connect(_update.unbind(1))
+	total.increased.connect(_update.unbind(1))
+	_update.call()
+
+
 ## Sets current to total
 func fill() -> void:
 	current.set_to(get_total())
