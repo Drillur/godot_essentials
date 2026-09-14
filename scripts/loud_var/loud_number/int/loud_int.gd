@@ -1,33 +1,28 @@
 class_name LoudInt
 extends LoudNumber
 
-
 const ZERO: int = 0
 const ONE: int = 1
 
-@warning_ignore("unused_private_class_variable")
 @export var current: int:
 	set = _set_current, get = _get_current
 @export var saved_pending_value: int = 0
 
 var previous: int
 var base: int
-#var unclamped_value: int
 var custom_minimum_limit := MIN_INT:
 	set = _set_minimum_limit
 var custom_maximum_limit := MAX_INT:
 	set = _set_maximum_limit
 
-
 #region Init
-
 
 func _init(_base: int = ZERO, _min := MIN_INT, _max := MAX_INT) -> void:
 	base = _base
 	current = base
 	previous = base
 	changed.connect(loud_number_init)
-	
+
 	custom_minimum_limit = _min
 	custom_maximum_limit = _max
 
@@ -38,26 +33,23 @@ func _create_book() -> void:
 	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
-
 
 #region Setters
 
-
 func _set_current(n: int) -> void:
 	assert(not is_nan(n))
-	
+
 	#unclamped_value = n
 	n = clampi(n, custom_minimum_limit, custom_maximum_limit)
-	
+
 	if current == n:
 		return
-	
+
 	previous = current
 	current = n
 	text_requires_update = true
-	
+
 	_emit_signals(previous, current)
 
 
@@ -75,12 +67,9 @@ func _set_maximum_limit(n: int) -> void:
 	custom_maximum_limit = n
 	clamp_current()
 
-
 #endregion
 
-
 #region Signals
-
 
 func _emit_signals(_previous: int, _current: int) -> void:
 	assert(_current != _previous, "Do not emit signals if nothing changed.")
@@ -88,12 +77,12 @@ func _emit_signals(_previous: int, _current: int) -> void:
 		decreased.emit(_previous - _current)
 	elif _previous < _current:
 		increased.emit(_current - _previous)
-	
+
 	if _previous == 0:
 		became_non_zero.emit(_current)
 	elif _current == 0:
 		became_zero.emit(_previous)
-	
+
 	changed.emit()
 
 
@@ -104,12 +93,9 @@ func save_pending_value() -> void:
 func load_pending_value() -> void:
 	plus_equals(saved_pending_value)
 
-
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current = base
@@ -194,12 +180,9 @@ func set_bool_limiter(b: LoudBool, limit: int) -> void:
 func copy(loud_number: LoudNumber) -> void:
 	set_to(loud_number.val())
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> int:
 	return current
@@ -215,7 +198,7 @@ func get_effective_value() -> int:
 
 func get_text() -> String:
 	if text_requires_update:
-		update_text(current)#, unclamped_value)
+		update_text(current) #, unclamped_value)
 	return text
 
 
@@ -267,9 +250,7 @@ func get_x_percent(x: float) -> float:
 func is_zero() -> bool:
 	return is_equal_to(ZERO)
 
-
 #region - Operations
-
 
 func plus(_amount: int) -> int:
 	return current + _amount
@@ -294,8 +275,6 @@ func to_the_power_of(_n: float) -> float:
 func modulo(_amount: int) -> int:
 	return current % _amount
 
-
 #endregion
-
 
 #endregion

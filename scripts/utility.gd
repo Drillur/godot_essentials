@@ -13,7 +13,7 @@ const PLATFORM: Platform = Platform.PC
 
 @export var current_clock: float = Time.get_unix_time_from_system()
 
-var dev_mode: bool = true
+var dev_mode: bool = false
 var scroll_speed: int = 25
 
 var class_paths: Dictionary[String, String]
