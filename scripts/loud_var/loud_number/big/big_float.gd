@@ -1,7 +1,7 @@
 class_name BigFloat
 extends LoudNumber
+## DEPRECATED. Use LoudBig
 
-@warning_ignore("unused_private_class_variable")
 @export var saved_value: String
 @export var saved_pending_value: String
 
@@ -9,8 +9,7 @@ var current := Big.new(0.0):
 	get = _get_current
 var base: Big
 var previous := Big.new(0.0)
-#var unclamped_value: Big
-var cat: Variant
+var cat: LoudNumber
 var custom_minimum_limit: Big:
 	set = _set_minimum_limit
 var custom_maximum_limit: Big:
@@ -40,8 +39,6 @@ func _set_current(n: Big) -> void:
 	previous.set_to(current)
 
 	if custom_maximum_limit != null or custom_minimum_limit != null:
-		#unclamped_value.set_to(n)
-
 		if custom_maximum_limit != null:
 			n = Big.get_min(n, custom_maximum_limit)
 		if custom_minimum_limit != null:
@@ -62,15 +59,11 @@ func _get_current() -> Big:
 
 func _set_minimum_limit(n: Big) -> void:
 	custom_minimum_limit = n
-	#if not unclamped_value:
-	#unclamped_value = Big.new(0.0)
 	clamp_current()
 
 
 func _set_maximum_limit(n: Big) -> void:
 	custom_maximum_limit = n
-	#if not unclamped_value:
-	#unclamped_value = Big.new(0.0)
 	clamp_current()
 
 #endregion
@@ -192,7 +185,7 @@ func set_default_value_and_reset(n: Variant) -> void:
 	reset()
 
 
-func copycat(_cat: Variant) -> void:
+func copycat(_cat: LoudNumber) -> void:
 	cat = _cat
 	set_default_value_and_reset(0.0)
 	copy()
@@ -226,10 +219,7 @@ func get_effective_value() -> Big:
 func get_text() -> String:
 	if text_requires_update:
 		text_requires_update = false
-		#if not unclamped_value or current.is_equal_to(unclamped_value.val()):
 		text = current.get_text()
-		#else:
-		#text = "%s (%s)" % [current.get_text(), unclamped_value.get_text()]
 	return text
 
 

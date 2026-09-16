@@ -217,35 +217,6 @@ func clear_loud_pair() -> void:
 
 #endregion - LoudPairs
 
-#region - Price
-
-var price: Price
-
-
-func attach_price(_price: Price) -> void:
-	price = _price
-	if not is_node_ready():
-		await ready
-	progress = 0.0
-	queue.method = _update_price
-	queue.enable_looping()
-	queue.call_method()
-
-
-func _update_price() -> void:
-	var _progress: float = (
-			price.get_pending_progress_percent() if display_pending
-			else price.get_logarithmic_progress_percent() if logarithmic_mode
-			else price.get_progress_percent())
-	set_deferred("progress", _progress)
-
-	var display_edge: bool = (
-			not price.get_pending_progress_percent() == 1.0 if display_pending
-			else not price.get_progress_percent() == 1.0)
-	edge.set_deferred("visible", display_edge)
-
-#endregion - Price
-
 #endregion
 
 #region Animate

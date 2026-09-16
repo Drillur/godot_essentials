@@ -19,19 +19,6 @@ var timer_wait_time: float ## The wait_time when the timer was started.
 var wait_time: LoudFloat
 var wait_time_range: LoudFloatPair
 
-#region Init
-
-func _init(_wait_time := 0.0, optional_maximum_duration := 0.0) -> void:
-	if optional_maximum_duration > 0.0:
-		wait_time_range = LoudFloatPair.new(_wait_time, optional_maximum_duration)
-		wait_time = LoudFloat.new(0.0)
-		random = true
-	else:
-		wait_time = LoudFloat.new(_wait_time)
-	wait_time.custom_minimum_limit = LoudTimer.MINIMUM_DURATION
-
-#endregion
-
 #region Static
 
 class TimeUnit:
@@ -171,6 +158,18 @@ static func format_big_time(time: Big) -> String:
 
 #endregion
 
+#region Init
+
+func _init(_wait_time := 0.0, optional_maximum_duration := 0.0) -> void:
+	if optional_maximum_duration > 0.0:
+		wait_time_range = LoudFloatPair.new(_wait_time, optional_maximum_duration)
+		wait_time = LoudFloat.new(0.0)
+		random = true
+	else:
+		wait_time = LoudFloat.new(_wait_time)
+	wait_time.custom_minimum_limit = LoudTimer.MINIMUM_DURATION
+
+#endregion
 #region Signals
 
 func timer_timeout() -> void:
@@ -255,6 +254,8 @@ func get_time_elapsed() -> float:
 
 
 func get_percent() -> float:
+	if timer_wait_time <= 0.0:
+		return 0.0
 	return 1.0 - (get_time_left() / timer_wait_time)
 
 
@@ -291,13 +292,13 @@ func get_text() -> String:
 
 func get_average_duration() -> float:
 	if random:
-		return wait_time_range.get_midpoint() * wait_time.get_value()
+		return wait_time_range.get_midpoint()
 	return wait_time.get_value()
 
 
 func get_maximum_duration() -> float:
 	if random:
-		return wait_time_range.get_total() * wait_time.get_value()
+		return wait_time_range.get_total()
 	return wait_time.get_value()
 
 #endregion

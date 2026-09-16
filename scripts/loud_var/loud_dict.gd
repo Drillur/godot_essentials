@@ -1,6 +1,190 @@
 class_name LoudDict
 extends LoudVar
 
+var data := { }
+var base := { }
+var multiplicative: bool
+var add_to_sum: Callable
+var subtract_from_sum: Callable
+var reset_sum: Callable
+var is_value_redundant: Callable
+var would_divide_by_zero: Callable
+
+#region For get random key()
+
+var _changed := true
+var _keys: Array
+
+#endregion
+
+func _init(_data := { }) -> void:
+	multiplicative = _data.get("multiplicative", false)
+	_data.erase("multiplicative")
+	base = _data
+	data = base.duplicate()
+	if multiplicative:
+		is_value_redundant = func(value) -> bool:
+			match typeof(value):
+				TYPE_INT, TYPE_FLOAT:
+					return is_equal_approx(value, 1)
+				_:
+					return value.is_equal_to(1)
+		would_divide_by_zero = func(value) -> bool:
+			match typeof(value):
+				TYPE_INT, TYPE_FLOAT:
+					return is_zero_approx(value)
+				_:
+					return value.is_zero()
+	else:
+		is_value_redundant = func(value) -> bool:
+			match typeof(value):
+				TYPE_INT, TYPE_FLOAT:
+					return is_zero_approx(value)
+				_:
+					return value.is_zero()
+		would_divide_by_zero = func(_value) -> bool:
+			return false
+
+#region Internal
+
+func recalculate_sum() -> void:
+	reset_sum.call()
+	for value in data.values():
+		add_to_sum.call(value)
+	_changed = true
+
+
+func are_values_equal(a: Variant, b: Variant) -> bool:
+	var a_type: int = typeof(a)
+	if not (a_type == TYPE_INT or a_type == TYPE_FLOAT):
+		return a.is_equal_to(b)
+
+	var b_type: int = typeof(b)
+	if not (b_type == TYPE_INT or b_type == TYPE_FLOAT):
+		return b.is_equal_to(a)
+
+	return is_equal_approx(a, b)
+
+
+func add(key: Variant, value: Variant) -> void:
+	if is_value_redundant.call(value):
+		return
+	if value is Big:
+		data[key] = Big.new(value)
+	else:
+		data[key] = value
+	_changed = true
+	add_to_sum.call(value)
+
+
+func erase(key: Variant) -> void:
+	if not data.has(key):
+		return
+	var value: Variant = get_value(key)
+	if would_divide_by_zero.call(value):
+		data.erase(key)
+		recalculate_sum()
+		return
+	subtract_from_sum.call(value)
+	_changed = true
+	data.erase(key)
+
+
+## Returns a key based on the weights of the values. [br]This should only be used on a LoudDict
+## with ints or floats in the values
+func get_random_key(rng: RandomNumberGenerator = Utility.rng) -> Variant:
+	if _changed:
+		_update_keys_and_values()
+	return _keys[rng.rand_weighted(values())]
+
+
+func get_n_random_keys(n: int, rng: RandomNumberGenerator = Utility.rng) -> Array[Variant]:
+	var result: Array[Variant]
+	var _data: Dictionary = data.duplicate()
+	var __keys: Array = _data.keys().duplicate()
+	var __values: PackedFloat32Array = _data.values().duplicate()
+	for __ in range(n):
+		var key: Variant = __keys[rng.rand_weighted(__values)]
+		var index: int = __keys.find(key)
+		__keys.remove_at(index)
+		__values.remove_at(index)
+		result.append(key)
+	return result
+
+
+func _update_keys_and_values() -> void:
+	if not _changed:
+		return
+	_changed = false
+	_keys = data.keys()
+
+#endregion
+
+#region Action
+
+## Sets data to the base values and then recalculates the sum
+func reset() -> void:
+	data = base.duplicate()
+	recalculate_sum()
+
+
+## Returns whether anything was changed
+func edit(key: Variant, value: Variant) -> bool:
+	var has_key: bool = data.has(key)
+	var previous_value: Variant = null
+	if has_key:
+		previous_value = get_value(key)
+		if are_values_equal(previous_value, value):
+			return false
+		erase(key)
+
+	if is_value_redundant.call(value):
+		# If had the key already:
+		# 	The value is being edited from non-zero to zero (ie 5 -> 0)
+		# 	For this case, it should return true (a change occurred)
+		# If the key didn't exist:
+		# 	It's trying to add zero or multiply by 1
+		return has_key
+
+	add(key, value)
+	return true
+
+#endregion
+
+#region Get
+
+func has(key: Variant) -> bool:
+	return data.has(key)
+
+
+func get_value(key: Variant) -> Variant:
+	return data.get(key, null)
+
+
+func keys() -> Array:
+	return data.keys()
+
+
+## data.values()
+func values() -> Array:
+	return data.values()
+
+
+func size() -> int:
+	return data.size()
+
+
+func is_empty() -> bool:
+	return data.is_empty()
+
+
+func get_text() -> String:
+	return str(data)
+
+#endregion
+
+#region Classes
+
 class Int:
 	extends LoudDict
 
@@ -82,192 +266,5 @@ class _Big:
 			subtract_from_sum = func(value):
 				sum.minus_equals(value)
 		sum = Big.new(1.0 if multiplicative else 0.0)
-
-
-var data := { }
-var base := { }
-var multiplicative: bool
-var add_to_sum: Callable
-var subtract_from_sum: Callable
-var reset_sum: Callable
-var is_value_redundant: Callable
-var would_divide_by_zero: Callable
-
-#region For get random key()
-
-var _changed := true
-var _keys: Array
-var _values: PackedFloat32Array
-
-#endregion
-
-func _init(_data := { }) -> void:
-	multiplicative = _data.get("multiplicative", false)
-	_data.erase("multiplicative")
-	base = _data
-	data = base.duplicate()
-	if multiplicative:
-		is_value_redundant = func(value) -> bool:
-			match typeof(value):
-				TYPE_INT, TYPE_FLOAT:
-					return is_equal_approx(value, 1)
-				_:
-					return value.is_equal_to(1)
-		would_divide_by_zero = func(value) -> bool:
-			match typeof(value):
-				TYPE_INT, TYPE_FLOAT:
-					return is_zero_approx(value)
-				_:
-					return value.is_zero()
-	else:
-		is_value_redundant = func(value) -> bool:
-			match typeof(value):
-				TYPE_INT, TYPE_FLOAT:
-					return is_zero_approx(value)
-				_:
-					return value.is_zero()
-		would_divide_by_zero = func(_value) -> bool:
-			return false
-
-#region Internal
-
-func recalculate_sum() -> void:
-	reset_sum.call()
-	for value in data.values():
-		add_to_sum.call(value)
-	_changed = true
-
-
-func are_values_equal(a: Variant, b: Variant) -> bool:
-	var a_type: int = typeof(a)
-	if not (a_type == TYPE_INT or a_type == TYPE_FLOAT):
-		return a.is_equal_to(b)
-
-	var b_type: int = typeof(b)
-	if not (b_type == TYPE_INT or b_type == TYPE_FLOAT):
-		return b.is_equal_to(a)
-
-	return a == b
-
-
-func add(key: Variant, value: Variant) -> void:
-	if is_value_redundant.call(value):
-		return
-	if value is Big:
-		data[key] = Big.new(value)
-	else:
-		data[key] = value
-	_changed = true
-	add_to_sum.call(value)
-
-
-func erase(key: Variant) -> void:
-	if not data.has(key):
-		return
-	var value: Variant = get_value(key)
-	if would_divide_by_zero.call(value):
-		data.erase(key)
-		recalculate_sum()
-		return
-	subtract_from_sum.call(value)
-	_changed = true
-	data.erase(key)
-
-
-func get_random_value(rng: RandomNumberGenerator) -> Variant:
-	if _changed:
-		_update_keys_and_values()
-	return _values[rng.rand_weighted(_values)]
-
-
-## Returns a key based on the weights of the values
-func get_random_key(rng: RandomNumberGenerator = Utility.rng) -> Variant:
-	if _changed:
-		_update_keys_and_values()
-	return _keys[rng.rand_weighted(_values)]
-
-
-func get_specific_number_of_random_keys(n: int, rng: RandomNumberGenerator = Utility.rng) -> Array[Variant]:
-	var result: Array[Variant]
-	var _data: Dictionary = data.duplicate()
-	var __keys: Array = _data.keys().duplicate()
-	var __values: PackedFloat32Array = _data.values().duplicate()
-	for __ in range(n):
-		var key: Variant = __keys[rng.rand_weighted(__values)]
-		var index: int = __keys.find(key)
-		__keys.remove_at(index)
-		__values.remove_at(index)
-		result.append(key)
-	return result
-
-
-func _update_keys_and_values() -> void:
-	if not _changed:
-		return
-	_changed = false
-	_keys = data.keys()
-	_values = data.values()
-
-#endregion
-
-#region Action
-
-## Sets data to the base values and then recalculates the sum
-func reset() -> void:
-	data = base.duplicate()
-	recalculate_sum()
-
-
-## Returns whether anything was changed
-func edit(key: Variant, value: Variant) -> bool:
-	var has_key: bool = data.has(key)
-	var previous_value: Variant = null
-	if has_key:
-		previous_value = get_value(key)
-		if are_values_equal(previous_value, value):
-			return false
-		erase(key)
-
-	if is_value_redundant.call(value):
-		# If had the key already:
-		# 	The value is being edited from non-zero to zero (ie 5 -> 0)
-		# 	For this case, it should return true (a change occurred)
-		# If the key didn't exist:
-		# 	It's trying to add zero or multiply by 1
-		return has_key
-
-	add(key, value)
-	return true
-
-#endregion
-
-#region Get
-
-func has(key: Variant) -> bool:
-	return data.has(key)
-
-
-func get_value(key: Variant) -> Variant:
-	return data.get(key, null)
-
-
-func keys() -> Array:
-	return data.keys()
-
-
-func values() -> Array:
-	return data.values()
-
-
-func size() -> int:
-	return data.size()
-
-
-func is_empty() -> bool:
-	return data.is_empty()
-
-
-func get_text() -> String:
-	return str(data)
 
 #endregion

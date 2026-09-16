@@ -2,21 +2,16 @@
 class_name Folder
 extends MarginContainer
 
+static var joypad_detected := LoudBool.new()
+
 @export var icon: Texture2D = null:
 	set = _set_icon
 @export var header_label_text: String = "Folder":
 	set = _set_header_label_text
 @export var is_open: bool = false:
 	set = _set_is_open
-
-@export_group("Color")
 @export var color: Color = Color.WHITE:
 	set = _set_color
-@export var currency_color: StringName = &""
-@export var lored_color: StringName = &""
-@export var stage_color: StringName = &""
-@export var tree_color: StringName = &""
-@export_group("")
 
 #region Onready Variables
 
@@ -33,24 +28,12 @@ extends MarginContainer
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
-		_ready_color()
 		if not icon:
 			icon_texture_rect.queue_free()
 		await Utility.process()
-		Settings.joypad_detected.changed.connect(_update_focus_mode)
+		joypad_detected.changed.connect(_update_focus_mode)
 		_update_focus_mode()
 	_update()
-
-
-func _ready_color() -> void:
-	if not currency_color.is_empty():
-		color = Currency.get_color(currency_color)
-	elif not lored_color.is_empty():
-		color = LORED.get_details(lored_color).get_color()
-	elif not stage_color.is_empty():
-		color = Stage.get_color(stage_color)
-	elif not tree_color.is_empty():
-		color = UpgradeTree.fetch(tree_color).details.get_color()
 
 #endregion
 
@@ -72,23 +55,17 @@ func _set_icon(new_texture: Texture2D) -> void:
 func _set_header_label_text(new_text: String) -> void:
 	if header_label_text == new_text:
 		return
-
 	header_label_text = new_text
-
 	if not is_node_ready():
 		await ready
-
 	header_label.text = new_text
-
 	header_label.visible = not new_text.is_empty()
 
 
 func _set_is_open(new_val: bool) -> void:
 	if is_open == new_val:
 		return
-
 	is_open = new_val
-
 	if is_node_ready():
 		_update()
 
@@ -96,7 +73,6 @@ func _set_is_open(new_val: bool) -> void:
 func _set_color(new_color: Color) -> void:
 	if not is_node_ready():
 		await ready
-
 	color = new_color
 	arrow_texture_rect.modulate = color
 	header_button.modulate = color
@@ -111,10 +87,8 @@ func _set_color(new_color: Color) -> void:
 func _update() -> void:
 	const ARROW_S_LINE_UP: Texture2D = preload("uid://ca7587w1g2bcy")
 	const ARROW_S_LINE_DOWN: Texture2D = preload("uid://dmm7w4jdsctsb")
-
 	if not is_node_ready():
 		await ready
-
 	content_container.visible = is_open
 	arrow_texture_rect.texture = ARROW_S_LINE_DOWN if not is_open else ARROW_S_LINE_UP
 	header_label.text = ("[b]" if is_open else "") + header_label_text
@@ -137,7 +111,7 @@ func _on_header_button_left_pressed() -> void:
 
 func _update_focus_mode() -> void:
 	header_button.focus_mode = (
-			Control.FOCUS_ALL if Settings.joypad_detected.is_true() else Control.FOCUS_NONE
+			Control.FOCUS_ALL if joypad_detected.is_true() else Control.FOCUS_NONE
 	)
 
 #endregion

@@ -6,18 +6,15 @@ signal method_called
 enum CooldownType { PROCESS, PHYSICS_PROCESS, DURATION }
 enum QueueType { NODE, RESOURCE }
 
-static var list: Array[Queueable]
-
-var done := LoudBool.new(false)
-
 var type: QueueType
 
-var queued := false
 var cooldown := false
-var method: Callable:
-	set = _set_method
 var cooldown_type: CooldownType
 var cooldown_duration: float = -1.0
+
+var queued := false
+var method: Callable:
+	set = _set_method
 
 var node: CanvasItem
 var parent: CanvasItem
@@ -25,7 +22,11 @@ var parent_visible_in_tree := false
 
 #region Static
 
-static func new_node_queueable(_node: CanvasItem, _cooldown_type := CooldownType.PROCESS, _cooldown_duration := -1.0) -> Queueable:
+static func new_node_queueable(
+		_node: CanvasItem,
+		_cooldown_type := CooldownType.PROCESS,
+		_cooldown_duration := -1.0,
+) -> Queueable:
 	var queue := Queueable.new(QueueType.NODE, _cooldown_type, _cooldown_duration)
 	queue.node = _node
 	if not queue.node.is_node_ready():
@@ -33,48 +34,18 @@ static func new_node_queueable(_node: CanvasItem, _cooldown_type := CooldownType
 	queue.parent = queue.node.get_parent()
 	if not queue.parent.is_node_ready():
 		await queue.parent.ready
-	queue.node.visibility_changed.connect(queue._on_visibility_changed)
-	queue.parent.visibility_changed.connect(queue._on_visibility_changed)
-	queue._on_visibility_changed()
-	queue.done.set_true()
+	queue.node.visibility_changed.connect(queue.on_visibility_changed)
+	queue.parent.visibility_changed.connect(queue.on_visibility_changed)
+	queue.on_visibility_changed()
 	return queue
 
 
-static func new_permanent_node_queueable(
-		_method: Callable,
-		_signals: Array[Signal],
-		_node: CanvasItem,
+static func new_resource_queueable(
 		_cooldown_type := CooldownType.PROCESS,
 		_cooldown_duration := -1.0,
-) -> void:
-	var queue := await new_node_queueable(_node, _cooldown_type, _cooldown_duration)
-	queue.method = _method
-	for sig: Signal in _signals:
-		sig.connect(queue.call_method)
-	list.append(queue)
-	await Main.done.await_true()
-	queue.call_method()
-
-
-static func new_resource_queueable(_cooldown_type := CooldownType.PROCESS, _cooldown_duration := -1.0) -> Queueable:
+) -> Queueable:
 	var queue := Queueable.new(QueueType.RESOURCE, _cooldown_type, _cooldown_duration)
-	queue.done.set_true()
 	return queue
-
-
-static func new_permanent_resource_queueable(
-		_method: Callable,
-		_signals: Array[Signal],
-		_cooldown_type := CooldownType.PROCESS,
-		_cooldown_duration := -1.0,
-) -> void:
-	var queue := new_resource_queueable(_cooldown_type, _cooldown_duration)
-	queue.method = _method
-	for sig: Signal in _signals:
-		sig.connect(queue.call_method)
-	list.append(queue)
-	await Main.done.await_true()
-	queue.call_method()
 
 
 ## Creates a resource Queueable with CooldownType.DURATION equal to
@@ -111,7 +82,7 @@ func _set_method(val: Callable) -> void:
 
 #region Node
 
-func _on_visibility_changed():
+func on_visibility_changed():
 	parent_visible_in_tree = (
 			parent.is_visible_in_tree() if parent is CanvasItem
 			else node.is_visible_in_tree())
@@ -132,9 +103,9 @@ func call_method() -> void:
 
 	if queued:
 		return
-	if Main.done.is_false():
+	if Main.done.is_false() and type == QueueType.NODE:
 		queued = true
-		await Main.done.became_true
+		await Main.done.await_true()
 		queued = false
 	if cooldown:
 		queued = true
@@ -162,11 +133,12 @@ func call_method() -> void:
 
 
 func _should_call_method_again() -> bool:
-	return is_method_assigned() and (
-			type == QueueType.RESOURCE
-			or (
-					is_instance_valid(node)
-					and is_instance_valid(parent)))
+	if not is_method_assigned():
+		return false
+	if type == QueueType.RESOURCE:
+		return true
+	# type == QueueType.NODE
+	return is_instance_valid(node) and is_instance_valid(parent)
 
 
 func reset() -> void:
@@ -196,6 +168,12 @@ func _cooldown_period() -> void:
 			await Utility.physics()
 		CooldownType.DURATION:
 			await Utility.timer(cooldown_duration)
+
+
+## Connects [param sig] to [method call_method]
+func connect_signals(sigs: Array[Signal]) -> void:
+	for sig: Signal in sigs:
+		sig.connect(call_method)
 
 #endregion
 

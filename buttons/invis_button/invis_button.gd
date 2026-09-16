@@ -1,7 +1,6 @@
 class_name InvisButton
 extends Button
 
-
 signal left_pressed
 signal right_pressed
 
@@ -23,16 +22,13 @@ const BUTTON_UP_AUDIO_POOL: Array[StringName] = [
 	&"button_up_3",
 	&"button_up_4",
 ]
-
 @export var audio_enabled: bool = true
 @export var separate_audios: bool = true
 
 var color: Color:
 	set = _set_color
 
-
 #region Set Get
-
 
 func _set_color(val: Color) -> void:
 	if color == val:
@@ -40,17 +36,14 @@ func _set_color(val: Color) -> void:
 	color = val
 	modulate = val
 
-
 #endregion
 
-
 #region Signals
-
 
 func _on_gui_input(_event: InputEvent) -> void:
 	if not visible or disabled:
 		return
-	
+
 	if _event.is_action_pressed(&"ui_accept"):
 		left_pressed.emit()
 	elif _event.is_action_pressed(&"joy_y"):
@@ -67,12 +60,9 @@ func _on_button_up() -> void:
 		return
 	_play_button_up_audio()
 
-
 #endregion
 
-
 #region Actions
-
 
 func disable() -> void:
 	disabled = true
@@ -89,12 +79,9 @@ func set_pointing_hand_cursor_shape() -> void:
 func set_arrow_cursor_shape() -> void:
 	mouse_default_cursor_shape = Control.CURSOR_ARROW
 
-
 #endregion
 
-
 #region Private
-
 
 func _play_appropriate_audio() -> void:
 	if separate_audios:
@@ -110,12 +97,13 @@ func _play_button_click_audio() -> void:
 
 func _play_button_down_audio() -> void:
 	if audio_enabled:
-		Main.play_audio(ResourceBag.get_audio(BUTTON_DOWN_AUDIO_POOL.pick_random()), Utility.AudioLayer.UI)
+		var audio: AudioStream = ResourceBag.get_audio(BUTTON_DOWN_AUDIO_POOL.pick_random())
+		Main.play_audio(audio, Utility.AudioLayer.UI)
 
 
 func _play_button_up_audio() -> void:
 	if audio_enabled:
-		Main.play_audio(ResourceBag.get_audio(BUTTON_UP_AUDIO_POOL.pick_random()), Utility.AudioLayer.UI)
-
+		var audio: AudioStream = ResourceBag.get_audio(BUTTON_UP_AUDIO_POOL.pick_random())
+		Main.play_audio(audio, Utility.AudioLayer.UI)
 
 #endregion

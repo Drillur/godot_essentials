@@ -35,12 +35,12 @@ const POW10: Array[float] = [
 
 # Do not alter these! They are used throughout the code base for comparisons etc.
 static var NEGATIVE_ONE: Big = Big.new(-1.0)
-static var ZERO: Big = Big.new(0.0, 0)
+static var ZERO: Big = Big.new(0.0)
 static var ONE_PERCENT: Big = Big.new(0.01)
-static var ONE: Big = Big.new(1.0, 0)
-static var TEN: Big = Big.new(10.0, 0)
-static var SIXTY: Big = Big.new(60.0, 0)
-static var ONE_E_10: Big = Big.new("1e10")
+static var ONE: Big = Big.new(1.0)
+static var TEN: Big = Big.new(10.0)
+static var SIXTY: Big = Big.new(60.0)
+static var ONE_E_10: Big = Big.new(1, 10)
 
 var mantissa: float
 var exponent: int
@@ -212,7 +212,7 @@ static func multiply(_x: Variant, _y: Variant) -> Big:
 
 
 static func divide(_x: Variant, _y: Variant) -> Big:
-	_x = to_big(_x)
+	_x = Big.new(_x)
 	_y = to_big(_y)
 
 	if _y.mantissa == 0.0:
@@ -221,10 +221,6 @@ static func divide(_x: Variant, _y: Variant) -> Big:
 
 	var new_exponent: int = _x.exponent - _y.exponent
 	var new_mantissa: float = _x.mantissa / _y.mantissa
-	while new_mantissa > 0.0 and new_mantissa < 1.0 and new_exponent > 0:
-		new_mantissa *= 10.0
-		new_exponent -= 1
-
 	var result := Big.new(new_mantissa, new_exponent)
 	return result
 
@@ -663,6 +659,10 @@ func is_greater_than_or_equal_to(_n: Variant) -> bool:
 
 func is_less_than(_n: Variant) -> bool:
 	_n = to_big(_n)
+	var sign_self := signf(mantissa)
+	var sign_n := signf(_n.mantissa)
+	if sign_self != sign_n:
+		return sign_self < sign_n
 	if mantissa == 0.0 and _n.mantissa == 0.0:
 		return false
 	if exponent < _n.exponent:
@@ -773,7 +773,7 @@ func to_letters_notation() -> String:
 	if mantissa_text == "1000":
 		mantissa_text = "1"
 		index += 1
-		if index >= LoudNumber.STANDARD_SUFFIXES.size():
+		if index >= LoudNumber.LETTER_SUFFIXES.size():
 			return to_scientific_notation()
 	if mantissa_text.ends_with(".0"):
 		mantissa_text = mantissa_text.replace(".0", "")

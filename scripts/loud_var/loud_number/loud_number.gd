@@ -338,7 +338,7 @@ static func format_percent(percent: float) -> String:
 	var floor_log: int = floori(log(percent) / NATURAL_LOG)
 
 	# Huge percent
-	if floor_log >= 6:
+	if floor_log >= 3:
 		return Big.new(percent).get_text() + "%"
 
 	# Very small % to 100%
@@ -513,7 +513,7 @@ func remove_pending(source: Variant) -> void:
 
 #region Action
 
-func copycat(cat: Resource) -> void:
+func copycat(cat: LoudNumber) -> void:
 	copycat_num = cat
 	copycat_num.changed.connect(copycat_changed)
 	copycat_changed()

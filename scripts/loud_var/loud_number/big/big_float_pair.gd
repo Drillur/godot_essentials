@@ -1,11 +1,11 @@
 class_name BigFloatPair
 extends Resource
+## DEPRECATED. Use LoudBigPair
 
 signal filled
 signal emptied
 
-@export var current: BigFloat
-
+var current: BigFloat
 var total: BigFloat
 var cap_current := true
 
@@ -15,10 +15,10 @@ func _init(base_value = 1.0, base_total = base_value) -> void:
 	current = BigFloat.new(base_value)
 	total = BigFloat.new(base_total)
 
-	current.changed.connect(emit_changed)
+	current.changed.connect(changed.emit)
 	current.increased.connect(check_if_full.unbind(1))
 	current.decreased.connect(check_if_empty.unbind(1))
-	total.changed.connect(emit_changed)
+	total.changed.connect(changed.emit)
 	total.changed.connect(check_if_full)
 	total.changed.connect(check_if_empty)
 

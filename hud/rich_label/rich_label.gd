@@ -2,12 +2,6 @@
 class_name RichLabel
 extends RichTextLabel
 
-enum AttachType {
-	NONE,
-	PRICE,
-	CURRENCY,
-}
-
 @export var autowrap := true:
 	set = _set_autowrap
 @export var hide_icon := false
@@ -22,7 +16,8 @@ enum AttachType {
 @export var font_size := 12:
 	set = _set_font_size
 @export var prepended_text: String = ""
-@export var appended_text: String = ""
+@export var appended_text: String = "":
+	set = _set_appended_text
 ## If true, custom_minimum_size will update when size changes to match the largest size
 @export_group("Time Mode")
 @export var time_mode := false
@@ -36,7 +31,6 @@ var queue: Queueable
 var color_queue: Queueable
 var watched_strings: Array[LoudString]
 var base_text: String
-var attach_type: AttachType
 var standard_theme: bool
 
 #region Init
@@ -49,8 +43,6 @@ func _ready() -> void:
 
 	if text.contains("[img") and not text.contains("uid"):
 		printerr("Do not add [img] bbcode in labels without UID. ", text)
-		#print(" - Why not? Because if the path, UID, or size of your image changes, it can cause misc issues. Future-proof your game! Don't freakin do it!")
-		pass
 
 	set_physics_process(false)
 	set_base_text()
@@ -137,12 +129,18 @@ func _set_center(val: bool) -> void:
 			text = "[center]" + text
 
 
+func _set_appended_text(val: String) -> void:
+	if appended_text == val:
+		return
+	appended_text = val
+	if is_node_ready():
+		set_base_text()
+
+
 func _set_font_size(val: int) -> void:
 	if font_size == val:
 		return
 	font_size = val
-	#if not Engine.is_editor_hint():
-	#return
 	if text.contains("[font_size="):
 		var previous_font_size_text: String = text.split("[font_size=")[1].split("]")[0]
 		text = text.replace("[font_size=%s]" % previous_font_size_text, "")
@@ -169,12 +167,8 @@ func enable_autowrap() -> void:
 
 
 func _validate_queue() -> void:
-	if not queue:
-		queue = await Queueable.new_node_queueable(
-			self,
-			Queueable.CooldownType.DURATION,
-			0.1,
-		)
+	if queue == null:
+		queue = await Queueable.new_node_queueable(self, Queueable.CooldownType.DURATION, 0.1)
 
 
 func reset() -> void:
@@ -232,7 +226,6 @@ func attach_string(_strings: Variant) -> void:
 	queue.method = string_changed
 	for x in watched_strings:
 		x.changed.connect(queue.call_method)
-	#string_changed()
 	queue.call_method()
 
 
@@ -264,17 +257,10 @@ var offset: Big
 
 
 func clear_value() -> void:
-	assert(currency == null, "You probably don't want to clear_value when a currency is attached. fix ur shit ")
 	if value:
 		value.changed.disconnect(queue.call_method)
 		value = null
 	offset = null
-	match attach_type:
-		AttachType.PRICE, AttachType.CURRENCY:
-			if currency:
-				currency.amount.changed.disconnect(queue.call_method)
-				currency = null
-	attach_type = AttachType.NONE
 
 
 func attach_float_pair(_value: LoudFloatPair) -> void:
@@ -341,7 +327,14 @@ func attach_big_float(_value: BigFloat, _offset: Variant = null) -> void:
 	_validate_queue()
 	if value:
 		var new_offset: Big = Big.new(_offset) if _offset != null else null
-		if value == _value and ((offset == null and new_offset == null) or offset.is_equal_to(new_offset)):
+		var nope: bool = (
+				value == _value
+				and (
+						(offset == null and new_offset == null)
+						or offset.is_equal_to(new_offset)
+				)
+		)
+		if nope:
 			return
 		clear_value()
 	value = _value
@@ -391,7 +384,6 @@ func _update_text__percent_mode() -> void:
 			value is LoudFloatPair
 			or value is LoudIntPair
 			or value is BigFloatPair)
-
 	write(
 		LoudNumber.format_percent(
 			value.get_current_percent() if value_is_pair else value.times(LoudFloat.ONE_PERCENT),
@@ -430,44 +422,5 @@ func _update_text__time_mode() -> void:
 				write(value.get_text() + "/s")
 
 #endregion
-
-#endregion
-
-#region game-specific
-
-var currency: Currency
-
-
-func attach_price(key: StringName, _price: Price) -> void:
-	attach_type = AttachType.PRICE
-	await _validate_queue()
-	currency = Currency.fetch(key)
-	value = _price.current[key]
-	queue.method = update_text_price
-	currency.amount.changed.connect(queue.call_method)
-	value.changed.connect(queue.call_method)
-	update_text_price()
-
-
-func clear_price() -> void:
-	queue.clear()
-	clear_currency()
-	clear_value()
-
-
-func update_text_price() -> void:
-	if value == null:
-		return
-	var result_text: String = value.get_text()
-	if not hide_icon:
-		result_text += currency.details.get_icon_and_name()
-	write.call_deferred(result_text)
-
-
-func clear_currency() -> void:
-	if not currency:
-		return
-	currency.amount.changed.disconnect(queue.call_method)
-	currency = null
 
 #endregion

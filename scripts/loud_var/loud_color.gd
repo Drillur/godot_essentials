@@ -1,35 +1,30 @@
 class_name LoudColor
 extends LoudVar
 
-
-signal changed_with_color(color)
-
-@export var current: Color: set = _set_current
+@export var current: Color:
+	set = _set_current
 
 var base: Color
 
-
 #region Static
-
 
 static func get_color_from_dict(_data: Dictionary) -> Color:
 	return Color(
-			_data.get("r", 1.0),
-			_data.get("g", 1.0),
-			_data.get("b", 1.0),
-			_data.get("a", 1.0))
-
+		_data.get("r", 1.0),
+		_data.get("g", 1.0),
+		_data.get("b", 1.0),
+		_data.get("a", 1.0),
+	)
 
 #endregion
 
-
 #region Init
-
 
 func _init(r: Variant = Color.WHITE, g := 1.0, b := 1.0, a := 1.0) -> void:
 	if r is Color:
 		base = r
 	elif r is String:
+		assert(Color.html_is_valid(r), "Not a valid HTML string: %s" % r)
 		base = Color.html(r)
 	elif r is LoudColor:
 		base = r.val()
@@ -37,28 +32,21 @@ func _init(r: Variant = Color.WHITE, g := 1.0, b := 1.0, a := 1.0) -> void:
 		base = Color(r, g, b, a)
 	current = base
 
-
 #endregion
 
-
 #region Setters
-
 
 func _set_current(new_current: Color) -> void:
 	if current == new_current:
 		return
-	
-	current = new_current
-	
-	emit_changed()
-	changed_with_color.emit(new_current)
 
+	current = new_current
+
+	changed.emit()
 
 #endregion
 
-
 #region Action
-
 
 func set_to(_val: Color) -> void:
 	current = _val
@@ -76,7 +64,7 @@ func subscribe_node(node: CanvasItem) -> void:
 	var has_color: bool = node.get("color") != null
 	var is_scroll_container: bool = node is ScrollContainer
 	var is_tab_container: bool = node is TabContainer
-	
+
 	var update_color := func():
 		if has_color:
 			node.color = get_value()
@@ -87,17 +75,14 @@ func subscribe_node(node: CanvasItem) -> void:
 			node.add_theme_color_override(_NAME, get_value())
 		else:
 			node.modulate = get_value()
-	
+
 	node.tree_exiting.connect(changed.disconnect.bind(update_color))
 	changed.connect(update_color)
 	update_color.call()
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> Color:
 	return current
@@ -109,6 +94,5 @@ func val() -> Color:
 
 func get_text() -> String:
 	return str(current)
-
 
 #endregion

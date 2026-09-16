@@ -28,7 +28,6 @@ var subtracters: Array[Resource]
 var multipliers: Array[Resource] ## As of Stage 3, the highest adders.size() I saw was 18
 var conditional_multipliers: Dictionary[Variant, ConditionalEntry]
 var dividers: Array[Resource]
-var powerers: Array[Resource]
 
 var book: Dictionary[Category, LoudDict] = { }
 
@@ -215,6 +214,8 @@ func conditional_multiplier_changed(conditional_entry: ConditionalEntry) -> void
 #endregion
 
 func add_divider(object: LoudNumber) -> void:
+	if dividers.has(object) or object.changed.is_connected(divider_changed):
+		return
 	dividers.append(object)
 	object.changed.connect(divider_changed.bind(object))
 	divider_changed(object)
@@ -253,44 +254,16 @@ func get_added():
 	return book[Book.Category.ADDED].sum
 
 
-func get_added_text() -> String:
-	var sum: Variant = get_added()
-	if type == Type.INT or type == Type.FLOAT:
-		return LoudNumber.format_number(sum)
-	return sum.get_text()
-
-
 func get_subtracted():
 	return book[Book.Category.SUBTRACTED].sum
-
-
-func get_subtracted_text() -> String:
-	var sum: Variant = get_subtracted()
-	if type == Type.INT or type == Type.FLOAT:
-		return LoudNumber.format_number(sum)
-	return sum.get_text()
 
 
 func get_multiplied():
 	return book[Book.Category.MULTIPLIED].sum
 
 
-func get_multiplied_text() -> String:
-	var sum: Variant = get_multiplied()
-	if type == Type.INT or type == Type.FLOAT:
-		return LoudNumber.format_number(sum)
-	return sum.get_text()
-
-
 func get_divided():
 	return book[Book.Category.DIVIDED].sum
-
-
-func get_divided_text() -> String:
-	var sum: Variant = get_divided()
-	if type == Type.INT or type == Type.FLOAT:
-		return LoudNumber.format_number(sum)
-	return sum.get_text()
 
 
 func get_pending():
@@ -299,15 +272,6 @@ func get_pending():
 
 func get_added_from_source(_source: Variant) -> Variant:
 	return book[Book.Category.ADDED].get_value(_source)
-
-	#func report() -> void:
-	#Log.prn("Added:", get_added_text(), book[Book.Category.ADDED].data,
-	#"\nMultiplied:", get_multiplied_text(), book[Book.Category.MULTIPLIED].data
-	#)
-	#Log.prn(
-	#"Subtracted:", get_subtracted_text(), book[Book.Category.SUBTRACTED].data,
-	#"\nDivided:", get_divided_text(), book[Book.Category.DIVIDED].data,
-	#)
 
 #endregion
 

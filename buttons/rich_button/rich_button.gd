@@ -136,9 +136,7 @@ func _ready():
 	update_check_button_visibility()
 
 	if not Engine.is_editor_hint():
-		if not Main.done.is_true():
-			await Main.done.became_true
-		Settings.joypad_detected.changed.connect(_update_focus_mode)
+		joypad_detected.changed.connect(_update_focus_mode)
 		_update_focus_mode()
 
 
@@ -395,15 +393,16 @@ func _on_focus_entered() -> void:
 
 #region Focus
 
+## Copycats Settings.joypad_detected
+static var joypad_detected := LoudBool.new(false)
+
+
 func _update_focus_mode() -> void:
 	focus_mode = (
 			Control.FOCUS_ALL
-			if allow_focus and Settings.joypad_detected.is_true()
+			if allow_focus and joypad_detected.is_true()
 			else Control.FOCUS_NONE
 	)
 	invis_button.focus_mode = focus_mode
 
 #endregion
-
-func _on_confirm_mouse_entered() -> void:
-	pass # Replace with function body.

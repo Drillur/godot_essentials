@@ -1,7 +1,6 @@
 class_name LoudFloat
 extends LoudNumber
 
-
 const ONE: float = 1.0
 const ZERO: float = 0.0
 const ONE_PERCENT: float = 0.01
@@ -21,9 +20,7 @@ var custom_minimum_limit := LoudNumber.MIN_FLOAT:
 var custom_maximum_limit := LoudNumber.MAX_FLOAT:
 	set = _set_maximum_limit
 
-
 #region Static
-
 
 static func roll_as_int(n: float) -> int:
 	var chance_to_return_plus_one: float = get_decimals(n)
@@ -52,19 +49,16 @@ static func to_float(n: Variant) -> float:
 				return float(n.current)
 	return float(n)
 
-
 #endregion
 
-
 #region Init
-
 
 func _init(_base: float = 0.0, _custom_minimum_limit := MIN_FLOAT, _custom_maximum_limit := MAX_FLOAT) -> void:
 	base = _base
 	current = base
 	previous = base
 	changed.connect(loud_number_init)
-	
+
 	custom_minimum_limit = _custom_minimum_limit
 	custom_maximum_limit = _custom_maximum_limit
 
@@ -75,28 +69,25 @@ func _create_book() -> void:
 	book.sync_allowed.became_true.connect(sync.call_deferred)
 	book.pending_changed.connect(pending_changed.emit)
 
-
 #endregion
-
 
 #region Setters
 
-
 func _set_current(n: float) -> void:
 	assert(not is_nan(n))
-	
+
 	#unclamped_value = n
 	n = clampf(n, custom_minimum_limit, custom_maximum_limit)
 	if is_zero_approx(n):
 		n = 0.0
-	
+
 	if current == n:
 		return
-	
+
 	previous = current
 	current = n
 	text_requires_update = true
-	
+
 	_emit_signals(previous, current)
 
 
@@ -114,12 +105,9 @@ func _set_maximum_limit(n: float) -> void:
 	custom_maximum_limit = n
 	clamp_current()
 
-
 #endregion
 
-
 #region Signals
-
 
 func _emit_signals(_previous: float, _current: float) -> void:
 	assert(_current != _previous, "Do not emit signals if nothing changed.")
@@ -127,12 +115,12 @@ func _emit_signals(_previous: float, _current: float) -> void:
 		decreased.emit(_previous - _current)
 	elif _previous < _current:
 		increased.emit(_current - _previous)
-	
+
 	if _previous == 0.0:
 		became_non_zero.emit(_current)
 	elif _current == 0.0:
 		became_zero.emit(_previous)
-	
+
 	changed.emit()
 
 
@@ -143,12 +131,9 @@ func save_pending_value() -> void:
 func load_pending_value() -> void:
 	plus_equals(saved_pending_value)
 
-
 #endregion
 
-
 #region Action
-
 
 func reset() -> void:
 	current = base
@@ -234,12 +219,9 @@ func set_bool_limiter(b: LoudBool, limit: float) -> void:
 func copy(loud_number: LoudNumber) -> void:
 	set_to(loud_number.val())
 
-
 #endregion
 
-
 #region Get
-
 
 func get_value() -> float:
 	return current
@@ -255,7 +237,7 @@ func get_effective_value() -> float:
 
 func get_text() -> String:
 	if text_requires_update:
-		update_text(current)#, unclamped_value)
+		update_text(current) #, unclamped_value)
 	return text
 
 
@@ -300,9 +282,7 @@ func get_x_percent(x: float) -> float:
 func is_zero() -> bool:
 	return is_equal_to(ZERO)
 
-
 #region - Operations
-
 
 func plus(_amount: float) -> float:
 	return current + _amount
@@ -327,8 +307,6 @@ func to_the_power_of(_n: float) -> float:
 func to_ceil() -> float:
 	return ceilf(current)
 
-
 #endregion
-
 
 #endregion
