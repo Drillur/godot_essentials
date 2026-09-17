@@ -52,7 +52,7 @@ signal toggled(_toggled: bool)
 		if not is_node_ready():
 			await ready
 		update_icon()
-@export_range(15, 64) var icon_size := 24:
+@export_range(15, 96) var icon_size := 24:
 	set(val):
 		icon_size = val
 		if not is_node_ready():

@@ -31,9 +31,6 @@ var data: Dictionary[StringName, Dictionary] = {
 ## skipped_data[&"all_data"] = [&"Currencies", &"LOREDs"][/code]
 var skipped_data: Dictionary[StringName, Array] = { }
 
-var script_count: int = 0 ## Pointless
-var line_count: int = 0 ## Also pointless
-
 #region Init
 
 func _ready():
@@ -43,12 +40,6 @@ func _ready():
 
 	if Utility.dev_mode:
 		Log.pr("Cached icons and nodes in", int(Time.get_ticks_msec() - start_time), "ms")
-		Log.pr(
-			"The game has %s scripts and %s lines" % [
-				script_count,
-				LoudNumber.format_number(line_count),
-			],
-		)
 
 	done.set_true()
 
@@ -132,11 +123,6 @@ func dir_contents(path: String) -> void:
 					audio_paths[_name] = _path
 				"gd":
 					script_paths[_name] = _path
-					if Utility.dev_mode:
-						script_count += 1
-						var script: GDScript = load(_path)
-						var total_lines: int = script.source_code.split("\n").size()
-						line_count += total_lines
 				"png", "svg":
 					texture_paths[_name] = _path
 				_:
