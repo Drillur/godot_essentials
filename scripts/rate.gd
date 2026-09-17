@@ -5,6 +5,11 @@ const SMOOTHING_THRESHOLD: int = 30
 
 static var list: Dictionary[Variant, Rate]
 
+## Called after each log() with the newly-averaged rate for a key.
+## avg is null when there's nothing left to average (the source should be cleared).
+## Wire this in your project's boot code if you want averages pushed somewhere.
+static var on_average_changed: Callable
+
 var production: Dictionary[StringName, Array]
 var consumption: Dictionary[StringName, Array]
 
@@ -72,27 +77,20 @@ func _init(
 
 func apply() -> void:
 	for key: StringName in production.keys():
-		var rate: Currency.CurrencyRate = Currency.fetch(key).average_rate
+		_apply_one(key, production[key], true)
+	for key: StringName in consumption.keys():
+		_apply_one(key, consumption[key], false)
 
-		var rates: Array = production[key]
-		if rates.size() == 0:
-			rate.gain.remove_added(self)
-			continue
 
-		var sum: Big = rates.reduce(Big.sum, Big.ZERO)
-		var avg: Big = sum.divided_by(rates.size())
-		rate.gain.edit_added(self, avg)
+func _apply_one(key: StringName, rates: Array, is_production: bool) -> void:
+	if not on_average_changed.is_valid():
+		return
 
-	for key: StringName in consumption:
-		var rate: Currency.CurrencyRate = Currency.fetch(key).average_rate
+	if rates.size() == 0:
+		on_average_changed.call(self, key, null, is_production)
+		return
 
-		var rates: Array = consumption[key]
-		if rates.size() == 0:
-			rate.loss.remove_added(self)
-			continue
-
-		var sum: Big = rates.reduce(Big.sum, Big.ZERO)
-		var avg: Big = sum.divided_by(rates.size())
-		rate.loss.edit_added(self, avg)
+	var sum: Big = rates.reduce(Big.sum, Big.ZERO)
+	on_average_changed.call(self, key, sum.divided_by(rates.size()), is_production)
 
 #endregion
